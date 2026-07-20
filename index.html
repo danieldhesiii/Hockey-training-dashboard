@@ -407,7 +407,41 @@ details.acc .inner{padding:0 14px 14px}
 <!-- ================= PROGRESS ================= -->
 <section class="page" id="p-log">
   <h2 class="ttl">Progress</h2>
-  <p class="sub">Bodyweight is your steering wheel for lean gain. Log it fasted, watch the trend, not the daily noise.</p>
+  <p class="sub">Log your food, water and bodyweight — then let the trend tell you whether your intake is actually driving lean gain.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Today’s intake</h3>
+    <div id="intakeToday"></div>
+    <div class="field" style="margin:10px 0 6px"><label>Log for date</label><input id="intakeDate" type="date"></div>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Add calories (kcal)</label>
+        <div style="display:flex;gap:8px">
+          <input id="calInput" type="number" inputmode="numeric" placeholder="e.g. 650">
+          <button class="btn" style="width:auto;margin:0;padding:0 18px" onclick="addCal()">Add</button>
+        </div>
+      </div>
+      <div class="field" style="margin:6px 0"><label>Add water</label>
+        <div style="display:flex;gap:6px">
+          <button class="btn ghost" style="margin:0;padding:12px 6px" onclick="addWater(250)">+250 ml</button>
+          <button class="btn ghost" style="margin:0;padding:12px 6px" onclick="addWater(500)">+500 ml</button>
+        </div>
+      </div>
+    </div>
+    <div class="toggle-row" style="margin:4px 0 0">
+      <span style="flex:1;font-size:12.5px">Daily water goal</span>
+      <select id="waterGoal" style="width:auto;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:8px 30px 8px 12px;border-radius:10px" onchange="saveWaterGoal()">
+        <option value="2500">2.5 L</option><option value="3000">3.0 L</option>
+        <option value="3500" selected>3.5 L</option><option value="4000">4.0 L</option><option value="4500">4.5 L</option>
+      </select>
+    </div>
+    <button class="btn ghost" style="margin-top:10px" onclick="clearToday()">Clear this day’s intake</button>
+    <div id="intakeList" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Intake vs weight</h3>
+    <div id="intakeInsight"></div>
+  </div>
 
   <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>Bodyweight log</h3>
@@ -855,6 +889,7 @@ function calc(){
   const bmr=Math.round(10*w+6.25*h-5*age+(curSex==='m'?5:-161));
   const tdee=Math.round(bmr*act);
   const target=Math.round(tdee+goal);
+  LS.set('tdee',tdee);LS.set('target',target);
   const prot=Math.round(ppk*w);
   const fat=Math.round(0.9*w);
   let carbKcal=target-(prot*4)-(fat*9);
@@ -871,6 +906,7 @@ function calc(){
     `≈ ${perMeal} g protein across 5 meals · carbs ≈ ${gkg} g/kg · ${goal>0?'lean-gain surplus of +'+goal+' kcal':goal<0?'deficit of '+goal+' kcal':'maintenance'}. `+
     (curSex==='f'?'':'')+`Recalculate as your bodyweight climbs.`;
   planCalc();
+  if(document.getElementById('intakeToday'))renderIntake();
 }
 function planCalc(){
   const cur=num('weight'),tgt=num('target'),rate=parseFloat(document.getElementById('rate').value);
@@ -928,6 +964,93 @@ function addBW(){
   LS.set('bw',data);document.getElementById('bwInput').value='';renderBW();
 }
 function delBW(i){const data=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);data.splice(i,1);LS.set('bw',data);renderBW();}
+
+/* ============ DAILY INTAKE (calories + water) ============ */
+function intakeDateVal(){const d=document.getElementById('intakeDate').value;return d||new Date().toISOString().slice(0,10);}
+function getIntake(){return LS.get('intake',[]);}
+function findDay(data,d){return data.findIndex(x=>x.d===d);}
+function bar(pct,fill){pct=Math.max(0,Math.min(100,pct));
+  return `<div style="background:var(--bg2);border:1px solid var(--line);border-radius:999px;height:12px;overflow:hidden;margin:6px 0 12px"><div style="height:100%;width:${pct}%;background:${fill};border-radius:999px;transition:.3s"></div></div>`;}
+function addCal(){
+  const add=parseFloat(document.getElementById('calInput').value);
+  if(!add){alert('Enter calories');return;}
+  const d=intakeDateVal(),data=getIntake(),i=findDay(data,d);
+  if(i>=0)data[i].kcal=(data[i].kcal||0)+add;else data.push({d,kcal:add,water:0});
+  LS.set('intake',data);document.getElementById('calInput').value='';renderIntake();
+}
+function addWater(ml){
+  const d=intakeDateVal(),data=getIntake(),i=findDay(data,d);
+  if(i>=0)data[i].water=(data[i].water||0)+ml;else data.push({d,kcal:0,water:ml});
+  LS.set('intake',data);renderIntake();
+}
+function clearToday(){
+  const d=intakeDateVal(),data=getIntake(),i=findDay(data,d);
+  if(i>=0&&confirm('Clear calories & water logged for '+d+'?')){data.splice(i,1);LS.set('intake',data);renderIntake();}
+}
+function delIntake(d){const data=getIntake(),i=findDay(data,d);if(i>=0){data.splice(i,1);LS.set('intake',data);renderIntake();}}
+function saveWaterGoal(){LS.set('waterGoal',parseInt(document.getElementById('waterGoal').value));renderIntake();}
+function renderIntake(){
+  const data=getIntake(),d=intakeDateVal();
+  const wg=LS.get('waterGoal',3500);
+  const sel=document.getElementById('waterGoal');if(sel)sel.value=wg;
+  const target=LS.get('target',0);
+  const today=data.find(x=>x.d===d)||{kcal:0,water:0};
+  const kcal=today.kcal||0,water=today.water||0;
+  let calLine;
+  if(target){const rem=target-kcal;
+    calLine=`<div class="kv" style="border:none;padding-bottom:0"><span class="k">Calories</span><span class="v">${kcal.toLocaleString()} / ${target.toLocaleString()} kcal <span style="font-weight:400;color:${rem>=0?'var(--dim)':'#fb7185'}">(${rem>=0?rem.toLocaleString()+' left':Math.abs(rem).toLocaleString()+' over'})</span></span></div>`
+      +bar(kcal/target*100,'linear-gradient(90deg,#fbbf24,#f59e0b)');
+  }else{
+    calLine=`<div class="kv" style="border:none;padding-bottom:0"><span class="k">Calories</span><span class="v">${kcal.toLocaleString()} kcal</span></div>`
+      +`<div class="note" style="margin:6px 0 12px">Set your target in the <b onclick="go('calc')" style="cursor:pointer">Calorie Calculator</b> to track calories remaining.</div>`;
+  }
+  const waterL=(water/1000).toFixed(2),wgL=(wg/1000).toFixed(1);
+  const waterLine=`<div class="kv" style="border:none;padding-bottom:0"><span class="k">Water</span><span class="v">${waterL} / ${wgL} L</span></div>`
+    +bar(water/wg*100,'linear-gradient(90deg,#38bdf8,#0ea5e9)');
+  document.getElementById('intakeToday').innerHTML=calLine+waterLine;
+  const list=document.getElementById('intakeList');
+  const sorted=data.slice().sort((a,b)=>a.d<b.d?1:-1);
+  list.innerHTML=sorted.length
+    ? '<div class="blocklabel b-warm" style="margin:10px 0 4px">History</div>'+sorted.map(x=>`<div class="logrow"><span>${x.d}</span><span>${(x.kcal||0).toLocaleString()} kcal · ${((x.water||0)/1000).toFixed(2)} L <span class="del" onclick="delIntake('${x.d}')">✕</span></span></div>`).join('')
+    : '';
+  renderIntakeInsight();
+}
+function renderIntakeInsight(){
+  const host=document.getElementById('intakeInsight');if(!host)return;
+  const intake=getIntake().filter(x=>(x.kcal||0)>0).sort((a,b)=>a.d<b.d?-1:1);
+  const bw=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);
+  const target=LS.get('target',0),tdee=LS.get('tdee',0);
+  if(intake.length<3){
+    host.innerHTML='<p style="color:var(--dim);font-size:13px;margin:0">Log at least <b>3 days of calories</b> (and keep weighing in) to see whether your intake is driving the weight change you want.</p>';
+    return;
+  }
+  const recent=intake.slice(-14);
+  const avgCal=Math.round(recent.reduce((s,x)=>s+(x.kcal||0),0)/recent.length);
+  let trend=null;
+  if(bw.length>=2){
+    const first=bw[0],last=bw[bw.length-1];
+    const days=(new Date(last.d)-new Date(first.d))/86400000;
+    if(days>=1)trend=(last.w-first.w)/days*7;
+  }
+  let rows=`<div class="kv"><span class="k">Avg intake (last ${recent.length} logged ${recent.length===1?'day':'days'})</span><span class="v">${avgCal.toLocaleString()} kcal</span></div>`;
+  if(target)rows+=`<div class="kv"><span class="k">Lean-gain target</span><span class="v">${target.toLocaleString()} kcal</span></div>`;
+  if(tdee)rows+=`<div class="kv"><span class="k">Est. maintenance</span><span class="v">${tdee.toLocaleString()} kcal</span></div>`;
+  if(trend!==null)rows+=`<div class="kv"><span class="k">Weight trend</span><span class="v" style="color:${trend>0.02?'#4ade80':trend<-0.02?'#fb7185':'#93a4c7'}">${trend>=0?'+':''}${trend.toFixed(2)} kg/wk</span></div>`;
+  let msg;
+  if(trend===null){
+    msg='Add a few <b>bodyweight</b> entries over several days to unlock the trend comparison.';
+  }else if(trend>0.45){
+    msg=`Gaining <b>${trend.toFixed(2)} kg/wk</b> — faster than the lean-gain range (0.2–0.35). Trim ~150–250 kcal/day (mostly carbs & fat, keep protein high) to stay lean.`;
+  }else if(trend>=0.2){
+    msg=`Right in the sweet spot at <b>${trend.toFixed(2)} kg/wk</b>. Your intake is dialled in — hold it steady and keep logging.`;
+  }else if(trend>0){
+    msg=`Gaining slowly (<b>${trend.toFixed(2)} kg/wk</b>). For faster lean gain add ~150 kcal/day; if you're happy with the pace, this is about as lean as it gets.`;
+  }else{
+    msg=`Not gaining (<b>${trend.toFixed(2)} kg/wk</b>). For lean gain, add ~150–250 kcal/day`+(tdee&&avgCal<tdee?` — you're averaging <b>below</b> your estimated maintenance, so you can't build.`:`.`);
+  }
+  host.innerHTML=rows+`<div class="note" style="margin-top:12px">${msg}</div>`;
+}
+
 function addPR(){
   const lift=document.getElementById('prLift').value;const val=document.getElementById('prVal').value.trim();
   if(!val){alert('Enter your top set');return;}
@@ -944,7 +1067,7 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','sex','gameOn'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
@@ -964,7 +1087,8 @@ document.getElementById('phaseTag2').textContent=PHASES[phase].name;
 document.getElementById('phasePill').textContent='In-Season · '+PHASES[phase].name;
 document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===curSex));
 document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
-renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();
+document.getElementById('intakeDate').value=new Date().toISOString().slice(0,10);
+renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();renderIntake();
 go('home');
 
 /* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
