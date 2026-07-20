@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hockey System">
+<title>Hockey Performance System</title>
+<link rel="manifest" href='data:application/manifest+json,{"name":"Hockey Performance System","short_name":"Hockey","start_url":".","display":"standalone","background_color":"#0b1220","theme_color":"#0b1220","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 192 192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2236%22 fill=%22%230b1220%22/%3E%3Ctext x=%2296%22 y=%22132%22 font-size=%22120%22 text-anchor=%22middle%22%3E%F0%9F%8F%92%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<style>
+:root{
+  --bg:#0b1220; --bg2:#111a2e; --card:#141e35; --card2:#1a2740;
+  --line:#243352; --txt:#e8eefc; --muted:#93a4c7; --dim:#66799e;
+  --ice:#38bdf8; --ice2:#0ea5e9; --deep:#1d4ed8;
+  --hard:#f43f5e; --mod:#f59e0b; --easy:#22c55e; --power:#a78bfa; --game:#ef4444;
+  --ok:#34d399; --shadow:0 8px 30px rgba(0,0,0,.35);
+  --r:16px; --maxw:1000px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1200px 700px at 50% -10%,#16233f 0%,var(--bg) 55%) fixed;
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:88px;
+}
+a{color:var(--ice)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px}
+header.top{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(180deg,rgba(11,18,32,.96),rgba(11,18,32,.82));
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;padding:14px 16px;max-width:var(--maxw);margin:0 auto}
+.puck{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--ice),var(--deep));
+  display:grid;place-items:center;font-size:22px;box-shadow:0 6px 18px rgba(56,189,248,.35)}
+.brand h1{font-size:17px;margin:0;letter-spacing:.3px}
+.brand p{margin:0;font-size:12px;color:var(--muted)}
+.phasepill{margin-left:auto;font-size:11px;color:var(--ice);border:1px solid var(--line);
+  background:var(--card);padding:6px 10px;border-radius:999px;white-space:nowrap}
+
+/* Tabs */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:rgba(13,20,36,.95);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);display:flex;justify-content:center;
+  padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+}
+.tabbar .inner{display:flex;gap:2px;max-width:var(--maxw);width:100%;overflow-x:auto;scrollbar-width:none}
+.tabbar .inner::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;min-width:62px;background:none;border:none;color:var(--dim);
+  font-size:10.5px;font-weight:600;padding:8px 6px 4px;border-radius:12px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
+.tab .ic{font-size:19px;line-height:1}
+.tab.active{color:var(--ice);background:rgba(56,189,248,.10)}
+.tab:active{transform:scale(.94)}
+
+section.page{display:none;padding:20px 0 10px;animation:fade .25s ease}
+section.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+h2.ttl{font-size:22px;margin:2px 0 4px;letter-spacing:.2px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+h3{font-size:16px;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+h3 .bar{width:4px;height:18px;border-radius:3px;background:var(--ice)}
+h4{font-size:14px;margin:18px 0 8px;color:var(--txt)}
+
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+  border-radius:var(--r);padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+.card.tight{padding:13px 14px}
+.grid{display:grid;gap:12px}
+@media(min-width:640px){.grid.g2{grid-template-columns:1fr 1fr}.grid.g3{grid-template-columns:1fr 1fr 1fr}}
+
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:999px;
+  letter-spacing:.4px;text-transform:uppercase}
+.t-hard{background:rgba(244,63,94,.15);color:#fb7185;border:1px solid rgba(244,63,94,.3)}
+.t-mod{background:rgba(245,158,11,.15);color:#fbbf24;border:1px solid rgba(245,158,11,.3)}
+.t-easy{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.t-power{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.3)}
+.t-game{background:rgba(239,68,68,.18);color:#f87171;border:1px solid rgba(239,68,68,.35)}
+.t-ice{background:rgba(56,189,248,.14);color:var(--ice);border:1px solid rgba(56,189,248,.3)}
+
+/* Weekly grid */
+.week{display:grid;gap:10px}
+.day{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:13px 14px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.day:hover{border-color:var(--ice2)}
+.day .accent{position:absolute;left:0;top:0;bottom:0;width:4px}
+.day .dname{min-width:46px;font-weight:800;font-size:13px;color:var(--muted);padding-left:6px}
+.day .dbody{flex:1}
+.day .dbody .role{font-weight:700;font-size:14.5px;margin-bottom:2px}
+.day .dbody .desc{font-size:12.5px;color:var(--muted)}
+.day .chev{color:var(--dim);align-self:center;font-size:20px}
+
+.acc-hard{background:var(--hard)} .acc-mod{background:var(--mod)} .acc-easy{background:var(--easy)}
+.acc-power{background:var(--power)} .acc-game{background:var(--game)}
+
+/* Exercise tables */
+.ex{margin:8px 0}
+.ex table{width:100%;border-collapse:collapse;font-size:13px}
+.ex th{text-align:left;color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase;
+  letter-spacing:.4px;padding:6px 8px;border-bottom:1px solid var(--line)}
+.ex td{padding:9px 8px;border-bottom:1px solid rgba(36,51,82,.5);vertical-align:top}
+.ex td.exn{font-weight:600}
+.ex td .cue{display:block;color:var(--dim);font-size:11.5px;margin-top:2px}
+.ex td.scheme{white-space:nowrap;color:var(--ice);font-variant-numeric:tabular-nums;font-weight:600}
+.blocklabel{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--power);margin:16px 0 4px}
+.blocklabel.b-str{color:var(--ice)} .blocklabel.b-cond{color:var(--mod)}
+.blocklabel.b-prehab{color:var(--easy)} .blocklabel.b-warm{color:var(--muted)}
+
+ul.clean{list-style:none;padding:0;margin:8px 0}
+ul.clean li{padding:7px 0 7px 24px;position:relative;font-size:13.5px;border-bottom:1px solid rgba(36,51,82,.4)}
+ul.clean li:last-child{border-bottom:none}
+ul.clean li:before{content:"";position:absolute;left:4px;top:14px;width:7px;height:7px;
+  border-radius:2px;background:var(--ice);transform:rotate(45deg)}
+ul.clean li b{color:#fff}
+
+.note{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.25);border-radius:12px;
+  padding:11px 13px;font-size:13px;color:var(--muted);margin:12px 0}
+.note b{color:var(--ice)}
+.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3)}
+.warn b{color:var(--mod)}
+
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid rgba(36,51,82,.5);font-size:13.5px}
+.kv:last-child{border:none}
+.kv .k{color:var(--muted)} .kv .v{font-weight:700;color:#fff;text-align:right}
+
+/* Calculator */
+.field{margin:12px 0}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.field input,.field select{width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;
+  padding:12px 12px;border-radius:12px;font-size:15px;font-family:inherit;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus{outline:none;border-color:var(--ice)}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%2393a4c7' stroke-width='2' fill='none'/></svg>");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:34px}
+.seg{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{flex:1;background:none;border:none;color:var(--muted);padding:9px;border-radius:9px;
+  font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:inherit}
+.seg button.on{background:var(--ice);color:#04121f}
+.btn{width:100%;background:linear-gradient(135deg,var(--ice),var(--ice2));color:#04121f;border:none;
+  padding:14px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px;font-family:inherit}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+.result{background:linear-gradient(135deg,#0e2036,#0c1a2e);border:1px solid var(--ice2);border-radius:16px;padding:18px;margin:16px 0}
+.bignum{font-size:40px;font-weight:800;color:var(--ice);line-height:1;font-variant-numeric:tabular-nums}
+.bignum small{font-size:14px;color:var(--muted);font-weight:600}
+.macros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.macro{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}
+.macro .mg{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.macro .ml{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.macro.p .mg{color:#f87171}.macro.c .mg{color:#fbbf24}.macro.f .mg{color:#818cf8}
+
+/* progress */
+.spark{width:100%;height:70px;display:block}
+.logrow{display:flex;justify-content:space-between;font-size:13px;padding:8px 4px;border-bottom:1px solid rgba(36,51,82,.5)}
+.logrow .del{color:var(--dim);cursor:pointer;font-weight:700}
+.chip{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:12px;margin:3px 4px 3px 0;color:var(--muted)}
+
+details.acc{border:1px solid var(--line);border-radius:12px;margin:8px 0;background:var(--card);overflow:hidden}
+details.acc>summary{padding:13px 14px;cursor:pointer;font-weight:700;font-size:14px;list-style:none;
+  display:flex;align-items:center;gap:8px}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary:after{content:"+";margin-left:auto;color:var(--dim);font-size:18px;font-weight:400}
+details.acc[open]>summary:after{content:"–"}
+details.acc .inner{padding:0 14px 14px}
+
+.foot{color:var(--dim);font-size:11.5px;text-align:center;padding:24px 10px 6px;line-height:1.7}
+.hidegame{opacity:.5}
+.toggle-row{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:13.5px;color:var(--muted)}
+.switch{position:relative;width:46px;height:26px;flex:none}
+.switch input{display:none}
+.switch .sl{position:absolute;inset:0;background:var(--card2);border:1px solid var(--line);border-radius:999px;transition:.2s}
+.switch .sl:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.2s}
+.switch input:checked+.sl{background:rgba(56,189,248,.3);border-color:var(--ice)}
+.switch input:checked+.sl:before{transform:translateX(20px);background:var(--ice)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="puck">🏒</div>
+    <div>
+      <h1>Hockey Performance System</h1>
+      <p>Strength · Power · Speed · Conditioning · Nutrition</p>
+    </div>
+    <div class="phasepill" id="phasePill">In-Season · 6+Game</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ================= OVERVIEW ================= -->
+<section class="page active" id="p-home">
+  <h2 class="ttl">Your System</h2>
+  <p class="sub">A complete, physiology-driven plan built around your Saturday game. Everything below works fully offline — save it to your home screen.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>How this is built</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 6px">Hockey is an <b style="color:#fff">alactic-aerobic</b> sport: repeated 40–60s max-effort shifts with ~2–3× rest, decided by explosive first strides, shot power, and how fast you recover between bursts. So the plan trains, in priority order:</p>
+    <ul class="clean">
+      <li><b>Max strength</b> — the base that makes every stride, hit and shot more forceful.</li>
+      <li><b>Power &amp; speed</b> — converting that strength into fast, explosive output (jumps, throws, Olympic variations, sprints, contrast work).</li>
+      <li><b>Energy systems</b> — alactic power + anaerobic capacity for shifts, and a strong aerobic base so you recover between them.</li>
+      <li><b>Injury-proofing</b> — groin, hamstrings, hips, shoulders, neck and tendons via targeted isometrics &amp; prehab woven into every session.</li>
+      <li><b>Reactive plyometrics</b> — low-volume, read-and-react fast-twitch drills (including your rear-foot-elevated tap drill) for a faster first step.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>The core principle: hard / easy</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0">You train 6 days plus a game — that only works if intensity <b style="color:#fff">undulates</b>. Every hard day is followed by something the body can recover through. Heavy CNS work (max strength, power, sprints) sits early-to-mid week after you've recovered from the game; the day before the game is a short <b style="color:var(--power)">primer</b> that leaves you springy, not sore. This is how advanced athletes hold high frequency without burning out.</p>
+  </div>
+
+  <div class="grid g3">
+    <div class="card tight"><div style="font-size:26px">💪</div><b>Under 75 min</b><div style="font-size:12.5px;color:var(--muted)">Most sessions 45–65 min. Priming day ~30 min.</div></div>
+    <div class="card tight"><div style="font-size:26px">📈</div><b>Auto-regulated</b><div style="font-size:12.5px;color:var(--muted)">Loads by %1RM and RPE — scale to how you feel.</div></div>
+    <div class="card tight"><div style="font-size:26px">🔁</div><b>Flexible days</b><div style="font-size:12.5px;color:var(--muted)">Anchor to game day; shift the week if it moves.</div></div>
+  </div>
+
+  <div class="note"><b>Add to home screen →</b> On iPhone: Share → "Add to Home Screen". On Android: menu → "Install app" / "Add to Home Screen". It then opens like an app and works with no internet. Your logged weights &amp; notes are saved on this device.</div>
+
+  <h3><span class="bar"></span>Jump in</h3>
+  <div class="grid g2">
+    <div class="card tight" style="cursor:pointer" onclick="go('week')"><b>📅 Weekly Plan →</b><div style="font-size:12.5px;color:var(--muted)">See the 6-day map around your game.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('train')"><b>🏋️ Workouts →</b><div style="font-size:12.5px;color:var(--muted)">Full session detail, sets &amp; reps.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('cardio')"><b>❤️ Conditioning →</b><div style="font-size:12.5px;color:var(--muted)">Energy-system interval menu.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('calc')"><b>🧮 Calorie Calculator →</b><div style="font-size:12.5px;color:var(--muted)">Your maintenance &amp; lean-gain targets.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('wrist')"><b>🩹 Wrist Rehab →</b><div style="font-size:12.5px;color:var(--muted)">Isometrics now, dynamic later + gym swaps.</div></div>
+  </div>
+</section>
+
+<!-- ================= WEEKLY PLAN ================= -->
+<section class="page" id="p-week">
+  <h2 class="ttl">Weekly Plan</h2>
+  <p class="sub">Anchored to a <b style="color:#f87171">Saturday game</b>. Tap any day to open the full session.</p>
+
+  <div class="toggle-row">
+    <label class="switch"><input type="checkbox" id="gameToggle" checked onchange="toggleGame()"><span class="sl"></span></label>
+    <span id="gameLabel">Game week (Saturday game) — showing pre-game taper</span>
+  </div>
+
+  <div class="week" id="weekList"></div>
+
+  <div class="note" style="margin-top:16px"><b>Legend:</b>
+    <span class="tag t-hard" style="margin-left:4px">Hard</span> high CNS ·
+    <span class="tag t-mod">Moderate</span> ·
+    <span class="tag t-easy">Easy</span> recovery ·
+    <span class="tag t-power">Primer</span> ·
+    <span class="tag t-game">Game</span>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>If your game moves (Fri instead of Sat)</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0">The sequence is anchored, not fixed to weekdays. Rule of thumb: <b style="color:#fff">the day before the game is always the Primer</b>, and <b style="color:#fff">the day after is always Recovery/Aerobic</b>. Everything else keeps its order. So if the game shifts to Friday, Thursday becomes the primer, and Saturday becomes your recovery/aerobic day (or an extra strength session — see below).</p>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>No game this Saturday?</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 6px">Swap the Primer + Game for one of these on Sat, and keep Sunday as recovery:</p>
+    <ul class="clean">
+      <li><b>Option A — Extra Lower Power:</b> repeat a trimmed version of the Monday lower session (drop 1–2 accessories) to bank another quality strength stimulus.</li>
+      <li><b>Option B — Long conditioning:</b> a full energy-system session (repeat-sprint + aerobic finisher) to build your engine while there's no game to save for.</li>
+      <li><b>Option C — Full rest:</b> if the last block was heavy, take the day. Six quality days already beats seven junk ones.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>12-week progression</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 8px">Run the same weekly template through three 4-week blocks; the emphasis of the strength/power work shifts. Deload every 4th week (cut working sets ~40%, keep it snappy). Use the phase toggle to change the loading targets shown in Workouts.</p>
+    <div class="seg" style="margin-bottom:8px" id="phaseSeg">
+      <button data-ph="hyp" onclick="setPhase('hyp')">Wk 1–4 · Base</button>
+      <button data-ph="str" class="on" onclick="setPhase('str')">Wk 5–8 · Strength</button>
+      <button data-ph="pow" onclick="setPhase('pow')">Wk 9–12 · Power</button>
+    </div>
+    <div id="phaseDesc" style="font-size:13px;color:var(--muted)"></div>
+  </div>
+</section>
+
+<!-- ================= WORKOUTS ================= -->
+<section class="page" id="p-train">
+  <h2 class="ttl">Workouts</h2>
+  <p class="sub">Loading targets follow the phase you picked (<span id="phaseTag2" style="color:var(--ice);font-weight:700">Strength</span>). RPE = reps-in-reserve guide; RPE 8 ≈ 2 reps left.</p>
+
+  <div class="note"><b>Wrist injury?</b> Keep training — just use straps on pulls and neutral-grip / dumbbell pressing up top. Full swaps are in the <a href="#" onclick="go('wrist');return false;">Wrist Rehab</a> tab.</div>
+
+  <details class="acc" id="plyoBox">
+    <summary><span class="tag t-power">Reactive</span>&nbsp; Reactive plyometrics &amp; fast-twitch drills</summary>
+    <div class="inner">
+      <p style="font-size:13px;color:var(--muted)">Trains the stretch-shortening cycle and read-and-react speed — your first step, edges and cuts. <b style="color:#fff">Rules: do them fresh, low volume, max quality, full recovery.</b> Slot them into a warm-up, Wednesday's speed day, or Friday's primer — never to fatigue.</p>
+
+      <div class="blocklabel b-power">Your reactive tap drill — single-leg, rear-foot elevated</div>
+      <div class="ex"><table><tbody>
+        <tr><td class="exn">RFE Reactive Foot-Taps<span class="cue">Rear foot resting light on a low box behind you (kickstand); weight on the front working leg. Keep a fast, springy in-place pogo tap on the ball of the working foot. On a called cue — "front / left / right" — reach and tap that spot ONCE, then snap straight back to the in-place rhythm. React fast, quiet feet, minimal ground-contact time.</span></td><td class="scheme">3–5 × 10–20s / leg</td></tr>
+      </tbody></table></div>
+      <div class="note">Progress it: add a 4th direction (back), speed up the calls, catch a ball mid-drill, shift more weight onto the front leg (less kickstand), or reach further. A partner calling — or a shuffled-cue / random-number app — adds the reaction element that mirrors reading the play.</div>
+
+      <div class="blocklabel b-power">Supporting reactive / fast-twitch drills</div>
+      <div class="ex"><table><tbody>
+        <tr><td class="exn">Pogo hops → single-leg pogos<span class="cue">Stiff ankles, straight legs, ground like it's hot. Double-leg first, then single.</span></td><td class="scheme">3×10–15</td></tr>
+        <tr><td class="exn">Reactive line / dot hops<span class="cue">Quick-feet patterns (fwd-back, side-side, X). Speed of contacts is the point.</span></td><td class="scheme">3×15–20s</td></tr>
+        <tr><td class="exn">Skater bounds (stick landings)<span class="cue">Lateral bound, stick &amp; hold 1s, then progress to continuous. Pure hockey edge power.</span></td><td class="scheme">3×4–6 / side</td></tr>
+        <tr><td class="exn">Snap-down / drop-and-stick<span class="cue">Reactive deceleration — teaches you to absorb force and re-load fast.</span></td><td class="scheme">3×4</td></tr>
+        <tr><td class="exn">Reaction first-step (on cue)<span class="cue">React to a call or visual and explode 5m. Pure reaction + acceleration.</span></td><td class="scheme">4–6 reps</td></tr>
+      </tbody></table></div>
+      <div class="note warn"><b>Keep contacts low</b> (~40–80 quality foot-contacts total) and fully recover between sets. Reactive work is nervous-system training, not conditioning — if it becomes a gasser, you've lost the point. Depth jumps: Power phase only.</div>
+    </div>
+  </details>
+
+  <div id="workoutHost"></div>
+
+  <div class="card warn note" style="margin-top:18px"><b>Warm-up (do before every session):</b> 3–5 min bike/row, then dynamic hips (leg swings, adductor rockbacks, world's-greatest-stretch), ankle mobility, glute activation (banded walks), and 2–3 build-up efforts of the day's first main movement. Never load heavy or sprint cold.</div>
+</section>
+
+<!-- ================= CONDITIONING ================= -->
+<section class="page" id="p-cardio">
+  <h2 class="ttl">Conditioning</h2>
+  <p class="sub">Energy-system menu matched to hockey shift demands (~40–60s work, ~1:2–1:3 rest). Pick sessions from the weekly plan; rotate the emphasis.</p>
+  <div id="cardioHost"></div>
+</section>
+
+<!-- ================= NUTRITION ================= -->
+<section class="page" id="p-nutri">
+  <h2 class="ttl">Nutrition — Lean Gain</h2>
+  <p class="sub">Goal: 79 → 84–85 kg, staying lean. That means a <b style="color:#fff">controlled surplus</b> and patience — chase ~0.2–0.35 kg/week.</p>
+  <div id="nutriHost"></div>
+  <div class="card tight" style="cursor:pointer;text-align:center" onclick="go('calc')"><b style="color:var(--ice)">→ Open the Calorie Calculator</b><div style="font-size:12.5px;color:var(--muted)">Get your exact maintenance &amp; target numbers</div></div>
+</section>
+
+<!-- ================= CALCULATOR ================= -->
+<section class="page" id="p-calc">
+  <h2 class="ttl">Calorie &amp; Macro Calculator</h2>
+  <p class="sub">Mifflin–St Jeor BMR × activity → maintenance, then your lean-gain target and macros. Updates live.</p>
+
+  <div class="card">
+    <div class="field"><label>Sex</label>
+      <div class="seg" id="sexSeg">
+        <button class="on" data-sex="m" onclick="setSex('m')">Male</button>
+        <button data-sex="f" onclick="setSex('f')">Female</button>
+      </div>
+    </div>
+    <div class="grid g2">
+      <div class="field"><label>Age (years)</label><input id="age" type="number" inputmode="numeric" value="25"></div>
+      <div class="field"><label>Height (cm)</label><input id="height" type="number" inputmode="numeric" value="180"></div>
+    </div>
+    <div class="field"><label>Current weight (kg)</label><input id="weight" type="number" inputmode="decimal" value="79"></div>
+    <div class="field"><label>Activity / training load</label>
+      <select id="activity">
+        <option value="1.2">Sedentary — desk job, no training</option>
+        <option value="1.375">Light — 1–3 sessions/week</option>
+        <option value="1.55">Moderate — 3–5 sessions/week</option>
+        <option value="1.725" selected>Very active — 6 sessions/week + game</option>
+        <option value="1.9">Extra active — 6 sessions + game + physical job</option>
+      </select>
+    </div>
+    <div class="field"><label>Goal</label>
+      <select id="goal">
+        <option value="0">Maintain weight</option>
+        <option value="350" selected>Lean gain (+350 kcal) — recommended</option>
+        <option value="500">Faster gain (+500 kcal)</option>
+        <option value="-450">Lean out (−450 kcal)</option>
+      </select>
+    </div>
+    <div class="field"><label>Protein target</label>
+      <select id="protPerKg">
+        <option value="1.8">1.8 g/kg</option>
+        <option value="2.0" selected>2.0 g/kg — recommended for lean gain</option>
+        <option value="2.2">2.2 g/kg</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="result">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px">
+      <div><div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Daily target</div>
+        <div class="bignum"><span id="rTarget">–</span> <small>kcal/day</small></div></div>
+      <div style="text-align:right;font-size:13px;color:var(--muted)">
+        BMR <b id="rBmr" style="color:#fff">–</b><br>Maintenance <b id="rTdee" style="color:#fff">–</b></div>
+    </div>
+    <div class="macros">
+      <div class="macro p"><div class="mg"><span id="rProt">–</span>g</div><div class="ml">Protein</div></div>
+      <div class="macro c"><div class="mg"><span id="rCarb">–</span>g</div><div class="ml">Carbs</div></div>
+      <div class="macro f"><div class="mg"><span id="rFat">–</span>g</div><div class="ml">Fat</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:12px" id="rNotes"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Lean-gain planner</h3>
+    <div class="field"><label>Target weight (kg)</label><input id="target" type="number" inputmode="decimal" value="84"></div>
+    <div class="field"><label>Rate</label>
+      <select id="rate">
+        <option value="0.2">0.20 kg/week — very lean, minimal fat</option>
+        <option value="0.3" selected>0.30 kg/week — recommended</option>
+        <option value="0.4">0.40 kg/week — faster</option>
+      </select>
+    </div>
+    <div id="planOut" class="kv" style="border:none;padding-top:6px"></div>
+  </div>
+  <p class="foot">Estimates only — Mifflin–St Jeor is a population formula. Weigh yourself 3–4× a week fasted, average it, and adjust ±150 kcal after 2–3 weeks based on your real trend.</p>
+</section>
+
+<!-- ================= PROGRESS ================= -->
+<section class="page" id="p-log">
+  <h2 class="ttl">Progress</h2>
+  <p class="sub">Bodyweight is your steering wheel for lean gain. Log it fasted, watch the trend, not the daily noise.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Bodyweight log</h3>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Weight (kg)</label><input id="bwInput" type="number" inputmode="decimal" placeholder="79.0"></div>
+      <div class="field" style="margin:6px 0"><label>Date</label><input id="bwDate" type="date"></div>
+    </div>
+    <button class="btn" onclick="addBW()">Log weight</button>
+    <div id="bwTrend" style="margin-top:14px"></div>
+    <svg class="spark" id="bwSpark" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
+    <div id="bwList"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Key-lift PRs</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 8px">Track your big numbers over the blocks.</p>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Lift</label>
+        <select id="prLift">
+          <option>Back Squat</option><option>Trap-bar Deadlift</option><option>Bench Press</option>
+          <option>Weighted Pull-up</option><option>Hang Power Clean</option><option>Front Squat</option>
+          <option>Overhead Press</option><option>RB Split Squat</option>
+        </select></div>
+      <div class="field" style="margin:6px 0"><label>Top set (e.g. 120×3)</label><input id="prVal" placeholder="120×3"></div>
+    </div>
+    <button class="btn ghost" onclick="addPR()">Save PR</button>
+    <div id="prList" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card tight">
+    <div class="toggle-row" style="margin:0">
+      <span style="flex:1">Reset all saved data on this device</span>
+      <button class="btn ghost" style="width:auto;padding:8px 14px;margin:0" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WRIST REHAB ================= -->
+<section class="page" id="p-wrist">
+  <h2 class="ttl">Wrist Rehab</h2>
+  <p class="sub">Isometrics first, pain-guided, done at home — then ease into dynamic loading once it settles (~2 weeks). Protect it in the gym meanwhile.</p>
+
+  <div class="note warn"><b>Read first:</b> this is general rehab programming, not a diagnosis. If it hasn't been assessed — or if you get numbness/tingling, it gives way, there's night pain, or it's not improving in 2–3 weeks — see a physio or doctor. Sharp pain is a stop sign: work around it, never through it.</div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>The pain rule (every drill)</h3>
+    <ul class="clean">
+      <li>Keep pain <b>≤ 3/10</b> during the work, and it should settle to baseline within 24h.</li>
+      <li>Sore the next day = too much. Drop the load/effort next time.</li>
+      <li>Done right, isometrics often <b>reduce</b> pain — use them daily.</li>
+    </ul>
+  </div>
+
+  <details class="acc" open>
+   <summary><span class="tag t-easy">Now · Phase 1</span>&nbsp; Isometric holds — home, daily</summary>
+   <div class="inner">
+     <p style="font-size:13px;color:var(--muted)">No movement — build tolerance and calm the joint by pressing into a fixed resistance (your other hand, a table edge, a wall, a band). Effort ~40–60% to start, pain ≤3/10, 1–2× per day.</p>
+     <div class="blocklabel b-prehab">Protocol · 4–5 holds × 30–45s · rest ~30s</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Iso wrist extension<span class="cue">Palm down — press the back of your hand up into your other hand or under a table.</span></td><td class="scheme">5×30–45s</td></tr>
+       <tr><td class="exn">Iso wrist flexion<span class="cue">Palm up — press up into your other hand.</span></td><td class="scheme">5×30–45s</td></tr>
+       <tr><td class="exn">Iso radial / ulnar deviation<span class="cue">Thumb up (neutral), press sideways into a fixed object each way.</span></td><td class="scheme">4×20–30s ea</td></tr>
+       <tr><td class="exn">Iso supination / pronation<span class="cue">Hold a light hammer or dumbbell, resist rotation with the other hand. Both ways.</span></td><td class="scheme">4×20–30s ea</td></tr>
+       <tr><td class="exn">Sub-max grip squeeze<span class="cue">Squeeze a rolled towel or soft ball at ~50%. Pain-free only.</span></td><td class="scheme">5×20–30s</td></tr>
+     </tbody></table></div>
+     <div class="note">Start gentler if it's currently irritable (shorter holds, lighter press) and build effort week to week as pain allows.</div>
+   </div>
+  </details>
+
+  <details class="acc">
+   <summary><span class="tag t-mod">~2 weeks · Phase 2</span>&nbsp; Dynamic loading — when it's calmer</summary>
+   <div class="inner">
+     <p style="font-size:13px;color:var(--muted)">Once the isometrics are pain-free and daily use is comfortable, add controlled movement and light load. Slow tempo — especially the lowering. Still pain ≤3/10, still at home.</p>
+     <div class="blocklabel b-prehab">2–3 sets · 12–15 reps · light &amp; controlled</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Wrist flexion curl<span class="cue">Forearm on thigh, light DB/band, curl up, lower slow (3s).</span></td><td class="scheme">3×12–15</td></tr>
+       <tr><td class="exn">Wrist extension curl<span class="cue">Palm-down version — usually the key one. Very light to start.</span></td><td class="scheme">3×12–15</td></tr>
+       <tr><td class="exn">Radial / ulnar deviation<span class="cue">Hammer or light DB held vertical, tilt up/down.</span></td><td class="scheme">3×12–15</td></tr>
+       <tr><td class="exn">Pronation / supination<span class="cue">Hammer or band — rotate palm up ↔ down under control.</span></td><td class="scheme">3×12–15</td></tr>
+       <tr><td class="exn">Rice-bucket work<span class="cue">Dig, twist and open your hand in a bucket of rice — brilliant low-load forearm endurance.</span></td><td class="scheme">2–3×30–45s</td></tr>
+       <tr><td class="exn">Wrist CARs<span class="cue">Slow, full-range controlled circles to restore movement quality.</span></td><td class="scheme">2×5 ea way</td></tr>
+     </tbody></table></div>
+     <div class="note"><b>Progress load</b> only when there's no flare 24h later. Any flare → drop back to Phase 1 for a few days, then rebuild.</div>
+   </div>
+  </details>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Training around it — gym swaps</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 4px">Keep hammering the rest of the plan — just spare the wrist:</p>
+    <ul class="clean">
+      <li><b>Pulls (deadlift, RDL, rows):</b> use <b>straps</b> — takes grip/wrist out of it.</li>
+      <li><b>Pressing:</b> favour <b>neutral-grip dumbbells, a football/Swiss bar, or landmine press</b>; add <b>wrist wraps</b> for support.</li>
+      <li><b>Cleans / catches:</b> the rack catch loads the wrist in extension — use the <b>trap-bar jump</b> or a <b>DB hang high-pull</b> (already your Monday option).</li>
+      <li><b>Front squat:</b> skip the barbell rack grip — <b>safety-squat bar, cross-arm/strap hold, or heels-elevated goblet</b>.</li>
+      <li><b>Pull-ups:</b> <b>neutral-grip handles</b> or straps; if it bites, swap to chest-supported row / lat pulldown.</li>
+      <li><b>Med-ball catches:</b> keep the wrist neutral and firm, or reduce until Phase 2. Foot/lower-body plyos are wrist-safe — lean on those for now.</li>
+    </ul>
+    <div class="note">Lower-body and posterior-chain work barely touch the wrist. Load those hard, use straps/neutral grips up top, and let the isometrics do their job.</div>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+
+<nav class="tabbar"><div class="inner" id="tabInner"></div></nav>
+
+<div class="wrap"><p class="foot">Built for you — Kam · advanced hockey athlete. Not medical advice; train around any injuries and consult a professional for pain. Data stays on your device.</p></div>
+
+<script>
+/* ============ NAV ============ */
+const TABS=[
+ ["home","🏠","Home"],["week","📅","Week"],["train","🏋️","Train"],
+ ["cardio","❤️","Cardio"],["wrist","🩹","Wrist"],["nutri","🍽️","Fuel"],["calc","🧮","Calc"],["log","📈","Log"]
+];
+const tabInner=document.getElementById('tabInner');
+TABS.forEach(([id,ic,lb])=>{
+  const b=document.createElement('button');b.className='tab';b.dataset.tab=id;
+  b.innerHTML=`<span class="ic">${ic}</span>${lb}`;b.onclick=()=>go(id);tabInner.appendChild(b);
+});
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
+}
+
+/* ============ STORAGE ============ */
+const LS={get:(k,d)=>{try{return JSON.parse(localStorage.getItem('hk_'+k))??d}catch(e){return d}},
+          set:(k,v)=>{try{localStorage.setItem('hk_'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ============ PHASES ============ */
+const PHASES={
+ hyp:{name:'Base',main:'6–8 reps · RPE 7–8',
+   desc:'Build the engine and the tissue. Higher reps (6–8+), RPE 7–8, more accessory volume, and your biggest aerobic-base work. Groundwork that makes the heavy blocks safer and the season longer.'},
+ str:{name:'Strength',main:'3–5 reps · 84–90%',
+   desc:'Get strong. Heavy compounds (3–5 reps at 84–90%), lower volume, and intro contrast work (heavy lift paired with a jump). Strength is the parent quality — everything else grows from it.'},
+ pow:{name:'Power',main:'2–3 reps · high intent',
+   desc:'Turn strength into speed. Low-rep, high-intent lifts (87–92%), full-power jumps & throws, sprint focus, and contrast / complex pairs. Peak this into your competitive stretch.'}
+};
+let phase=LS.get('phase','str');
+
+/* ============ WEEKLY PLAN ============ */
+const DAYS=[
+ {k:'sun',d:'SUN',role:'Recovery + Aerobic',tag:'easy',rel:'Day after game',
+  desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
+ {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
+  desc:'Squat / trap-bar, jumps, single-leg, groin & hamstring isometrics.'},
+ {k:'tue',d:'TUE',role:'Upper · Strength + Power',tag:'hard',rel:'',
+  desc:'Press & pull, rotational med-ball (shot power), shoulder & neck health.'},
+ {k:'wed',d:'WED',role:'Speed + Anaerobic + Single-leg',tag:'mod',rel:'',
+  desc:'Sprints, agility, jump-strength, and your hardest conditioning.'},
+ {k:'thu',d:'THU',role:'Upper Hypertrophy + Prehab',tag:'easy',rel:'Low CNS',
+  desc:'Pump work, posterior chain, tendon & tissue health.'},
+ {k:'fri',d:'FRI',role:'CNS Primer (pre-game)',tag:'power',rel:'Day before game',
+  desc:'Short & sharp — jumps, throws, fast singles. Leave springy.'},
+ {k:'sat',d:'SAT',role:'GAME / SKATE',tag:'game',rel:'Compete',
+  desc:'Highest-intensity session of the week. Fuel before, refuel after.'}
+];
+function renderWeek(){
+  const gameOn=LS.get('gameOn',true);
+  const host=document.getElementById('weekList');host.innerHTML='';
+  DAYS.forEach(day=>{
+    let role=day.role,desc=day.desc,tag=day.tag,rel=day.rel;
+    if(day.k==='sat'&&!gameOn){role='Free Saturday';tag='mod';rel='No game';
+      desc='Extra Lower Power, a long conditioning session, or full rest — your call.';}
+    const el=document.createElement('div');el.className='day';
+    el.onclick=()=>{go('train');setTimeout(()=>{const t=document.getElementById('wk-'+day.k);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});},60);};
+    el.innerHTML=`<div class="accent acc-${tag}"></div><div class="dname">${day.d}</div>
+      <div class="dbody"><div class="role">${role}</div><div class="desc">${desc}</div>
+      <div style="margin-top:6px"><span class="tag t-${tag}">${tag==='easy'?'Recovery':tag==='power'?'Primer':tag==='game'?'Game':tag==='hard'?'Hard':'Moderate'}</span>
+      ${rel?`<span style="font-size:11px;color:var(--dim);margin-left:8px">${rel}</span>`:''}</div></div>
+      <div class="chev">›</div>`;
+    host.appendChild(el);
+  });
+}
+function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.set('gameOn',on);
+  document.getElementById('gameLabel').textContent=on?'Game week (Saturday game) — showing pre-game taper':'No game this week — Saturday is open';
+  renderWeek();}
+
+/* ============ WORKOUTS ============ */
+/* scheme can be a string, or {hyp,str,pow} */
+function S(o){return typeof o==='object'?o[phase]:o;}
+const WK={
+ sun:{title:'Recovery + Aerobic',tag:'easy',time:'30–45 min',
+  intro:'The day after your game. This is a session, not a formality — active recovery clears fatigue faster than sitting still. If the game truly wrecked you, take full rest instead.',
+  blocks:[
+   {l:'Aerobic base',c:'b-cond',items:[
+     ['Zone-2 bike or row','25–40 min','Nose-breathing pace, HR ~130–150. Builds the aerobic engine that clears fatigue between shifts.']]},
+   {l:'Mobility flow',c:'b-warm',items:[
+     ['Full-body flow','10 min','Hips 90/90, adductor rock-backs, thoracic rotations, couch stretch, ankle mobility.']]},
+   {l:'Prehab volume',c:'b-prehab',items:[
+     ['Copenhagen adduction','3×10 / side','Groin resilience — keep it controlled and pain-free today.'],
+     ['Nordic hamstring (easy)','2×5','Slow eccentric only.'],
+     ['Hip airplane','2×6 / side','Hip control & single-leg stability.'],
+     ['Band external rotation','2×15','Rotator-cuff health.'],
+     ['Neck isometrics','2×10s each way','Gentle — flexion, extension, both sides.']]},
+   {l:'Soft tissue',c:'b-warm',items:[
+     ['Foam roll','5 min','Quads, adductors, glutes, T-spine.']]}
+  ]},
+ mon:{title:'Lower · Max Strength + Power',tag:'hard',time:'60–65 min',
+  intro:'Your heaviest, highest-CNS day — placed ~48h after the game when you’re recovered and fresh. Power first while the nervous system is primed, then max strength, then protect the tissue that hockey punishes most.',
+  blocks:[
+   {l:'Power / potentiation',c:'b-power',items:[
+     ['Box jump or Broad jump',S({hyp:'4×4',str:'5×3',pow:'5×3 max intent'}),'Land soft, reset every rep. Full recovery — this is quality, not conditioning.'],
+     ['Hang power clean or Trap-bar jump',S({hyp:'4×3 moderate',str:'4×3 fast',pow:'5×2 explosive'}),'Triple extension — drive the floor away. Bar speed is everything.']]},
+   {l:'Max strength',c:'b-str',items:[
+     ['Back Squat or Trap-bar Deadlift',S({hyp:'4×6 @ 72–78%',str:'5×3–4 @ 84–90% · RPE 8',pow:'5×2 @ 88–92% + jump after each set'}),'Brace hard, control the descent, explode up. In Power phase, contrast each set with a jump.'],
+     ['RFE Split Squat (Bulgarian)',S({hyp:'3×8 / leg',str:'3×6 / leg',pow:'3×5 / leg heavy'}),'Skating-specific single-leg strength. Stay tall; front knee tracks over toe.'],
+     ['Romanian Deadlift','3×6–8','Hips back, long spine, feel the hamstrings load. Don’t chase weight over feel.']]},
+   {l:'Injury-prevention isometrics',c:'b-prehab',items:[
+     ['Copenhagen adduction','3×8–12 / side','The single most evidence-backed drill for cutting groin injuries in hockey.'],
+     ['Nordic hamstring','3×4–6','Eccentric brake — lower as slow as you can. Big hamstring-strain reducer.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Pallof press','3×10 / side','Anti-rotation — resist the twist, transfers straight to skating & shooting.']]}
+  ]},
+ tue:{title:'Upper · Strength + Power + Rotational',tag:'hard',time:'55–65 min',
+  intro:'Upper-body strength with rotational power for your shot. Paired push/pull supersets keep it under an hour, and the shoulder + neck work is your durability insurance.',
+  blocks:[
+   {l:'Rotational & upper power',c:'b-power',items:[
+     ['Rotational med-ball throw','4×4 / side','Shot power — drive from the hip and floor, whip through the torso.'],
+     ['Overhead med-ball slam','3×5','Full-body extension into the slam. Explosive intent.']]},
+   {l:'Strength — superset A (push/pull)',c:'b-str',items:[
+     ['Bench Press (or Football-bar / Incline)',S({hyp:'4×6–8 @ 72–78%',str:'4×4–5 @ 84–88% · RPE 8',pow:'5×3 @ 87–90% fast'}),'Shoulder blades set, controlled down, drive up. Superset with the pull-up.'],
+     ['Weighted Pull-up',S({hyp:'4×6–8',str:'4×4–5 heavy',pow:'4×3 heavy'}),'Full range, no kip. Add load as you progress.']]},
+   {l:'Strength — superset B',c:'b-str',items:[
+     ['Standing OH Press or Landmine Press','3×6–8','Overhead strength = protected, robust shoulders.'],
+     ['Chest-supported Row','3×8–10','Squeeze the mid-back, zero momentum.']]},
+   {l:'Shoulder & neck durability',c:'b-prehab',items:[
+     ['Half-kneeling cable rotation','3×10 / side','Rotational core control under load.'],
+     ['Face pull + external rotation','3×15','Rear delts + cuff — keeps shoulders healthy through a season of checks.'],
+     ['Neck isometrics','3×10s each way','A stronger neck absorbs impact and helps mitigate concussion risk.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Weighted plank / stir-the-pot','3×30–40s','Brace like you’re about to take a hit.']]}
+  ]},
+ wed:{title:'Speed + Anaerobic + Single-leg',tag:'mod',time:'55–65 min',
+  intro:'Speed while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery.',
+  blocks:[
+   {l:'Speed (fully recovered)',c:'b-power',items:[
+     ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
+     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
+     ['Resisted sled sprint (option)','6×15m','Add if available — builds acceleration force.']]},
+   {l:'Reactive plyometrics (fresh)',c:'b-power',items:[
+     ['RFE Reactive Foot-Taps','3–4×10–20s / leg','Rear-foot-elevated reactive taps to a called cue. Full detail in the Reactive panel at the top of this tab.'],
+     ['Skater bounds','3×5 / side','Lateral edge power — stick the landing, then flow into continuous.']]},
+   {l:'Strength-speed',c:'b-str',items:[
+     ['Trap-bar jump or Jump squat','4×3 light','Move light load with max speed. Velocity is the whole point.'],
+     ['Reverse lunge or Step-up','3×8 / leg','Controlled, powerful drive up.'],
+     ['Single-leg RDL','3×8 / leg','Balance + hamstring/glute — bulletproofs the stride.']]},
+   {l:'Anaerobic conditioning — pick one',c:'b-cond',items:[
+     ['Assault bike intervals','10–15s max / 20–40s rest ×8–12','Your short-burst engine — the currency of a shift. See Cardio tab.'],
+     ['OR Repeat run','1 min near-max / 2 min rest ×5–6','Speed-endurance for long shifts & penalty kills. Brutal — 1×/week max.']]},
+   {l:'Prehab',c:'b-prehab',items:[
+     ['Copenhagen adduction','2×10 / side','Groin.'],
+     ['Hip airplane','2×6 / side','Hip stability.']]}
+  ]},
+ thu:{title:'Upper Hypertrophy + Prehab',tag:'easy',time:'50–60 min',
+  intro:'A deliberately lower-CNS day: build muscle with higher reps, feed tendons and connective tissue, and bank prehab volume. This is what lets you train hard six days a week.',
+  blocks:[
+   {l:'Hypertrophy',c:'b-str',items:[
+     ['Incline DB Press','3×8–12','Controlled, full stretch. Chase a pump, not a max.'],
+     ['Cable Row / Lat Pulldown','3×10–12','Back thickness & width.'],
+     ['Lateral raise','3×12–15','Healthy, capable shoulders.'],
+     ['Rear-delt fly','3×15','Balances all the pressing.'],
+     ['Biceps + Triceps','3×10–15','Arm & elbow tissue health, low cost.']]},
+   {l:'Posterior chain & tendon health',c:'b-prehab',items:[
+     ['Glute-ham raise or Nordic','3×6–8','Hamstring durability.'],
+     ['Spanish squat or Wall-sit (isometric)','3×30–45s','Patellar-tendon health — huge for stop-start skating.'],
+     ['Tibialis raise + Calf raise','3×12–15','Ankle & shin resilience, injury-proofs landings.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Hollow hold','3×20–30s','Total anterior-core tension.'],
+     ['Side plank','3×30s / side','Lateral trunk stability for skating.']]},
+   {l:'Optional aerobic finisher',c:'b-cond',items:[
+     ['Zone-2 bike','10–15 min','Adds to your base without touching recovery.']]}
+  ]},
+ fri:{title:'CNS Primer (pre-game)',tag:'power',time:'~30 min',
+  intro:'The day before your game. The goal is to wake up the nervous system without creating fatigue — a little fast, explosive work leaves you feeling springy on Saturday, not flat. Done right, this is a secret weapon. Keep it short and crisp.',
+  blocks:[
+   {l:'Prime',c:'b-power',items:[
+     ['Pogo hops','3×10','Stiff, fast ankles — reactive.'],
+     ['RFE Reactive Foot-Taps','2×10s / leg','Light and sharp — primes fast-twitch without fatigue.'],
+     ['Box jump','3×3','Crisp and powerful, full recovery.'],
+     ['Rotational med-ball throw','3×3','Wake up the shot.']]},
+   {l:'Potentiate',c:'b-str',items:[
+     ['One main lift — fast singles','2–3 singles @ ~85%','No grinding. Remind the CNS what heavy & fast feels like, then stop.'],
+     ['Short sprint','3×10m','Pure acceleration, easy on the volume.']]},
+   {l:'Mobility & activation',c:'b-prehab',items:[
+     ['Dynamic flow + glute/adductor activation','~10 min','Leave the gym feeling ready, not tired. If in doubt, do less.']]}
+  ]},
+ sat:{title:'GAME / SKATE',tag:'game',time:'Match day',
+  intro:'The highest-intensity session of your week — and it counts as training. Everything else was built to make this better.',
+  blocks:[
+   {l:'Pre-game',c:'b-warm',items:[
+     ['Dynamic warm-up + activation','15–20 min','Raise temperature, fire glutes & hips, a few build-up sprints.'],
+     ['Caffeine (optional)','3–6 mg/kg, ~45 min before','If you use it — improves sprint power & alertness.'],
+     ['Fuel','2–3h before','Carb-focused meal + moderate protein, low fat/fibre. Hydrate + sodium.']]},
+   {l:'Post-game — start recovery',c:'b-cond',items:[
+     ['Refuel window','within ~60 min','30–40g protein + a big dose of carbs + fluids/electrolytes. This kicks off the whole week’s recovery.'],
+     ['Wind down','evening','Light stretch, then prioritise sleep — adaptation happens tonight.']]},
+   {l:'No game this week?',c:'b-str',items:[
+     ['Extra Lower Power','~45 min','Trimmed version of Monday — bank another quality stimulus.'],
+     ['OR Long conditioning','~30 min','Repeat-sprint + aerobic finisher while there’s no game to save for.'],
+     ['OR Full rest','—','If the block was heavy, take it. Six quality days beats seven junk ones.']]}
+  ]}
+};
+function renderWorkouts(){
+  const host=document.getElementById('workoutHost');host.innerHTML='';
+  const order=['sun','mon','tue','wed','thu','fri','sat'];
+  const labels={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+  order.forEach(k=>{
+    const w=WK[k];
+    let blocks='';
+    w.blocks.forEach(b=>{
+      let rows='';
+      b.items.forEach(it=>{
+        rows+=`<tr><td class="exn">${it[0]}<span class="cue">${it[2]}</span></td><td class="scheme">${S(it[1])}</td></tr>`;
+      });
+      blocks+=`<div class="blocklabel ${b.c}">${b.l}</div><div class="ex"><table><tbody>${rows}</tbody></table></div>`;
+    });
+    const tagName={easy:'Recovery',hard:'Hard · High CNS',mod:'Moderate',power:'Primer',game:'Game'}[w.tag];
+    const det=document.createElement('details');det.className='acc';det.id='wk-'+k;
+    if(k==='mon')det.open=true;
+    det.innerHTML=`<summary><span class="accent acc-${w.tag}" style="position:static;width:6px;height:20px;border-radius:3px"></span>
+      ${labels[k]} — ${w.title}</summary>
+      <div class="inner">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 10px"><span class="tag t-${w.tag}">${tagName}</span><span class="chip">⏱ ${w.time}</span></div>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 6px">${w.intro}</p>
+        ${blocks}
+      </div>`;
+    host.appendChild(det);
+  });
+}
+
+/* ============ CONDITIONING ============ */
+const CARDIO=[
+ {n:'Alactic Power (ATP-PC)',tag:'power',proto:'6–10s all-out / 60–90s full rest × 6–10',
+  why:'Pure explosive speed & first-step. Full recovery so every rep is maximal quality — this is speed work, not a gasser.',mode:'Assault bike, sprints, or on-ice'},
+ {n:'Anaerobic Capacity',tag:'hard',proto:'10–15s hard / 20–40s rest × 8–12  (2–3 rounds, 3–5 min between)',
+  why:'Repeated short bursts — the exact currency of a hockey shift. This is your bread-and-butter conditioning.',mode:'Assault / air bike'},
+ {n:'Lactic Power / Speed-Endurance',tag:'hard',proto:'60s near-max / 120s rest × 5–6',
+  why:'Tolerance to the burn of long shifts & penalty kills. Very demanding — use sparingly, ~1×/week.',mode:'Run, bike, or on-ice'},
+ {n:'Repeat-Sprint Ability (RSA)',tag:'mod',proto:'8–10 × 30–40m sprints on a 25–30s cycle',
+  why:'Sprint, walk back, sprint again — mimics taking repeated shifts. Trains you to recover fast between efforts.',mode:'Track, turf, or on-ice'},
+ {n:'Aerobic Base / Cardiac Output',tag:'easy',proto:'25–45 min steady, HR ~130–150',
+  why:'The engine that clears fatigue between shifts and between games. Bigger base = faster recovery. 1–2×/week.',mode:'Bike, row, or easy run'},
+ {n:'Tempo / Threshold intervals',tag:'mod',proto:'4–6 × 3 min hard-sustainable / 90s easy',
+  why:'Raises the ceiling of your aerobic system without heavy CNS cost. Great mid-week engine work.',mode:'Bike or row'}
+];
+function renderCardio(){
+  const host=document.getElementById('cardioHost');host.innerHTML='';
+  const map=document.createElement('div');map.className='card';
+  map.innerHTML=`<h3 style="margin-top:4px"><span class="bar"></span>How to place it</h3>
+    <ul class="clean">
+      <li><b>Wednesday</b> is your main anaerobic day — pick Anaerobic Capacity or Lactic Power.</li>
+      <li><b>Sunday</b> (+ optional Thursday finisher) is aerobic base — the recovery engine.</li>
+      <li><b>Alactic power</b> fits as a short finisher on a strength day, or inside the Friday primer.</li>
+      <li><b>In-season the games ARE conditioning</b> — cut volume and keep just base + one anaerobic session. Off-season, add a session.</li>
+    </ul>
+    <div class="note"><b>Why this mix:</b> a shift is ~40–60s of high intensity with roughly 1:2–1:3 rest. So you train the short bursts (alactic + anaerobic capacity) and a strong aerobic base to recover between them — not long slow steady-state alone.</div>`;
+  host.appendChild(map);
+  CARDIO.forEach(c=>{
+    const tn={power:'Alactic',hard:'Hard',mod:'Moderate',easy:'Base'}[c.tag];
+    const el=document.createElement('div');el.className='card tight';
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <b style="font-size:15px">${c.n}</b><span class="tag t-${c.tag}">${tn}</span></div>
+      <div style="font-family:ui-monospace,monospace;font-size:14px;color:var(--ice);margin:8px 0;font-weight:600">${c.proto}</div>
+      <div style="font-size:13px;color:var(--muted)">${c.why}</div>
+      <div class="chip" style="margin-top:8px">🚴 ${c.mode}</div>`;
+    host.appendChild(el);
+  });
+}
+
+/* ============ NUTRITION ============ */
+function renderNutri(){
+  const host=document.getElementById('nutriHost');
+  host.innerHTML=`
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>The lean-gain rules</h3>
+     <ul class="clean">
+       <li><b>Controlled surplus:</b> roughly <b>+250–400 kcal/day</b> over maintenance. More than that and the extra mostly becomes fat you’ll have to cut later.</li>
+       <li><b>Slow rate:</b> aim for <b>0.2–0.35 kg/week</b>. As an advanced lifter your muscle-gain ceiling is slower — patience keeps it lean.</li>
+       <li><b>Timeline:</b> 79 → 84–85 kg lean is realistically <b>~4–6 months</b>. Rushing it just adds fat.</li>
+       <li><b>Train hard &amp; sleep:</b> the surplus only becomes muscle if the training stimulus and recovery are there.</li>
+     </ul>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>Daily macros</h3>
+     <div class="kv"><span class="k">Protein</span><span class="v">~2.0 g/kg · ≈ 160–175 g</span></div>
+     <div class="kv"><span class="k">Carbs</span><span class="v">5–7 g/kg · ≈ 400–450 g</span></div>
+     <div class="kv"><span class="k">Fat</span><span class="v">0.8–1.0 g/kg · ≈ 70–80 g</span></div>
+     <div class="note"><b>Carbs are not the enemy for a hockey player.</b> They fuel your sprints, power output and on-ice repeat efforts, and refill muscle glycogen after games. Keep them high — especially around training. Use the calculator for your exact numbers.</div>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>Meal timing</h3>
+     <ul class="clean">
+       <li><b>4–5 meals</b>, ~0.4 g/kg protein each (≈ 30–40 g) to max out muscle protein synthesis across the day.</li>
+       <li><b>Around training:</b> concentrate carbs pre &amp; post — fuel the session, then refill.</li>
+       <li><b>Pre-game meal 2–3h out:</b> carb-focused, moderate protein, low fat &amp; fibre so it digests clean.</li>
+       <li><b>Post-game is priority #1:</b> carbs + 30–40 g protein + fluids within ~60 min.</li>
+       <li><b>Before bed:</b> slow protein (cottage cheese / casein) supports overnight recovery.</li>
+     </ul>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>Supplements (evidence-based)</h3>
+     <div class="kv"><span class="k"><b style="color:#fff">Creatine monohydrate</b> — 5 g/day</span><span class="v">Power & strength</span></div>
+     <div class="kv"><span class="k"><b style="color:#fff">Whey protein</b></span><span class="v">Hit protein easily</span></div>
+     <div class="kv"><span class="k"><b style="color:#fff">Caffeine</b> — 3–6 mg/kg pre-game</span><span class="v">Sprint power, focus</span></div>
+     <div class="kv"><span class="k"><b style="color:#fff">Beta-alanine</b> — 3–5 g/day</span><span class="v">Buffers the burn</span></div>
+     <div class="kv"><span class="k"><b style="color:#fff">Vitamin D3</b> (if low/winter)</span><span class="v">Bone & muscle</span></div>
+     <div class="kv"><span class="k"><b style="color:#fff">Omega-3 · Electrolytes</b></span><span class="v">Recovery · sweat</span></div>
+     <div class="note">Creatine, enough protein, and sleep do ~90% of the work. Everything else is a small edge.</div>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>Sample day (scale to your calculator target)</h3>
+     <ul class="clean">
+       <li><b>Breakfast:</b> 4 eggs + 80 g oats + banana + berries + honey. <span style="color:var(--dim)">~35 g protein</span></li>
+       <li><b>Snack:</b> 200 g Greek yogurt + granola + whey scoop. <span style="color:var(--dim)">~45 g protein</span></li>
+       <li><b>Lunch:</b> 200 g chicken + 250 g cooked rice + veg + olive oil. <span style="color:var(--dim)">~55 g protein</span></li>
+       <li><b>Pre-train:</b> rice cakes + jam + whey. <span style="color:var(--dim)">~25 g protein</span></li>
+       <li><b>Dinner:</b> 220 g salmon/lean beef + 300 g potato + veg. <span style="color:var(--dim)">~50 g protein</span></li>
+       <li><b>Before bed:</b> 200 g cottage cheese + peanut butter. <span style="color:var(--dim)">~30 g protein</span></li>
+     </ul>
+     <div class="note">Add/remove carb portions (rice, potato, oats, fruit) to dial the total up or down to your target. Protein anchors stay put.</div>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px"><span class="bar"></span>Staying lean while gaining</h3>
+     <ul class="clean">
+       <li>Weigh <b>3–4× a week fasted</b>; judge by the weekly average, never a single day.</li>
+       <li>Gaining <b>&gt;0.4 kg/week for 2+ weeks?</b> Trim 150–200 kcal (usually carbs/fat, keep protein).</li>
+       <li>Not moving in 2–3 weeks? Add ~150 kcal.</li>
+       <li>Track a monthly waist measurement + photo — the mirror catches what the scale hides.</li>
+     </ul>
+   </div>`;
+}
+
+/* ============ CALCULATOR ============ */
+let curSex=LS.get('sex','m');
+function setSex(s){curSex=s;LS.set('sex',s);
+  document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===s));calc();}
+function num(id){const v=parseFloat(document.getElementById(id).value);return isNaN(v)?0:v;}
+function calc(){
+  const w=num('weight'),h=num('height'),age=num('age');
+  const act=parseFloat(document.getElementById('activity').value);
+  const goal=parseFloat(document.getElementById('goal').value);
+  const ppk=parseFloat(document.getElementById('protPerKg').value);
+  if(!w||!h||!age){return;}
+  const bmr=Math.round(10*w+6.25*h-5*age+(curSex==='m'?5:-161));
+  const tdee=Math.round(bmr*act);
+  const target=Math.round(tdee+goal);
+  const prot=Math.round(ppk*w);
+  const fat=Math.round(0.9*w);
+  let carbKcal=target-(prot*4)-(fat*9);
+  const carb=Math.max(0,Math.round(carbKcal/4));
+  document.getElementById('rBmr').textContent=bmr.toLocaleString();
+  document.getElementById('rTdee').textContent=tdee.toLocaleString();
+  document.getElementById('rTarget').textContent=target.toLocaleString();
+  document.getElementById('rProt').textContent=prot;
+  document.getElementById('rCarb').textContent=carb;
+  document.getElementById('rFat').textContent=fat;
+  const perMeal=Math.round(prot/5);
+  const gkg=(carb/w).toFixed(1);
+  document.getElementById('rNotes').innerHTML=
+    `≈ ${perMeal} g protein across 5 meals · carbs ≈ ${gkg} g/kg · ${goal>0?'lean-gain surplus of +'+goal+' kcal':goal<0?'deficit of '+goal+' kcal':'maintenance'}. `+
+    (curSex==='f'?'':'')+`Recalculate as your bodyweight climbs.`;
+  planCalc();
+}
+function planCalc(){
+  const cur=num('weight'),tgt=num('target'),rate=parseFloat(document.getElementById('rate').value);
+  const out=document.getElementById('planOut');
+  if(!cur||!tgt){out.innerHTML='';return;}
+  if(tgt<=cur){out.innerHTML=`<span class="k">You’re already at or above target.</span>`;return;}
+  const weeks=Math.ceil((tgt-cur)/rate);
+  const months=(weeks/4.345).toFixed(1);
+  const d=new Date();d.setDate(d.getDate()+weeks*7);
+  const dateStr=d.toLocaleDateString(undefined,{month:'short',year:'numeric'});
+  out.innerHTML=`<span class="k">${cur} → ${tgt} kg at ${rate} kg/wk</span>
+    <span class="v">${weeks} weeks · ~${months} months<br><span style="font-weight:400;color:var(--dim)">≈ ${dateStr}</span></span>`;
+}
+['weight','height','age','activity','goal','protPerKg','target','rate'].forEach(id=>{
+  document.addEventListener('input',e=>{if(e.target.id===id)calc();});
+});
+
+/* ============ PROGRESS ============ */
+function renderBW(){
+  const data=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);
+  const list=document.getElementById('bwList');const spark=document.getElementById('bwSpark');
+  const trend=document.getElementById('bwTrend');
+  if(!data.length){list.innerHTML='<p style="color:var(--dim);font-size:13px;text-align:center;padding:8px">No entries yet — log your first weight.</p>';
+    spark.innerHTML='';trend.innerHTML='';return;}
+  // sparkline
+  const ws=data.map(x=>x.w);const min=Math.min(...ws),max=Math.max(...ws);const rng=(max-min)||1;
+  const n=data.length;
+  const pts=data.map((x,i)=>{const px=n===1?150:(i/(n-1))*300;const py=64-((x.w-min)/rng)*58-3;return px.toFixed(1)+','+py.toFixed(1);});
+  let poly=`<polyline fill="none" stroke="#38bdf8" stroke-width="2" stroke-linejoin="round" points="${pts.join(' ')}"/>`;
+  const area=`<polygon fill="rgba(56,189,248,.12)" points="0,70 ${pts.join(' ')} 300,70"/>`;
+  const dots=data.map((x,i)=>{const[px,py]=pts[i].split(',');return `<circle cx="${px}" cy="${py}" r="2.4" fill="#38bdf8"/>`}).join('');
+  spark.innerHTML=area+poly+dots;
+  // trend: last up-to-7 avg vs previous up-to-7
+  const recent=data.slice(-7),prev=data.slice(-14,-7);
+  const avg=a=>a.reduce((s,x)=>s+x.w,0)/a.length;
+  const rA=avg(recent);
+  let tHtml=`<div class="kv" style="border:none"><span class="k">Latest</span><span class="v">${data[data.length-1].w} kg</span></div>`;
+  if(prev.length){const change=(rA-avg(prev));const perWk=change; const col=change>0?'#4ade80':change<0?'#fb7185':'#93a4c7';
+    tHtml+=`<div class="kv" style="border:none"><span class="k">7-day avg trend</span><span class="v" style="color:${col}">${change>=0?'+':''}${change.toFixed(2)} kg/wk</span></div>`;}
+  trend.innerHTML=tHtml;
+  // list (latest first)
+  list.innerHTML=data.slice().reverse().map((x,ri)=>{
+    const realIndex=data.length-1-ri;
+    return `<div class="logrow"><span>${x.d}</span><span>${x.w} kg <span class="del" onclick="delBW(${realIndex})">✕</span></span></div>`;
+  }).join('');
+}
+function addBW(){
+  const w=parseFloat(document.getElementById('bwInput').value);
+  let d=document.getElementById('bwDate').value;
+  if(!w){alert('Enter a weight');return;}
+  if(!d){d=new Date().toISOString().slice(0,10);}
+  const data=LS.get('bw',[]);
+  const existing=data.findIndex(x=>x.d===d);
+  if(existing>=0)data[existing].w=w;else data.push({d,w});
+  LS.set('bw',data);document.getElementById('bwInput').value='';renderBW();
+}
+function delBW(i){const data=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);data.splice(i,1);LS.set('bw',data);renderBW();}
+function addPR(){
+  const lift=document.getElementById('prLift').value;const val=document.getElementById('prVal').value.trim();
+  if(!val){alert('Enter your top set');return;}
+  const d=new Date().toISOString().slice(0,10);
+  const prs=LS.get('pr',[]);prs.push({lift,val,d});LS.set('pr',prs);
+  document.getElementById('prVal').value='';renderPR();
+}
+function renderPR(){
+  const prs=LS.get('pr',[]);const host=document.getElementById('prList');
+  if(!prs.length){host.innerHTML='<p style="color:var(--dim);font-size:13px;text-align:center">No PRs logged yet.</p>';return;}
+  host.innerHTML=prs.slice().reverse().map((p,ri)=>{const realIndex=prs.length-1-ri;
+    return `<div class="logrow"><span><b>${p.lift}</b> · ${p.val}</span><span style="color:var(--dim)">${p.d} <span class="del" onclick="delPR(${realIndex})">✕</span></span></div>`;
+  }).join('');
+}
+function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
+function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
+  ['bw','pr','phase','sex','gameOn'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+
+/* ============ PHASE CONTROL ============ */
+function setPhase(p){phase=p;LS.set('phase',p);
+  document.querySelectorAll('#phaseSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ph===p));
+  document.getElementById('phaseDesc').textContent=PHASES[p].desc;
+  document.getElementById('phaseTag2').textContent=PHASES[p].name;
+  document.getElementById('phasePill').textContent='In-Season · '+PHASES[p].name;
+  renderWorkouts();
+}
+
+/* ============ INIT ============ */
+document.getElementById('gameToggle').checked=LS.get('gameOn',true);
+toggleGame();
+document.querySelectorAll('#phaseSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ph===phase));
+document.getElementById('phaseDesc').textContent=PHASES[phase].desc;
+document.getElementById('phaseTag2').textContent=PHASES[phase].name;
+document.getElementById('phasePill').textContent='In-Season · '+PHASES[phase].name;
+document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===curSex));
+document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
+renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();
+go('home');
+
+/* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
+if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>
