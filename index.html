@@ -673,7 +673,7 @@ details.acc .inner{padding:0 14px 14px}
 
   <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>Log a session</h3>
-    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px">Pick the session you actually did — defaults to today, but change it if you swapped days. Targets are prefilled; type what you hit.</p>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px">Pick the session you actually did — defaults to today, but change it if you swapped days. Log the <b>weight × reps for each set</b>, add sets with <b>+ set</b>, and add any extra exercise from your bank at the bottom.</p>
     <div class="grid g2">
       <div class="field" style="margin:6px 0"><label>Session</label><select id="sessSel" onchange="loadSessionForm()"></select></div>
       <div class="field" style="margin:6px 0"><label>Date</label><input id="sessDate" type="date"></div>
@@ -1876,47 +1876,91 @@ function buildSessionSelect(){
   sel.innerHTML=DOW.map(k=>`<option value="${k}">${DAY_FULL[k].slice(0,3)} — ${wk[k].title}</option>`).join('')+'<option value="custom">Custom / other</option>';
   sel.value=todayKey();
 }
-function exRow(name,target){
-  return `<div style="border-bottom:1px solid rgba(36,51,82,.4);padding:8px 0">
-    <div style="font-weight:600;font-size:13.5px">${name}</div>
-    <div style="font-size:11.5px;color:var(--dim);margin-bottom:5px">Target: ${target}</div>
-    <input class="exDid" data-name="${name}" placeholder="what you did — e.g. 100×5, 100×5, 105×3" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit">
-  </div>`;
+const inpCss='background:var(--bg2);border:1px solid var(--line);color:#fff;padding:8px;border-radius:9px;font-size:13px;font-family:inherit';
+function renumberSets(container){[...container.querySelectorAll('.setRow')].forEach((r,i)=>{r.querySelector('.setLbl').textContent='Set '+(i+1);});}
+function setRowEl(n,w,r){
+  const row=document.createElement('div');row.className='setRow';
+  row.style.cssText='display:flex;gap:6px;align-items:center;margin:4px 0';
+  row.innerHTML=`<span class="setLbl" style="font-size:11.5px;color:var(--dim);min-width:38px">Set ${n}</span>
+    <input class="sw" type="number" inputmode="decimal" value="${w!=null?w:''}" placeholder="kg" style="width:72px;${inpCss}">
+    <span style="color:var(--dim);font-size:12px">×</span>
+    <input class="sr" type="number" inputmode="numeric" value="${r!=null?r:''}" placeholder="reps" style="width:72px;${inpCss}">
+    <span class="del rmSet" style="margin-left:auto;cursor:pointer">✕</span>`;
+  row.querySelector('.rmSet').onclick=()=>{const c=row.parentElement;row.remove();renumberSets(c);};
+  return row;
 }
-function addCustomRow(){
-  const rows=document.getElementById('exRows');if(!rows)return;
-  const div=document.createElement('div');div.style.cssText='border-bottom:1px solid rgba(36,51,82,.4);padding:8px 0';
-  div.innerHTML=`<input class="exName" placeholder="Exercise" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit;margin-bottom:5px">
-    <input class="exDid" placeholder="what you did — e.g. 100×5, 100×5" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit">`;
-  rows.appendChild(div);
+function makeExRow(name,target,presets){
+  const row=document.createElement('div');row.className='exLogRow';row.dataset.name=name;
+  row.style.cssText='border-bottom:1px solid rgba(36,51,82,.4);padding:10px 0';
+  const head=document.createElement('div');
+  head.style.cssText='display:flex;justify-content:space-between;align-items:baseline;gap:8px';
+  head.innerHTML=`<div><div style="font-weight:600;font-size:13.5px">${name}</div>${target?`<div style="font-size:11.5px;color:var(--dim)">Target: ${target}</div>`:''}</div><span class="del rmRow" style="cursor:pointer;font-size:11.5px">remove</span>`;
+  head.querySelector('.rmRow').onclick=()=>row.remove();
+  const sets=document.createElement('div');sets.className='setsWrap';
+  const addBtn=document.createElement('button');addBtn.className='btn ghost';addBtn.textContent='+ set';
+  addBtn.style.cssText='width:auto;margin:6px 0 0;padding:6px 12px;font-size:12.5px';
+  addBtn.onclick=()=>{sets.appendChild(setRowEl(sets.children.length+1));};
+  row.appendChild(head);row.appendChild(sets);row.appendChild(addBtn);
+  (presets&&presets.length?presets:[{}]).forEach((s,i)=>sets.appendChild(setRowEl(i+1,s.w,s.r)));
+  return row;
+}
+function isProgramExercise(name){
+  return Object.values(WK_SETS).some(set=>Object.values(set).some(day=>day.blocks.some(b=>b.items.some(it=>it[0]===name))));
+}
+function exerciseLibrary(){
+  const names=new Set();
+  Object.values(WK_SETS).forEach(set=>Object.values(set).forEach(day=>day.blocks.forEach(b=>b.items.forEach(it=>names.add(it[0])))));
+  LS.get('exbank',[]).forEach(n=>names.add(n));
+  return [...names].sort();
+}
+function buildAddExerciseUI(){
+  const box=document.createElement('div');box.style.cssText='margin-top:14px';
+  box.innerHTML=`<label style="display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-weight:600">Add another exercise <span style="color:var(--dim);font-weight:400">— new names are saved to your bank</span></label>
+    <div style="display:flex;gap:6px">
+      <input id="addExInput" list="exBankList" placeholder="type or pick from your bank" style="flex:1;${inpCss};padding:10px;font-size:13.5px">
+      <button class="btn" style="width:auto;margin:0;padding:0 16px" id="addExBtn">Add</button>
+    </div>
+    <datalist id="exBankList">${exerciseLibrary().map(n=>`<option value="${n.replace(/"/g,'&quot;')}"></option>`).join('')}</datalist>`;
+  box.querySelector('#addExBtn').onclick=()=>{const inp=box.querySelector('#addExInput');const name=inp.value.trim();if(!name)return;addExerciseToWorkout(name);inp.value='';};
+  return box;
+}
+function addExerciseToWorkout(name){
+  const bank=LS.get('exbank',[]);
+  if(!isProgramExercise(name)&&!bank.some(n=>n.toLowerCase()===name.toLowerCase())){bank.push(name);LS.set('exbank',bank);
+    const dl=document.getElementById('exBankList');if(dl){const o=document.createElement('option');o.value=name;dl.appendChild(o);}}
+  const wrap=document.getElementById('exRows');if(wrap)wrap.appendChild(makeExRow(name,''));
 }
 function loadSessionForm(){
   const sel=document.getElementById('sessSel'),host=document.getElementById('sessForm');if(!sel||!host)return;
+  host.innerHTML='';
+  const wrap=document.createElement('div');wrap.id='exRows';host.appendChild(wrap);
   const k=sel.value;
-  if(k==='custom'){host.innerHTML='<div id="exRows"></div><button class="btn ghost" onclick="addCustomRow()">+ Add exercise</button>';addCustomRow();return;}
-  const w=curWK()[k];let rows='';
-  w.blocks.forEach(b=>b.items.forEach(it=>{rows+=exRow(it[0],S(it[1]));}));
-  host.innerHTML=`<div id="exRows">${rows}</div>`;
+  if(k!=='custom'){curWK()[k].blocks.forEach(b=>b.items.forEach(it=>wrap.appendChild(makeExRow(it[0],S(it[1])))));}
+  host.appendChild(buildAddExerciseUI());
 }
+function fmtSets(sets){return sets.map(s=>`${s.w?s.w:''}${s.w&&s.r?'×':s.w?'':''}${s.r?s.r:''}`.trim()||'✓').join(', ');}
 function saveSession(){
   const sel=document.getElementById('sessSel'),k=sel.value,wk=curWK();
   const title=k==='custom'?'Custom session':(wk[k]?wk[k].title:'Session');
   const ex=[];
-  document.querySelectorAll('#sessForm .exDid').forEach(inp=>{
-    const did=inp.value.trim();let name=inp.dataset.name||'';
-    if(!name){const nm=inp.parentElement.querySelector('.exName');name=nm?nm.value.trim():'';}
-    if(did||(name&&k==='custom'))ex.push({name,did});
+  document.querySelectorAll('#exRows .exLogRow').forEach(row=>{
+    const name=row.dataset.name||'';const sets=[];
+    row.querySelectorAll('.setRow').forEach(sr=>{
+      const w=sr.querySelector('.sw').value.trim(),r=sr.querySelector('.sr').value.trim();
+      if(w||r)sets.push({w,r});
+    });
+    if(sets.length)ex.push({name,sets});
   });
   const d=document.getElementById('sessDate').value||new Date().toISOString().slice(0,10);
   const rpe=parseInt(document.getElementById('sessRPE').value)||null;
   const feel=document.getElementById('sessFeel').value;
   const note=document.getElementById('sessNote').value.trim();
-  if(!ex.some(e=>e.did)&&!rpe){alert('Log at least one exercise or the session RPE');return;}
+  if(!ex.length&&!rpe){alert('Log at least one exercise (a set) or the session RPE');return;}
   const sessions=LS.get('sessions',[]);
   sessions.push({id:Date.now()+''+Math.floor(Math.random()*1000),d,block:curBlock().k,key:k,title,rpe,feel,note,ex});
   LS.set('sessions',sessions);
-  document.querySelectorAll('#sessForm .exDid').forEach(i=>i.value='');
   document.getElementById('sessRPE').value='';document.getElementById('sessNote').value='';
+  loadSessionForm();
   const msg=document.getElementById('sessMsg');msg.textContent='✓ Workout saved.';clearTimeout(window._st);window._st=setTimeout(()=>msg.textContent='',2500);
   renderSessionHistory();renderRecommendation();renderToday();
 }
@@ -1927,7 +1971,7 @@ function renderSessionHistory(){
   if(!s.length){host.innerHTML='<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">No workouts logged yet.</p>';return;}
   const fic={great:'💪',ok:'🙂',rough:'😪'};
   host.innerHTML=s.map(x=>{
-    const exList=x.ex.filter(e=>e.did).map(e=>`<div style="font-size:12.5px;color:var(--muted);padding:2px 0">${e.name}: <span style="color:var(--txt);font-weight:600">${e.did}</span></div>`).join('');
+    const exList=x.ex.filter(e=>(e.sets&&e.sets.length)||e.did).map(e=>`<div style="font-size:12.5px;color:var(--muted);padding:2px 0">${e.name}: <span style="color:var(--txt);font-weight:600">${e.sets?fmtSets(e.sets):e.did}</span></div>`).join('');
     return `<details class="acc"><summary>${x.d} — ${x.title}${x.rpe?` · RPE ${x.rpe}`:''} ${fic[x.feel]||''}</summary>
       <div class="inner">${exList||'<div style="font-size:12px;color:var(--dim)">No exercises recorded.</div>'}${x.note?`<div class="note" style="margin-top:8px">${x.note}</div>`:''}
       <div class="del" style="margin-top:10px;display:inline-block" onclick="delSession('${x.id}')">✕ Delete</div></div></details>`;
@@ -1998,7 +2042,7 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','block','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery','sessions','readiness'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','block','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery','sessions','readiness','exbank'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
