@@ -444,6 +444,28 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 
   <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Activity &amp; workouts</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 4px">Log the session you did — from your plan or anything else — and it estimates calories burned from your bodyweight.</p>
+    <div class="field" style="margin:8px 0 6px"><label>Date</label><input id="actDate" type="date"></div>
+    <div class="field" style="margin:6px 0"><label>Activity</label>
+      <select id="actSel" onchange="estBurn()"></select>
+    </div>
+    <div class="field" style="margin:6px 0" id="actNameWrap"><label>Custom name</label><input id="actName" placeholder="e.g. Stick &amp; puck, dog walk, yoga"></div>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Minutes</label><input id="actMins" type="number" inputmode="numeric" value="45" oninput="estBurn()"></div>
+      <div class="field" style="margin:6px 0"><label>Calories burned (est.)</label><input id="actKcal" type="number" inputmode="numeric" placeholder="auto"></div>
+    </div>
+    <button class="btn" onclick="addActivity()">Add activity</button>
+    <div id="actToday" style="margin-top:14px"></div>
+    <div id="actList"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Weekly review</h3>
+    <div id="reviewOut"></div>
+  </div>
+
+  <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>Bodyweight log</h3>
     <div class="grid g2">
       <div class="field" style="margin:6px 0"><label>Weight (kg)</label><input id="bwInput" type="number" inputmode="decimal" placeholder="79.0"></div>
@@ -1051,6 +1073,114 @@ function renderIntakeInsight(){
   host.innerHTML=rows+`<div class="note" style="margin-top:12px">${msg}</div>`;
 }
 
+/* ============ ACTIVITY / WORKOUT LOG ============ */
+const ACTS=[
+ {g:'From your plan', n:'Lower · Strength + Power (Mon)', met:6,  cat:'strength'},
+ {g:'From your plan', n:'Upper · Strength + Power (Tue)', met:6,  cat:'strength'},
+ {g:'From your plan', n:'Speed + Anaerobic (Wed)',       met:8,  cat:'speed'},
+ {g:'From your plan', n:'Upper Hypertrophy + Prehab (Thu)',met:5, cat:'strength'},
+ {g:'From your plan', n:'CNS Primer (Fri)',              met:5,  cat:'recovery'},
+ {g:'From your plan', n:'Game / Skate (Sat)',            met:8,  cat:'game'},
+ {g:'From your plan', n:'Recovery + Aerobic (Sun)',      met:4,  cat:'recovery'},
+ {g:'Cardio / ice',   n:'Ice hockey — game or skate',    met:8,  cat:'game'},
+ {g:'Cardio / ice',   n:'Running',                       met:9,  cat:'conditioning'},
+ {g:'Cardio / ice',   n:'Cycling (steady)',              met:6,  cat:'conditioning'},
+ {g:'Cardio / ice',   n:'Assault bike / HIIT',           met:10, cat:'conditioning'},
+ {g:'Cardio / ice',   n:'Rowing',                        met:7,  cat:'conditioning'},
+ {g:'Cardio / ice',   n:'Swimming',                      met:7,  cat:'conditioning'},
+ {g:'Cardio / ice',   n:'Walking',                       met:3.5,cat:'other'},
+ {g:'Gym',            n:'Weight training',               met:5,  cat:'strength'},
+ {g:'Gym',            n:'Mobility / stretching',         met:2.5,cat:'recovery'},
+ {g:'Sport',          n:'Football / soccer',             met:7,  cat:'conditioning'},
+ {g:'Sport',          n:'Basketball',                    met:6.5,cat:'conditioning'},
+ {g:'Other',          n:'Custom…',                       met:0,  cat:'other'}
+];
+function bodyKg(){const bw=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);
+  if(bw.length)return bw[bw.length-1].w;
+  const w=parseFloat(document.getElementById('weight').value);return w||80;}
+function buildActSelect(){
+  const sel=document.getElementById('actSel');let html='',g='';
+  ACTS.forEach((a,i)=>{if(a.g!==g){if(g)html+='</optgroup>';html+=`<optgroup label="${a.g}">`;g=a.g;}
+    html+=`<option value="${i}">${a.n}</option>`;});
+  html+='</optgroup>';sel.innerHTML=html;
+}
+function estBurn(){
+  const a=ACTS[parseInt(document.getElementById('actSel').value)];if(!a)return;
+  const mins=parseFloat(document.getElementById('actMins').value)||0;
+  document.getElementById('actNameWrap').style.display=a.met===0?'block':'none';
+  if(a.met>0)document.getElementById('actKcal').value=Math.round(a.met*3.5*bodyKg()/200*mins);
+}
+function actDateVal(){const d=document.getElementById('actDate').value;return d||new Date().toISOString().slice(0,10);}
+function addActivity(){
+  const a=ACTS[parseInt(document.getElementById('actSel').value)];
+  const custom=document.getElementById('actName').value.trim();
+  const name=a.met===0?(custom||'Activity'):a.n;
+  const mins=parseFloat(document.getElementById('actMins').value)||0;
+  let kcal=parseFloat(document.getElementById('actKcal').value);
+  if(isNaN(kcal))kcal=a.met>0?Math.round(a.met*3.5*bodyKg()/200*mins):0;
+  const data=LS.get('activity',[]);
+  data.push({id:Date.now()+''+Math.floor(Math.random()*1000),d:actDateVal(),name,cat:a.cat,mins,kcal:Math.round(kcal)});
+  LS.set('activity',data);document.getElementById('actName').value='';renderActivity();
+}
+function delActivity(id){LS.set('activity',LS.get('activity',[]).filter(x=>x.id!==id));renderActivity();}
+function renderActivity(){
+  const data=LS.get('activity',[]),d=actDateVal();
+  const today=data.filter(x=>x.d===d);
+  const tMins=today.reduce((s,x)=>s+(x.mins||0),0),tKcal=today.reduce((s,x)=>s+(x.kcal||0),0);
+  document.getElementById('actToday').innerHTML= today.length
+    ? `<div class="kv" style="border:none"><span class="k">This day</span><span class="v">${tMins} min · ~${tKcal.toLocaleString()} kcal burned</span></div>`
+      +today.map(x=>`<div class="logrow"><span><b>${x.name}</b>${x.mins?` · ${x.mins} min`:''}</span><span style="color:var(--dim)">${x.kcal?'~'+x.kcal+' kcal':''} <span class="del" onclick="delActivity('${x.id}')">✕</span></span></div>`).join('')
+    : `<p style="color:var(--dim);font-size:13px;text-align:center;margin:4px 0">Nothing logged for this day yet.</p>`;
+  const others=data.filter(x=>x.d!==d).sort((a,b)=>a.d<b.d?1:-1);
+  const list=document.getElementById('actList');
+  if(others.length){
+    const byDay={};others.forEach(x=>{(byDay[x.d]=byDay[x.d]||[]).push(x);});
+    list.innerHTML='<div class="blocklabel b-warm" style="margin:12px 0 4px">Earlier</div>'+Object.keys(byDay).map(day=>{
+      const arr=byDay[day],m=arr.reduce((s,x)=>s+(x.mins||0),0),k=arr.reduce((s,x)=>s+(x.kcal||0),0);
+      return `<div class="logrow"><span>${day} · ${arr.map(x=>x.name).join(', ')}</span><span style="color:var(--dim)">${m} min${k?' · ~'+k+' kcal':''}</span></div>`;
+    }).join('');
+  }else list.innerHTML='';
+  renderReview();
+}
+function renderReview(){
+  const host=document.getElementById('reviewOut');if(!host)return;
+  const acts=LS.get('activity',[]);
+  const now=new Date(),cut=new Date();cut.setDate(now.getDate()-6);
+  const cutStr=cut.toISOString().slice(0,10);
+  const inWk=acts.filter(x=>x.d>=cutStr);
+  const bw=LS.get('bw',[]).slice().sort((a,b)=>a.d<b.d?-1:1);
+  const intake=getIntake().filter(x=>(x.kcal||0)>0);
+  if(!inWk.length&&!intake.length){
+    host.innerHTML='<p style="color:var(--dim);font-size:13px;margin:0">Log some activities (and your food) and this will evaluate your week — training frequency, variety, active load and whether it lines up with your weight trend.</p>';
+    return;
+  }
+  const trainDays=new Set(inWk.filter(x=>['strength','speed','game','conditioning'].includes(x.cat)).map(x=>x.d)).size;
+  const totalMins=inWk.reduce((s,x)=>s+(x.mins||0),0);
+  const totalKcal=inWk.reduce((s,x)=>s+(x.kcal||0),0);
+  const cats=new Set(inWk.map(x=>x.cat));
+  let rows=`<div class="kv"><span class="k">Training days (last 7)</span><span class="v">${trainDays} / 6</span></div>`
+    +`<div class="kv"><span class="k">Total active time</span><span class="v">${totalMins} min</span></div>`
+    +`<div class="kv"><span class="k">Est. calories burned</span><span class="v">~${totalKcal.toLocaleString()} kcal</span></div>`;
+  let trend=null;
+  if(bw.length>=2){const f=bw[0],l=bw[bw.length-1],dd=(new Date(l.d)-new Date(f.d))/86400000;if(dd>=1)trend=(l.w-f.w)/dd*7;}
+  if(trend!==null)rows+=`<div class="kv"><span class="k">Weight trend</span><span class="v" style="color:${trend>0.02?'#4ade80':trend<-0.02?'#fb7185':'#93a4c7'}">${trend>=0?'+':''}${trend.toFixed(2)} kg/wk</span></div>`;
+  const ev=[];
+  if(trainDays>=6)ev.push('Excellent consistency — you’re hitting the 6-day framework.');
+  else if(trainDays>=4)ev.push(`Solid work — ${trainDays} training days, just under the 6-day plan.`);
+  else if(trainDays>=2)ev.push(`Light week — only ${trainDays} training days logged vs the 6-day plan.`);
+  else if(inWk.length)ev.push('Very little training logged this week — get back on the plan when recovered.');
+  const want={strength:'strength',speed:'speed/plyo',conditioning:'conditioning',game:'game/skate'};
+  const missing=Object.keys(want).filter(c=>!cats.has(c));
+  if(missing.length&&trainDays>0)ev.push('Not logged this week: '+missing.map(c=>want[c]).join(', ')+'.');
+  if(cats.has('strength')&&(cats.has('conditioning')||cats.has('speed')||cats.has('game')))ev.push('Good balance of strength and energy-system work.');
+  if(trend!==null){
+    if(trend>0.45)ev.push('You’re training hard but gaining fast for a lean bulk — trim calories slightly to keep it lean.');
+    else if(trend>=0.2)ev.push('Training and fuelling are lined up — weight is moving at a lean-gain pace.');
+    else if(trend<=0)ev.push('Training hard but not gaining — eat more to turn this work into muscle.');
+  }
+  host.innerHTML=rows+(ev.length?'<div class="note" style="margin-top:12px"><b>Evaluation</b><ul class="clean" style="margin:6px 0 0">'+ev.map(e=>`<li>${e}</li>`).join('')+'</ul></div>':'');
+}
+
 function addPR(){
   const lift=document.getElementById('prLift').value;const val=document.getElementById('prVal').value.trim();
   if(!val){alert('Enter your top set');return;}
@@ -1067,7 +1197,7 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee','activity'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
@@ -1088,7 +1218,9 @@ document.getElementById('phasePill').textContent='In-Season · '+PHASES[phase].n
 document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===curSex));
 document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
 document.getElementById('intakeDate').value=new Date().toISOString().slice(0,10);
-renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();renderIntake();
+document.getElementById('actDate').value=new Date().toISOString().slice(0,10);
+buildActSelect();estBurn();
+renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();renderIntake();renderActivity();
 go('home');
 
 /* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
