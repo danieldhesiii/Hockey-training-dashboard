@@ -226,11 +226,14 @@ details.acc .inner{padding:0 14px 14px}
 
   <h3><span class="bar"></span>Jump in</h3>
   <div class="grid g2">
-    <div class="card tight" style="cursor:pointer" onclick="go('week')"><b>📅 Weekly Plan →</b><div style="font-size:12.5px;color:var(--muted)">See the 6-day map around your game.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('week')"><b>📅 Weekly Schedule →</b><div style="font-size:12.5px;color:var(--muted)">Gym, sprints, skills &amp; rehab mapped to your week.</div></div>
     <div class="card tight" style="cursor:pointer" onclick="go('train')"><b>🏋️ Workouts →</b><div style="font-size:12.5px;color:var(--muted)">Full session detail, sets &amp; reps.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('skills')"><b>🏒 Skills &amp; Speed →</b><div style="font-size:12.5px;color:var(--muted)">Shooting, stickhandling, sprints, agility.</div></div>
     <div class="card tight" style="cursor:pointer" onclick="go('cardio')"><b>❤️ Conditioning →</b><div style="font-size:12.5px;color:var(--muted)">Energy-system interval menu.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('rehab')"><b>🩹 Rehab →</b><div style="font-size:12.5px;color:var(--muted)">Wrist, knee &amp; shoulder — isometrics &amp; progressions.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('kitchen')"><b>🛒 Meals &amp; Groceries →</b><div style="font-size:12.5px;color:var(--muted)">Save meals, one-tap log, shopping list.</div></div>
     <div class="card tight" style="cursor:pointer" onclick="go('calc')"><b>🧮 Calorie Calculator →</b><div style="font-size:12.5px;color:var(--muted)">Your maintenance &amp; lean-gain targets.</div></div>
-    <div class="card tight" style="cursor:pointer" onclick="go('wrist')"><b>🩹 Wrist Rehab →</b><div style="font-size:12.5px;color:var(--muted)">Isometrics now, dynamic later + gym swaps.</div></div>
+    <div class="card tight" style="cursor:pointer" onclick="go('log')"><b>📈 Progress &amp; Tracking →</b><div style="font-size:12.5px;color:var(--muted)">Log food, water, activity &amp; bodyweight.</div></div>
   </div>
 </section>
 
@@ -253,6 +256,10 @@ details.acc .inner{padding:0 14px 14px}
     <span class="tag t-power">Primer</span> ·
     <span class="tag t-game">Game</span>
   </div>
+
+  <h3><span class="bar"></span>Full daily schedule</h3>
+  <p class="sub" style="margin-bottom:10px">Everything mapped onto the week — gym, sprints, change-of-direction, shooting, stickhandling and rehab. Tap the game toggle above to flip Saturday.</p>
+  <div id="scheduleHost"></div>
 
   <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>If your game moves (Fri instead of Sat)</h3>
@@ -286,7 +293,7 @@ details.acc .inner{padding:0 14px 14px}
   <h2 class="ttl">Workouts</h2>
   <p class="sub">Loading targets follow the phase you picked (<span id="phaseTag2" style="color:var(--ice);font-weight:700">Strength</span>). RPE = reps-in-reserve guide; RPE 8 ≈ 2 reps left.</p>
 
-  <div class="note"><b>Wrist injury?</b> Keep training — just use straps on pulls and neutral-grip / dumbbell pressing up top. Full swaps are in the <a href="#" onclick="go('wrist');return false;">Wrist Rehab</a> tab.</div>
+  <div class="note"><b>Wrist injury?</b> Keep training — just use straps on pulls and neutral-grip / dumbbell pressing up top. Full swaps are in the <a href="#" onclick="go('rehab');return false;">Rehab</a> tab.</div>
 
   <details class="acc" id="plyoBox">
     <summary><span class="tag t-power">Reactive</span>&nbsp; Reactive plyometrics &amp; fast-twitch drills</summary>
@@ -323,12 +330,97 @@ details.acc .inner{padding:0 14px 14px}
   <div id="cardioHost"></div>
 </section>
 
+<!-- ================= SKILLS & SPEED ================= -->
+<section class="page" id="p-skills">
+  <h2 class="ttl">Skills &amp; Speed</h2>
+  <p class="sub">Shooting, stickhandling, sprint speed and change-of-direction. The <b onclick="go('week')" style="color:var(--ice);cursor:pointer">schedule</b> tells you which day to do each.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Shooting — Mon &amp; Thu</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Quality over quantity — <b style="color:#fff">40–60 focused reps</b> beats 200 lazy ones. Do it after lifting on Monday, and as a fresher skill block on Thursday.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="exn">Wrist shots<span class="cue">Weight transfer back-to-front, pull the puck, snap the top hand. Pick corners.</span></td><td class="scheme">2×15</td></tr>
+      <tr><td class="exn">Snap shots<span class="cue">Quick release, minimal wind-up — flex the stick, fast hands.</span></td><td class="scheme">2×10</td></tr>
+      <tr><td class="exn">One-timers<span class="cue">Set the feet, take the pass into the shot in one motion.</span></td><td class="scheme">2×10</td></tr>
+      <tr><td class="exn">Backhand<span class="cue">Under-rated in games — pocket the puck, follow through high.</span></td><td class="scheme">1×10</td></tr>
+      <tr><td class="exn">Catch-and-release / in-tight<span class="cue">Receive, settle, shoot fast; then quick dekes to release in-tight.</span></td><td class="scheme">1×10</td></tr>
+    </tbody></table></div>
+    <div class="note">Wrist injury? Keep volume light and pain-free — favour quick snap shots over heavy slaps until Phase 2 (see <b onclick="go('rehab')" style="cursor:pointer">Rehab</b>).</div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Stickhandling — Tue, Thu &amp; daily-friendly</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Cheap on the body — you can touch it most days (even 10 min in the garage). Eyes up, soft hands, full range.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="exn">Stationary dribbles<span class="cue">Wide, tight, front-back, figure-8. Find a rhythm, then speed up.</span></td><td class="scheme">3–5 min</td></tr>
+      <tr><td class="exn">Toe-drags &amp; pulls<span class="cue">Deception — pull to forehand/backhand, toe-drag around a cone.</span></td><td class="scheme">5 min</td></tr>
+      <tr><td class="exn">Handling on the move<span class="cue">Weave cones, protect the puck, head up looking away from the blade.</span></td><td class="scheme">5 min</td></tr>
+      <tr><td class="exn">Reaction hands<span class="cue">React to a call/ball while handling — mirrors reading the ice.</span></td><td class="scheme">3–5 min</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Sprint speed — Wednesday</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Do it <b style="color:#fff">fresh</b>, full recovery, max intent — nervous-system work, not conditioning. First-step quickness wins hockey.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="exn">Acceleration sprints<span class="cue">Powerful first 3 steps, aggressive arm drive, forward lean. Walk back ~90s.</span></td><td class="scheme">6–8×15–20m</td></tr>
+      <tr><td class="exn">Flying / build-up runs<span class="cue">Ease in, hit top speed for 10–15m, relaxed and tall.</span></td><td class="scheme">3–4×30m</td></tr>
+      <tr><td class="exn">Resisted starts (optional)<span class="cue">Sled/band — teaches force into the ground. Keep it fast.</span></td><td class="scheme">4–6×15m</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Change of direction &amp; agility — Wednesday</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Plant, decelerate, re-accelerate — the skating skill of games. Pair it with the sprint work while you're fresh.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="exn">Pro-agility 5-10-5<span class="cue">Sprint 5, plant, 10 back, plant, 5 finish. Low hips, sharp cuts.</span></td><td class="scheme">4–5 reps</td></tr>
+      <tr><td class="exn">L-drill / box cuts<span class="cue">90° and 45° cuts — decelerate under control, drive out hard.</span></td><td class="scheme">4 reps</td></tr>
+      <tr><td class="exn">Reactive cuts<span class="cue">React to a call/point and cut that way — adds the read to the movement.</span></td><td class="scheme">4–6 reps</td></tr>
+      <tr><td class="exn">Crossover starts<span class="cue">Lateral push into a sprint — mirrors edges &amp; first-step on ice.</span></td><td class="scheme">4×10m ea</td></tr>
+    </tbody></table></div>
+    <div class="note">More reactive first-step &amp; edge drills (incl. your RFE tap drill) are in the Reactive panel at the top of <b onclick="go('train')" style="cursor:pointer">Train</b>.</div>
+  </div>
+</section>
+
 <!-- ================= NUTRITION ================= -->
 <section class="page" id="p-nutri">
   <h2 class="ttl">Nutrition — Lean Gain</h2>
   <p class="sub">Goal: 79 → 84–85 kg, staying lean. That means a <b style="color:#fff">controlled surplus</b> and patience — chase ~0.2–0.35 kg/week.</p>
   <div id="nutriHost"></div>
   <div class="card tight" style="cursor:pointer;text-align:center" onclick="go('calc')"><b style="color:var(--ice)">→ Open the Calorie Calculator</b><div style="font-size:12.5px;color:var(--muted)">Get your exact maintenance &amp; target numbers</div></div>
+</section>
+
+<!-- ================= KITCHEN ================= -->
+<section class="page" id="p-kitchen">
+  <h2 class="ttl">Meals &amp; Groceries</h2>
+  <p class="sub">Save the meals you actually eat, then one-tap log them to your day. Keep a grocery list so the food's always in.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>My meals</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px">Add a meal once; tap <b style="color:var(--ice)">Log</b> to add its calories to today's intake in the <b onclick="go('log')" style="cursor:pointer;color:var(--ice)">Log</b> tab.</p>
+    <div class="field" style="margin:6px 0"><label>Meal name</label><input id="mealName" placeholder="e.g. Chicken, rice &amp; veg"></div>
+    <div class="grid g3">
+      <div class="field" style="margin:6px 0"><label>Calories</label><input id="mealKcal" type="number" inputmode="numeric" placeholder="650"></div>
+      <div class="field" style="margin:6px 0"><label>Protein (g)</label><input id="mealProt" type="number" inputmode="numeric" placeholder="55"></div>
+      <div class="field" style="margin:6px 0;display:flex;align-items:flex-end"><button class="btn" style="margin:0" onclick="addMeal()">Save meal</button></div>
+    </div>
+    <div id="mealMsg" style="font-size:12.5px;color:var(--ok);min-height:16px;margin-top:4px"></div>
+    <div id="mealList" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Grocery list</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px">The staples that keep the plan running. Tap a suggestion or add your own; tap an item to tick it off.</p>
+    <div style="display:flex;gap:8px">
+      <input id="groInput" placeholder="Add item… e.g. Greek yogurt" style="flex:1;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:12px;border-radius:12px;font-size:15px;font-family:inherit" onkeydown="if(event.key==='Enter')addGrocery()">
+      <button class="btn" style="width:auto;margin:0;padding:0 18px" onclick="addGrocery()">Add</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px" id="groQuick"></div>
+    <div id="groList" style="margin-top:6px"></div>
+    <button class="btn ghost" style="margin-top:10px" onclick="clearGot()">Clear ticked items</button>
+  </div>
+
+  <div class="note"><b>Tip:</b> build meals from your grocery staples so your saved meals and shopping list stay in sync — e.g. a "Chicken &amp; rice bowl" meal pulls from chicken, rice and veg on the list.</div>
 </section>
 
 <!-- ================= CALCULATOR ================= -->
@@ -501,12 +593,14 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 </section>
 
-<!-- ================= WRIST REHAB ================= -->
-<section class="page" id="p-wrist">
-  <h2 class="ttl">Wrist Rehab</h2>
-  <p class="sub">Isometrics first, pain-guided, done at home — then ease into dynamic loading once it settles (~2 weeks). Protect it in the gym meanwhile.</p>
+<!-- ================= REHAB ================= -->
+<section class="page" id="p-rehab">
+  <h2 class="ttl">Rehab &amp; Prehab</h2>
+  <p class="sub">Wrist, knee and shoulder — isometrics first, pain-guided, then progress the load. The <b onclick="go('week')" style="color:var(--ice);cursor:pointer">schedule</b> shows which day to hit each.</p>
 
-  <div class="note warn"><b>Read first:</b> this is general rehab programming, not a diagnosis. If it hasn't been assessed — or if you get numbness/tingling, it gives way, there's night pain, or it's not improving in 2–3 weeks — see a physio or doctor. Sharp pain is a stop sign: work around it, never through it.</div>
+  <div class="note warn"><b>Read first:</b> this is general rehab programming, not a diagnosis. If something hasn't been assessed — or you get numbness/tingling, giving way, night pain, or it's not improving in 2–3 weeks — see a physio or doctor. Sharp pain is a stop sign: work around it, never through it.</div>
+
+  <h3><span class="bar"></span>🩹 Wrist</h3>
 
   <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>The pain rule (every drill)</h3>
@@ -563,6 +657,87 @@ details.acc .inner{padding:0 14px 14px}
     </ul>
     <div class="note">Lower-body and posterior-chain work barely touch the wrist. Load those hard, use straps/neutral grips up top, and let the isometrics do their job.</div>
   </div>
+
+  <h3 style="margin-top:30px"><span class="bar"></span>🦵 Knee</h3>
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Tendon pain rule</h3>
+    <ul class="clean">
+      <li>Tendon (patellar) pain up to <b>≤ 3–4/10</b> during loading is OK — judge it by <b>next-morning stiffness</b>, not just the session.</li>
+      <li>Worse or stiffer the next morning = too much load; drop it back.</li>
+      <li>Heavy <b>isometrics</b> can calm an angry tendon and even reduce pain — use them on sore days.</li>
+    </ul>
+  </div>
+
+  <details class="acc" open>
+   <summary><span class="tag t-easy">Phase 1</span>&nbsp; Isometrics — calm &amp; load the tendon</summary>
+   <div class="inner">
+     <p style="font-size:13px;color:var(--muted)">Long, heavy-ish holds through a pain-free range. Great before or after training, or daily if it's irritable.</p>
+     <div class="blocklabel b-prehab">4–5 holds × 30–45s · rest ~1–2 min</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Spanish squat<span class="cue">Band behind the knees, sit back into a ~70–90° hold, shins vertical. The go-to patellar-tendon iso.</span></td><td class="scheme">5×30–45s</td></tr>
+       <tr><td class="exn">Wall sit<span class="cue">Thighs parallel, hold. Simple and effective if you've no band.</span></td><td class="scheme">4×30–45s</td></tr>
+       <tr><td class="exn">Iso leg-extension hold<span class="cue">Machine or banded — hold at ~60° knee bend, hard but pain ≤3–4.</span></td><td class="scheme">4×30s</td></tr>
+       <tr><td class="exn">Iso split-squat hold<span class="cue">Loads one side — hold mid-range, tall torso.</span></td><td class="scheme">3×20–30s / leg</td></tr>
+     </tbody></table></div>
+   </div>
+  </details>
+
+  <details class="acc">
+   <summary><span class="tag t-mod">Phase 2</span>&nbsp; Slow isotonic loading — build tendon capacity</summary>
+   <div class="inner">
+     <p style="font-size:13px;color:var(--muted)">Once isometrics are comfortable, load through range with a <b>slow tempo</b> (3s down, 2–3s up). This is what actually thickens and strengthens the tendon.</p>
+     <div class="blocklabel b-prehab">3–4 sets · 6–8 reps · slow &amp; controlled</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Slow leg extension<span class="cue">3s down, pause, drive up. Build load week to week if no morning flare.</span></td><td class="scheme">3–4×6–8</td></tr>
+       <tr><td class="exn">Heels-elevated / decline squat<span class="cue">Plate or slant under heels — biases the quad &amp; tendon. Slow descent.</span></td><td class="scheme">3×8</td></tr>
+       <tr><td class="exn">Step-downs (eccentric)<span class="cue">Off a low box, lower under control on the working leg. Knee tracks over toe.</span></td><td class="scheme">3×8 / leg</td></tr>
+       <tr><td class="exn">Leg press (slow)<span class="cue">Controlled, full but pain-free range — great scalable load.</span></td><td class="scheme">3×8–10</td></tr>
+       <tr><td class="exn">Nordic / RDL (hamstring)<span class="cue">Balance the knee with posterior-chain strength.</span></td><td class="scheme">3×6–8</td></tr>
+       <tr><td class="exn">Tibialis + calf raise<span class="cue">Below-knee resilience — protects the knee on stops &amp; landings.</span></td><td class="scheme">3×12–15</td></tr>
+     </tbody></table></div>
+     <div class="note">Then re-introduce jumps/plyos only once slow strength is pain-free — start with landings (absorb), then low-amplitude hops, before reactive work.</div>
+   </div>
+  </details>
+
+  <h3 style="margin-top:30px"><span class="bar"></span>🫱 Shoulder</h3>
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>How to load it</h3>
+    <ul class="clean">
+      <li>Pain <b>≤ 3/10</b>, no sharp catching. Cuff &amp; scap work can be done most days at low load.</li>
+      <li>If it's irritable, start with <b>isometrics</b>; add movement as it settles.</li>
+      <li>A robust shoulder <b>and neck</b> is your best insurance against checks and falls.</li>
+    </ul>
+  </div>
+
+  <details class="acc" open>
+   <summary><span class="tag t-easy">Phase 1</span>&nbsp; Isometrics &amp; activation — irritable phase</summary>
+   <div class="inner">
+     <div class="blocklabel b-prehab">4–5 holds × 20–40s · pain-free</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Iso external rotation<span class="cue">Elbow at side, press the back of your hand into a wall/door frame. Don't let it move.</span></td><td class="scheme">4×30s</td></tr>
+       <tr><td class="exn">Iso internal rotation<span class="cue">Press palm into the wall the other way.</span></td><td class="scheme">4×30s</td></tr>
+       <tr><td class="exn">Iso abduction hold<span class="cue">Arm slightly out from the side, press into a wall.</span></td><td class="scheme">3×20–30s</td></tr>
+       <tr><td class="exn">Scapular sets<span class="cue">Gently set the shoulder blades down &amp; back, hold. Wakes up the stabilisers.</span></td><td class="scheme">3×20s</td></tr>
+     </tbody></table></div>
+   </div>
+  </details>
+
+  <details class="acc">
+   <summary><span class="tag t-mod">Phase 2</span>&nbsp; Cuff, scap &amp; loaded strength</summary>
+   <div class="inner">
+     <p style="font-size:13px;color:var(--muted)">Build the rotator cuff and scapular control, then re-load pressing/pulling. Slow and controlled.</p>
+     <div class="blocklabel b-prehab">2–3 sets · 12–15 reps</div>
+     <div class="ex"><table><tbody>
+       <tr><td class="exn">Band external / internal rotation<span class="cue">Elbow pinned to side — the cuff bread-and-butter.</span></td><td class="scheme">3×15 ea</td></tr>
+       <tr><td class="exn">Face pull + external rotation<span class="cue">Rear delts + cuff. Pull to the face, rotate the knuckles up.</span></td><td class="scheme">3×15</td></tr>
+       <tr><td class="exn">Prone Y-T-W raises<span class="cue">Lower-trap &amp; scap control — light, squeeze at the top.</span></td><td class="scheme">3×10 ea</td></tr>
+       <tr><td class="exn">Wall slides + serratus punch<span class="cue">Upward rotation &amp; serratus — huge for healthy overhead.</span></td><td class="scheme">3×10</td></tr>
+       <tr><td class="exn">Landmine press<span class="cue">Shoulder-friendly pressing angle — rebuild pressing strength here.</span></td><td class="scheme">3×8–10</td></tr>
+       <tr><td class="exn">Neck isometrics<span class="cue">All 4 directions — absorbs impact, mitigates concussion risk.</span></td><td class="scheme">3×10s ea</td></tr>
+     </tbody></table></div>
+     <div class="note">Progress to full DB/overhead pressing and pull-ups once these are pain-free. Keep face pulls &amp; cuff work in permanently as prehab.</div>
+   </div>
+  </details>
 </section>
 
 </div><!-- /wrap -->
@@ -575,7 +750,8 @@ details.acc .inner{padding:0 14px 14px}
 /* ============ NAV ============ */
 const TABS=[
  ["home","🏠","Home"],["week","📅","Week"],["train","🏋️","Train"],
- ["cardio","❤️","Cardio"],["wrist","🩹","Wrist"],["nutri","🍽️","Fuel"],["calc","🧮","Calc"],["log","📈","Log"]
+ ["cardio","❤️","Cardio"],["skills","🏒","Skills"],["rehab","🩹","Rehab"],
+ ["nutri","🍽️","Fuel"],["kitchen","🛒","Kitchen"],["calc","🧮","Calc"],["log","📈","Log"]
 ];
 const tabInner=document.getElementById('tabInner');
 TABS.forEach(([id,ic,lb])=>{
@@ -640,7 +816,47 @@ function renderWeek(){
 }
 function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.set('gameOn',on);
   document.getElementById('gameLabel').textContent=on?'Game week (Saturday game) — showing pre-game taper':'No game this week — Saturday is open';
-  renderWeek();}
+  renderWeek();if(document.getElementById('scheduleHost'))renderSchedule();}
+
+/* ============ FULL DAILY SCHEDULE ============ */
+const SCHED={
+ sun:[{t:'Gym',i:'🏋️',x:'Recovery + aerobic — Zone-2 bike/row 25–40 min, mobility flow'},
+      {t:'Rehab',i:'🩹',x:'Full daily set: wrist iso, knee iso (Spanish squat/wall-sit), shoulder band'},
+      {t:'Skills',i:'🏒',x:'Optional light stickhandling 10–15 min — hands stay sharp, low fatigue'}],
+ mon:[{t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps)'},
+      {t:'Rehab',i:'🩹',x:'Wrist isometrics; knee tendon iso after the lift'},
+      {t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after lifting (wrist/snap/one-timers)'}],
+ tue:[{t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball'},
+      {t:'Rehab',i:'🩹',x:'Shoulder focus: cuff/band, face pulls, scap work; wrist iso'},
+      {t:'Skills',i:'🏒',x:'Stickhandling 15–20 min — tight dribbles, deception, hands'}],
+ wed:[{t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
+      {t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, reactive first-step'},
+      {t:'Conditioning',i:'❤️',x:'Anaerobic intervals — assault bike or repeat runs'},
+      {t:'Rehab',i:'🩹',x:'Knee focus after sprints; wrist iso'}],
+ thu:[{t:'Gym',i:'🏋️',x:'Upper hypertrophy + prehab (lower CNS)'},
+      {t:'Rehab',i:'🩹',x:'Knee isotonic (slow leg ext/step-downs) + wrist Phase-2'},
+      {t:'Skills',i:'🏒',x:'Skill day — shooting + stickhandling, fresher so quality is high'}],
+ fri:[{t:'Primer',i:'⚡',x:'CNS primer — pogos, box jumps, 2–3 fast singles, 3×10m sprints'},
+      {t:'Skills',i:'🏒',x:'Light shooting/stickhandling touch — sharp, not tiring'},
+      {t:'Rehab',i:'🩹',x:'Wrist iso + mobility only — keep it light before the game'}],
+ sat:[{t:'Game',i:'🥅',x:'GAME / SKATE — fuel 2–3h before, refuel within 60 min after'},
+      {t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed; otherwise rest it'}]
+};
+const SCHED_LABELS={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+function schedTag(t){return {Gym:'ice',Speed:'power',Primer:'power',Agility:'power',Conditioning:'mod',Skills:'ice',Rehab:'easy',Game:'game'}[t]||'ice';}
+function renderSchedule(){
+  const host=document.getElementById('scheduleHost');if(!host)return;
+  const gameOn=LS.get('gameOn',true);
+  const order=['sun','mon','tue','wed','thu','fri','sat'];
+  host.innerHTML=order.map(k=>{
+    let blocks=SCHED[k];
+    if(k==='sat'&&!gameOn)blocks=[{t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
+      {t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
+      {t:'Skills',i:'🏒',x:'Great day for a longer skills session — shooting + stickhandling'}];
+    const rows=blocks.map(b=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(36,51,82,.4)"><span style="font-size:16px;line-height:1.4">${b.i}</span><div style="flex:1"><span class="tag t-${schedTag(b.t)}">${b.t}</span><div style="font-size:13px;color:var(--muted);margin-top:4px">${b.x}</div></div></div>`).join('');
+    return `<div class="card tight"><div style="font-weight:800;font-size:14px;margin-bottom:2px">${SCHED_LABELS[k]}</div>${rows}</div>`;
+  }).join('');
+}
 
 /* ============ WORKOUTS ============ */
 /* scheme can be a string, or {hyp,str,pow} */
@@ -1181,6 +1397,58 @@ function renderReview(){
   host.innerHTML=rows+(ev.length?'<div class="note" style="margin-top:12px"><b>Evaluation</b><ul class="clean" style="margin:6px 0 0">'+ev.map(e=>`<li>${e}</li>`).join('')+'</ul></div>':'');
 }
 
+/* ============ MEALS ============ */
+function addMeal(){
+  const name=document.getElementById('mealName').value.trim();
+  const kcal=parseInt(document.getElementById('mealKcal').value);
+  const prot=parseInt(document.getElementById('mealProt').value)||0;
+  if(!name||!kcal){alert('Enter a meal name and calories');return;}
+  const meals=LS.get('meals',[]);
+  meals.push({id:Date.now()+''+Math.floor(Math.random()*1000),name,kcal,prot});
+  LS.set('meals',meals);
+  document.getElementById('mealName').value='';document.getElementById('mealKcal').value='';document.getElementById('mealProt').value='';
+  renderMeals();
+}
+function delMeal(id){LS.set('meals',LS.get('meals',[]).filter(x=>x.id!==id));renderMeals();}
+function logMeal(id){
+  const m=LS.get('meals',[]).find(x=>x.id===id);if(!m)return;
+  const d=new Date().toISOString().slice(0,10),data=LS.get('intake',[]),i=data.findIndex(x=>x.d===d);
+  if(i>=0)data[i].kcal=(data[i].kcal||0)+m.kcal;else data.push({d,kcal:m.kcal,water:0});
+  LS.set('intake',data);if(document.getElementById('intakeToday'))renderIntake();
+  const msg=document.getElementById('mealMsg');if(msg){msg.textContent=`✓ Logged ${m.name} (+${m.kcal} kcal) to today.`;
+    clearTimeout(window._mt);window._mt=setTimeout(()=>{msg.textContent='';},2500);}
+}
+function renderMeals(){
+  const meals=LS.get('meals',[]),host=document.getElementById('mealList');if(!host)return;
+  host.innerHTML=meals.length
+    ? meals.map(m=>`<div class="logrow"><span><b>${m.name}</b> · ${m.kcal} kcal${m.prot?` · ${m.prot}g P`:''}</span><span><button class="chip" style="cursor:pointer;border:none;background:rgba(56,189,248,.14);color:var(--ice)" onclick="logMeal('${m.id}')">Log</button> <span class="del" onclick="delMeal('${m.id}')">✕</span></span></div>`).join('')
+    : '<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">No meals saved yet.</p>';
+}
+
+/* ============ GROCERIES ============ */
+const GRO_STAPLES=['Chicken breast','Lean beef','Salmon','Eggs','Greek yogurt','Cottage cheese','Oats','Rice','Potatoes','Pasta','Bananas','Berries','Mixed veg','Olive oil','Peanut butter','Whey protein','Milk','Nuts'];
+function buildGroQuick(){
+  const host=document.getElementById('groQuick');if(!host)return;
+  host.innerHTML=GRO_STAPLES.map(s=>`<button class="chip" style="cursor:pointer;border:none" onclick="quickGro(this)">+ ${s}</button>`).join('');
+}
+function addGroceryName(name){
+  name=(name||'').replace(/^\+\s*/,'').trim();if(!name)return;
+  const g=LS.get('grocery',[]);
+  if(!g.some(x=>x.name.toLowerCase()===name.toLowerCase()))g.push({id:Date.now()+''+Math.floor(Math.random()*1000),name,got:false});
+  LS.set('grocery',g);renderGrocery();
+}
+function addGrocery(){const el=document.getElementById('groInput');addGroceryName(el.value);el.value='';}
+function quickGro(btn){addGroceryName(btn.textContent);}
+function toggleGro(id){const g=LS.get('grocery',[]),it=g.find(x=>x.id===id);if(it)it.got=!it.got;LS.set('grocery',g);renderGrocery();}
+function delGro(id){LS.set('grocery',LS.get('grocery',[]).filter(x=>x.id!==id));renderGrocery();}
+function clearGot(){LS.set('grocery',LS.get('grocery',[]).filter(x=>!x.got));renderGrocery();}
+function renderGrocery(){
+  const g=LS.get('grocery',[]),host=document.getElementById('groList');if(!host)return;
+  host.innerHTML=g.length
+    ? g.map(x=>`<div class="logrow" style="cursor:pointer" onclick="toggleGro('${x.id}')"><span style="${x.got?'text-decoration:line-through;color:var(--dim)':''}">${x.got?'✓':'○'} ${x.name}</span><span class="del" onclick="event.stopPropagation();delGro('${x.id}')">✕</span></div>`).join('')
+    : '<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">List is empty — add staples above.</p>';
+}
+
 function addPR(){
   const lift=document.getElementById('prLift').value;const val=document.getElementById('prVal').value.trim();
   if(!val){alert('Enter your top set');return;}
@@ -1197,7 +1465,7 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee','activity'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
@@ -1219,8 +1487,9 @@ document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b
 document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
 document.getElementById('intakeDate').value=new Date().toISOString().slice(0,10);
 document.getElementById('actDate').value=new Date().toISOString().slice(0,10);
-buildActSelect();estBurn();
+buildActSelect();estBurn();buildGroQuick();
 renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();renderIntake();renderActivity();
+renderSchedule();renderMeals();renderGrocery();
 go('home');
 
 /* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
