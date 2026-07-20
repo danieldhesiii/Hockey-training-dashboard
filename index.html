@@ -209,6 +209,8 @@ details.acc .inner{padding:0 14px 14px}
   <h2 class="ttl">Your System</h2>
   <p class="sub">A complete, physiology-driven plan built around your Saturday game. Everything below works fully offline — save it to your home screen.</p>
 
+  <div class="card" style="cursor:pointer" onclick="go('wlog')"><div id="homeToday"></div></div>
+
   <div class="card">
     <h3 style="margin-top:4px"><span class="bar"></span>How this is built</h3>
     <p style="font-size:13.5px;color:var(--muted);margin:0 0 6px">Hockey is an <b style="color:#fff">alactic-aerobic</b> sport: repeated 40–60s max-effort shifts with ~2–3× rest, decided by explosive first strides, shot power, and how fast you recover between bursts. So the plan trains, in priority order:</p>
@@ -652,6 +654,47 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 </section>
 
+<!-- ================= WORKOUT LOG ================= -->
+<section class="page" id="p-wlog">
+  <h2 class="ttl">Workout Log</h2>
+  <p class="sub">Where you are in the plan, how ready you feel, and exactly what you lifted — logged so your days can flex.</p>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Today’s session</h3>
+    <div id="todaySession"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Readiness check-in</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 8px">A quick gut-check on how your body feels today (1 = low, 5 = high). Drives the recommendation below.</p>
+    <div id="readyInputs"></div>
+    <div id="recBox" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>Log a session</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 6px">Pick the session you actually did — defaults to today, but change it if you swapped days. Targets are prefilled; type what you hit.</p>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Session</label><select id="sessSel" onchange="loadSessionForm()"></select></div>
+      <div class="field" style="margin:6px 0"><label>Date</label><input id="sessDate" type="date"></div>
+    </div>
+    <div id="sessForm"></div>
+    <div class="grid g2">
+      <div class="field" style="margin:6px 0"><label>Session RPE (1–10)</label><input id="sessRPE" type="number" inputmode="numeric" min="1" max="10" placeholder="8"></div>
+      <div class="field" style="margin:6px 0"><label>How it felt</label>
+        <select id="sessFeel"><option value="great">💪 Great — strong</option><option value="ok" selected>🙂 OK — normal</option><option value="rough">😪 Rough — off</option></select></div>
+    </div>
+    <div class="field" style="margin:6px 0"><label>Notes (optional)</label><input id="sessNote" placeholder="e.g. squat felt heavy, back a bit tight"></div>
+    <button class="btn" onclick="saveSession()">Save workout</button>
+    <div id="sessMsg" style="font-size:12.5px;color:var(--ok);min-height:16px;margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-top:4px"><span class="bar"></span>History</h3>
+    <div id="sessHistory"></div>
+  </div>
+</section>
+
 <!-- ================= REHAB ================= -->
 <section class="page" id="p-rehab">
   <h2 class="ttl">Rehab &amp; Prehab</h2>
@@ -808,13 +851,13 @@ details.acc .inner{padding:0 14px 14px}
 <script>
 /* ============ NAV (grouped hubs + sub-nav) ============ */
 const PAGE_LABELS={home:'Home',week:'Schedule',year:'Year Plan',train:'Workouts',cardio:'Conditioning',
- skills:'Skills',rehab:'Rehab',nutri:'Guide',kitchen:'Meals & Shop',calc:'Calculator',log:'Daily Log'};
+ skills:'Skills',rehab:'Rehab',nutri:'Guide',kitchen:'Meals & Shop',calc:'Calculator',log:'Daily Log',wlog:'Workout Log'};
 const HUBS=[
  {id:'home',  ic:'🏠', lb:'Home',      pages:['home']},
  {id:'plan',  ic:'📅', lb:'Plan',      pages:['week','year']},
  {id:'move',  ic:'💪', lb:'Train',     pages:['train','cardio','skills','rehab']},
  {id:'fuel',  ic:'🍽️', lb:'Nutrition', pages:['nutri','kitchen','calc']},
- {id:'track', ic:'📈', lb:'Track',     pages:['log']}
+ {id:'track', ic:'📈', lb:'Track',     pages:['log','wlog']}
 ];
 function hubOf(page){return HUBS.find(h=>h.pages.indexOf(page)>=0)||HUBS[0];}
 const tabInner=document.getElementById('tabInner');
@@ -1804,6 +1847,141 @@ function renderGrocery(){
     : '<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">List is empty — add staples above.</p>';
 }
 
+/* ============ WORKOUT LOG (sets/reps + readiness + recommendation) ============ */
+const DOW=['sun','mon','tue','wed','thu','fri','sat'];
+const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+function todayKey(){return DOW[new Date().getDay()];}
+function loggedToday(k){const d=new Date().toISOString().slice(0,10);return LS.get('sessions',[]).some(x=>x.d===d&&x.key===k);}
+function renderToday(){
+  const k=todayKey(),w=curWK()[k],b=curBlock();
+  const host=document.getElementById('todaySession');
+  if(host){
+    const done=loggedToday(k);
+    host.innerHTML=`<div style="font-size:12.5px;color:var(--muted)">${DAY_FULL[k]} · ${b.name}</div>
+      <div style="font-weight:800;font-size:16px;margin:2px 0">${w.title} ${done?'<span class="tag t-easy">✓ Logged</span>':''}</div>
+      <div style="font-size:12.5px;color:var(--muted)">⏱ ${w.time} · ${w.intro.split('. ')[0]}.</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" style="width:auto;margin:0;padding:10px 16px" onclick="pickSession('${k}')">Log this session</button>
+        <button class="btn ghost" style="width:auto;margin:0;padding:10px 16px" onclick="go('train')">View full session</button>
+      </div>`;
+  }
+  const ht=document.getElementById('homeToday');
+  if(ht)ht.innerHTML=`<div style="font-size:12px;color:var(--muted)">Today · ${b.name}</div><b style="font-size:15px">${w.title}</b><div style="font-size:12px;color:var(--ice);margin-top:2px">Open Workout Log to check in &amp; log →</div>`;
+}
+function pickSession(k){const sel=document.getElementById('sessSel');if(sel){sel.value=k;loadSessionForm();}
+  const f=document.getElementById('sessForm');if(f)f.scrollIntoView({behavior:'smooth',block:'center'});}
+function buildSessionSelect(){
+  const sel=document.getElementById('sessSel');if(!sel)return;
+  const wk=curWK();
+  sel.innerHTML=DOW.map(k=>`<option value="${k}">${DAY_FULL[k].slice(0,3)} — ${wk[k].title}</option>`).join('')+'<option value="custom">Custom / other</option>';
+  sel.value=todayKey();
+}
+function exRow(name,target){
+  return `<div style="border-bottom:1px solid rgba(36,51,82,.4);padding:8px 0">
+    <div style="font-weight:600;font-size:13.5px">${name}</div>
+    <div style="font-size:11.5px;color:var(--dim);margin-bottom:5px">Target: ${target}</div>
+    <input class="exDid" data-name="${name}" placeholder="what you did — e.g. 100×5, 100×5, 105×3" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit">
+  </div>`;
+}
+function addCustomRow(){
+  const rows=document.getElementById('exRows');if(!rows)return;
+  const div=document.createElement('div');div.style.cssText='border-bottom:1px solid rgba(36,51,82,.4);padding:8px 0';
+  div.innerHTML=`<input class="exName" placeholder="Exercise" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit;margin-bottom:5px">
+    <input class="exDid" placeholder="what you did — e.g. 100×5, 100×5" style="width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 10px;border-radius:10px;font-size:13px;font-family:inherit">`;
+  rows.appendChild(div);
+}
+function loadSessionForm(){
+  const sel=document.getElementById('sessSel'),host=document.getElementById('sessForm');if(!sel||!host)return;
+  const k=sel.value;
+  if(k==='custom'){host.innerHTML='<div id="exRows"></div><button class="btn ghost" onclick="addCustomRow()">+ Add exercise</button>';addCustomRow();return;}
+  const w=curWK()[k];let rows='';
+  w.blocks.forEach(b=>b.items.forEach(it=>{rows+=exRow(it[0],S(it[1]));}));
+  host.innerHTML=`<div id="exRows">${rows}</div>`;
+}
+function saveSession(){
+  const sel=document.getElementById('sessSel'),k=sel.value,wk=curWK();
+  const title=k==='custom'?'Custom session':(wk[k]?wk[k].title:'Session');
+  const ex=[];
+  document.querySelectorAll('#sessForm .exDid').forEach(inp=>{
+    const did=inp.value.trim();let name=inp.dataset.name||'';
+    if(!name){const nm=inp.parentElement.querySelector('.exName');name=nm?nm.value.trim():'';}
+    if(did||(name&&k==='custom'))ex.push({name,did});
+  });
+  const d=document.getElementById('sessDate').value||new Date().toISOString().slice(0,10);
+  const rpe=parseInt(document.getElementById('sessRPE').value)||null;
+  const feel=document.getElementById('sessFeel').value;
+  const note=document.getElementById('sessNote').value.trim();
+  if(!ex.some(e=>e.did)&&!rpe){alert('Log at least one exercise or the session RPE');return;}
+  const sessions=LS.get('sessions',[]);
+  sessions.push({id:Date.now()+''+Math.floor(Math.random()*1000),d,block:curBlock().k,key:k,title,rpe,feel,note,ex});
+  LS.set('sessions',sessions);
+  document.querySelectorAll('#sessForm .exDid').forEach(i=>i.value='');
+  document.getElementById('sessRPE').value='';document.getElementById('sessNote').value='';
+  const msg=document.getElementById('sessMsg');msg.textContent='✓ Workout saved.';clearTimeout(window._st);window._st=setTimeout(()=>msg.textContent='',2500);
+  renderSessionHistory();renderRecommendation();renderToday();
+}
+function delSession(id){LS.set('sessions',LS.get('sessions',[]).filter(x=>x.id!==id));renderSessionHistory();renderRecommendation();renderToday();}
+function renderSessionHistory(){
+  const host=document.getElementById('sessHistory');if(!host)return;
+  const s=LS.get('sessions',[]).slice().sort((a,b)=>a.d<b.d?1:-1);
+  if(!s.length){host.innerHTML='<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">No workouts logged yet.</p>';return;}
+  const fic={great:'💪',ok:'🙂',rough:'😪'};
+  host.innerHTML=s.map(x=>{
+    const exList=x.ex.filter(e=>e.did).map(e=>`<div style="font-size:12.5px;color:var(--muted);padding:2px 0">${e.name}: <span style="color:var(--txt);font-weight:600">${e.did}</span></div>`).join('');
+    return `<details class="acc"><summary>${x.d} — ${x.title}${x.rpe?` · RPE ${x.rpe}`:''} ${fic[x.feel]||''}</summary>
+      <div class="inner">${exList||'<div style="font-size:12px;color:var(--dim)">No exercises recorded.</div>'}${x.note?`<div class="note" style="margin-top:8px">${x.note}</div>`:''}
+      <div class="del" style="margin-top:10px;display:inline-block" onclick="delSession('${x.id}')">✕ Delete</div></div></details>`;
+  }).join('');
+}
+/* ---- Readiness + recommendation ---- */
+const READY_FIELDS=[
+ {k:'sleep',lb:'Sleep',lo:'Poor',hi:'Great'},
+ {k:'sore',lb:'Soreness',lo:'Fresh',hi:'Very sore'},
+ {k:'energy',lb:'Energy',lo:'Flat',hi:'Buzzing'},
+ {k:'mood',lb:'Motivation',lo:'Low',hi:'High'}
+];
+function todayReady(){const d=new Date().toISOString().slice(0,10);return LS.get('readiness',[]).find(x=>x.d===d);}
+function setReady(field,val){
+  const d=new Date().toISOString().slice(0,10),r=LS.get('readiness',[]);let it=r.find(x=>x.d===d);
+  if(!it){it={d};r.push(it);}it[field]=val;LS.set('readiness',r);renderReadiness();renderRecommendation();
+}
+function renderReadiness(){
+  const host=document.getElementById('readyInputs');if(!host)return;
+  const t=todayReady()||{};
+  host.innerHTML=READY_FIELDS.map(f=>{
+    const btns=[1,2,3,4,5].map(n=>`<button class="${t[f.k]===n?'on':''}" onclick="setReady('${f.k}',${n})">${n}</button>`).join('');
+    return `<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span style="font-weight:600;color:var(--txt)">${f.lb}</span><span style="font-size:11px;color:var(--dim)">${f.lo} → ${f.hi}</span></div><div class="seg">${btns}</div></div>`;
+  }).join('');
+}
+function lastSession(){const s=LS.get('sessions',[]).slice().sort((a,b)=>a.d<b.d?1:-1);return s[0];}
+function renderRecommendation(){
+  const host=document.getElementById('recBox');if(!host)return;
+  const t=todayReady(),last=lastSession(),b=curBlock();
+  const feelTxt={great:'felt great',ok:'felt OK',rough:'felt rough'};
+  const lastLine=last?`Last session (${last.d}): <b style="color:#fff">${last.title}</b>${last.rpe?` · RPE ${last.rpe}`:''}${last.feel?` · ${feelTxt[last.feel]}`:''}.`:'No previous session logged yet.';
+  if(!t||[t.sleep,t.sore,t.energy,t.mood].some(v=>v==null)){
+    host.innerHTML=`<div class="note">${lastLine}<br>Fill in all four readiness scores for today’s recommendation.</div>`;return;
+  }
+  let score=t.sleep+t.energy+t.mood+(6-t.sore); // 4..20
+  if(last&&last.rpe>=9)score-=1;
+  if(last&&last.feel==='rough')score-=1;
+  let color,label,advice;
+  if(score>=16&&t.sore<=3){color='var(--easy)';label='🟢 Green — go for it';
+    advice='You’re fresh. Attack today’s session — chase your top-end loads at full intent, and add a back-off set if the bar is flying. Great day to push a PR.';}
+  else if(score>=11){color='var(--mod)';label='🟡 Amber — as planned';
+    advice='Solid readiness. Train the session as written — hit your prescribed sets & reps at the target RPE, no need to force extra.';}
+  else{color='var(--hard)';label='🔴 Red — auto-regulate';
+    advice='You’re run down. Cut volume ~30–40%, drop the heaviest top sets and keep bar speed crisp — or swap to a mobility/recovery session. Backing off today protects the whole week.';}
+  let extra='';
+  if(b.tmpl==='in'||b.k==='peak')extra=' In-season/peak: when in doubt, prioritise freshness for the game over grinding a lift.';
+  if(last&&last.rpe>=9&&color!=='var(--hard)')extra+=' Last session was very hard — lean toward the lighter end of today’s range.';
+  const todayW=curWK()[todayKey()];
+  host.innerHTML=`<div class="note" style="border-color:${color}"><div style="font-weight:800;color:${color};margin-bottom:4px">${label}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Readiness ${score}/20 · ${lastLine}</div>
+    <div style="font-size:13px;color:var(--txt)">${advice}${extra}</div>
+    <div style="font-size:12px;color:var(--dim);margin-top:6px">Today’s planned session: <b>${todayW.title}</b>.</div></div>`;
+}
+
 function addPR(){
   const lift=document.getElementById('prLift').value;const val=document.getElementById('prVal').value.trim();
   if(!val){alert('Enter your top set');return;}
@@ -1820,7 +1998,7 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','block','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','block','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery','sessions','readiness'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
@@ -1837,6 +2015,7 @@ function setBlock(k){
   const pt=document.getElementById('phaseTag2');if(pt)pt.textContent=PHASES[phase].name;
   updatePill();renderWorkouts();renderBlockBanner();renderYear();renderWeek();updateWeekContext();
   if(document.getElementById('scheduleHost'))renderSchedule();
+  if(document.getElementById('todaySession')){renderToday();buildSessionSelect();loadSessionForm();renderRecommendation();}
 }
 function blockDetailHTML(b){
   return `<div class="card">
@@ -1897,6 +2076,8 @@ document.getElementById('actDate').value=new Date().toISOString().slice(0,10);
 buildActSelect();estBurn();buildGroQuick();
 renderWorkouts();renderCardio();renderNutri();renderBW();renderPR();calc();renderIntake();renderActivity();
 renderSchedule();renderMeals();renderGrocery();
+document.getElementById('sessDate').value=new Date().toISOString().slice(0,10);
+buildSessionSelect();loadSessionForm();renderToday();renderReadiness();renderRecommendation();renderSessionHistory();
 go('home');
 
 /* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
