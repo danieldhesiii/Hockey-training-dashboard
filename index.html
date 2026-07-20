@@ -250,9 +250,9 @@ details.acc .inner{padding:0 14px 14px}
 <!-- ================= WEEKLY PLAN ================= -->
 <section class="page" id="p-week">
   <h2 class="ttl">Weekly Plan</h2>
-  <p class="sub">Anchored to a <b style="color:#f87171">Saturday game</b>. Tap any day to open the full session.</p>
+  <p class="sub" id="weekSub">Anchored to a <b style="color:#f87171">Saturday game</b>. Tap any day to open the full session.</p>
 
-  <div class="toggle-row">
+  <div class="toggle-row" id="gameToggleRow">
     <label class="switch"><input type="checkbox" id="gameToggle" checked onchange="toggleGame()"><span class="sl"></span></label>
     <span id="gameLabel">Game week (Saturday game) — showing pre-game taper</span>
   </div>
@@ -329,6 +329,19 @@ details.acc .inner{padding:0 14px 14px}
   <h3><span class="bar"></span>The full year</h3>
   <div id="blockTimeline"></div>
   <div class="note">A classic hockey macrocycle — build the base &amp; strength in the off-season, convert to power &amp; speed pre-season, maintain through the games, peak for playoffs, then recover. Dates are guides; shift them to your league's calendar.</div>
+
+  <h3><span class="bar"></span>The complete athlete</h3>
+  <p class="sub" style="margin-bottom:10px">The training is only half of it. These are the non-negotiables the best pros nail every day of the year.</p>
+  <div class="grid g2">
+    <div class="card tight"><b>😴 Sleep</b><div style="font-size:12.5px;color:var(--muted)">8–9h, consistent times, dark &amp; cool room. Your #1 recovery &amp; performance tool — protect it hardest the night before games.</div></div>
+    <div class="card tight"><b>🧊 Recovery</b><div style="font-size:12.5px;color:var(--muted)">Post-session protein + carbs, foam roll/soft tissue, easy aerobic flushes, contrast/cold when sore, manage weekly load.</div></div>
+    <div class="card tight"><b>📊 Monitor &amp; auto-regulate</b><div style="font-size:12.5px;color:var(--muted)">Track sleep, soreness, mood &amp; bodyweight (Track tab). Run lifts to RPE, not ego. Deload every 4th week.</div></div>
+    <div class="card tight"><b>🧘 Mobility &amp; prep</b><div style="font-size:12.5px;color:var(--muted)">10 min daily — hips, ankles, T-spine. Warm up properly before every session; never load cold.</div></div>
+    <div class="card tight"><b>🛡 Injury prevention</b><div style="font-size:12.5px;color:var(--muted)">The hockey big rocks: Copenhagen (groin), Nordic (hamstring), knee tendon iso, cuff + neck — woven into every week (Rehab tab).</div></div>
+    <div class="card tight"><b>🍽 Nutrition</b><div style="font-size:12.5px;color:var(--muted)">~2 g/kg protein, carbs timed around training &amp; games, hydrate + electrolytes. Creatine, omega-3, vit D (Fuel + Calc tabs).</div></div>
+    <div class="card tight"><b>🧠 Mental</b><div style="font-size:12.5px;color:var(--muted)">Consistent routine, visualisation, manage stress, and real downtime to switch off. The mind is a trainable quality.</div></div>
+    <div class="card tight"><b>🏒 Skills year-round</b><div style="font-size:12.5px;color:var(--muted)">Keep touching the puck — shooting &amp; stickhandling even off-season. Skill is a use-it-or-lose-it asset.</div></div>
+  </div>
 </section>
 
 <!-- ================= WORKOUTS ================= -->
@@ -840,42 +853,54 @@ const PHASES={
 
 /* ============ ANNUAL PERIODISATION (macrocycle) ============ */
 const BLOCKS=[
- {k:'gpp',name:'Off-Season · General Prep',months:'Apr–May',load:'hyp',
+ {k:'gpp',name:'Off-Season · General Prep',months:'Apr–May',load:'hyp',tmpl:'off',
    focus:'Rebuild the base — muscle, work capacity and fix any asymmetries after the season. Highest training volume of the year.',
    sled:'Moderate sled drags & pushes for work capacity — 4–6 controlled trips.',
    cond:'Aerobic base (Zone-2) + tempo — build the engine while there’s no game to save for.',
    plyo:'Extensive, low-intensity — pogos, box bounds, submax hops. Build tissue tolerance.',
-   week:'No games — Saturday becomes an extra strength or conditioning day.'},
- {k:'maxstr',name:'Off-Season · Max Strength',months:'June',load:'str',
+   week:'No games — 6 training days, higher volume. Saturday is energy-systems + skills.',
+   recovery:'Nail the routine now — 8–9h sleep, daily mobility, fix niggles. Build habits that hold all year.',
+   fuel:'Prime muscle-building window — lean-gain surplus (+300–400 kcal), ~2 g/kg protein, creatine daily.'},
+ {k:'maxstr',name:'Off-Season · Max Strength',months:'June',load:'str',tmpl:'off',
    focus:'Get strong. Heavy compounds, lower reps — this is where your top-end strength for the year is built.',
    sled:'Heavy sled drags / prowler pushes — build acceleration force. Slow, heavy, 6–8×15–20m.',
    cond:'Aerobic base maintained + intro anaerobic capacity. Barbell comes first.',
    plyo:'Build intensity — box jumps, broad jumps, low-amplitude bounds. Quality first.',
-   week:'No games — Saturday = extra lower or upper strength session.'},
- {k:'power',name:'Pre-Season · Power & Speed',months:'Jul–Aug',load:'pow',
+   week:'No games — heavy strength focus. Saturday = extra strength or conditioning.',
+   recovery:'Protect sleep around heavy days, manage CNS fatigue, deload every 4th week.',
+   fuel:'Keep the lean-gain surplus; plenty of carbs around heavy lifts. Creatine daily.'},
+ {k:'power',name:'Pre-Season · Power & Speed',months:'Jul–Aug',load:'pow',tmpl:'off',
    focus:'Convert strength to speed and power. Sprint, jump, throw, contrast pairs — peak your explosiveness for camp.',
    sled:'Light, explosive sled sprints & marches — resisted acceleration (~10–20% BW). Fast, 6×15m.',
    cond:'Repeat-sprint ability + anaerobic capacity — the hockey-shift energy system. Sharpen the engine.',
    plyo:'Intensive & reactive — depth jumps (if earned), skater bounds, reactive box bounds. Max intent.',
-   week:'Scrimmages / camp may appear — treat them as the Saturday game and taper into them.'},
- {k:'inseason',name:'In-Season · Maintain',months:'Sep–Feb',load:'str',
+   week:'No games yet (scrimmages may appear). Friday is total-body power / contrast.',
+   recovery:'Full recovery between speed reps and days — quality over quantity. Watch CNS load from sprints + jumps.',
+   fuel:'Slight surplus or maintenance — stay lean & fast for camp. Carbs around speed sessions.'},
+ {k:'inseason',name:'In-Season · Maintain',months:'Sep–Feb',load:'str',tmpl:'in',
    focus:'Maintain strength & power on lower volume, fresh for games. Two quality lifts/week is plenty — the games do the rest.',
-   sled:'Short acceleration sled as a primer — light, 3–4×10m, keeps the first step sharp without fatigue.',
+   sled:'Short acceleration sled as a primer — light, 3–4×15m, keeps the first step sharp without fatigue.',
    cond:'Games ARE conditioning — keep just aerobic base + one anaerobic session. Don’t over-condition.',
    plyo:'Low-dose reactive only — a few crisp contacts to stay springy. Never to fatigue.',
-   week:'Full game week — the Saturday-anchored schedule you see is built for this block.'},
- {k:'peak',name:'Playoffs · Peak',months:'March',load:'pow',
+   week:'Full game week — the Saturday-anchored schedule you see is built for this block.',
+   recovery:'Recovery IS the priority — sleep, post-game refuel, manage games & travel. Monitor readiness, auto-regulate.',
+   fuel:'Fuel for performance — maintenance to slight surplus, carbs around games, refuel within 60 min post-game.'},
+ {k:'peak',name:'Playoffs · Peak',months:'March',load:'pow',tmpl:'in',
    focus:'Peak and hold. Minimal volume, maximal quality — primers and fast singles. Feel explosive and recovered.',
    sled:'Optional light sled primer only — or drop it. Freshness beats everything now.',
    cond:'Games only + light base flushes. Protect the legs.',
    plyo:'Priming reactive touches — pogos, a few box jumps. Springy, never sore.',
-   week:'Every session serves the game. Cut volume ~40%, keep intensity crisp.'},
- {k:'transition',name:'Off · Transition',months:'Post-season · 2–4 wks',load:'hyp',
+   week:'Game week, tapered — cut lifting volume ~40%, keep intensity crisp.',
+   recovery:'Maximise sleep & downtime, minimise everything non-essential. Fresh legs win series.',
+   fuel:'Maintain weight, top up glycogen for games, hydrate + electrolytes.'},
+ {k:'transition',name:'Off · Transition',months:'Post-season · 2–4 wks',load:'hyp',tmpl:'trans',
    focus:'Active rest. Heal niggles, do something fun, let the CNS reset before GPP starts again.',
    sled:'Optional light sled walks if you feel like moving. No pressure.',
    cond:'Easy, enjoyable movement — bike, hike, swim. Stay active, stay loose.',
    plyo:'None required — just play.',
-   week:'Unstructured — train when you want, rest when you need.'}
+   week:'Unstructured — a couple of light full-body sessions, the rest is play & rest.',
+   recovery:'Actively rest — sleep in, de-stress, let aches heal. Mentally recharge for the year ahead.',
+   fuel:'Maintenance, keep protein up so you hold muscle — enjoy your food a bit.'}
 ];
 function detectBlock(){const m=new Date().getMonth();
   if(m>=3&&m<=4)return 'gpp';
@@ -890,7 +915,7 @@ function updatePill(){const el=document.getElementById('phasePill');if(el)el.tex
 let phase=LS.get('phase',curBlock().load);
 
 /* ============ WEEKLY PLAN ============ */
-const DAYS=[
+const DAYS_IN=[
  {k:'sun',d:'SUN',role:'Recovery + Aerobic',tag:'easy',rel:'Day after game',
   desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
@@ -906,12 +931,32 @@ const DAYS=[
  {k:'sat',d:'SAT',role:'GAME / SKATE',tag:'game',rel:'Compete',
   desc:'Highest-intensity session of the week. Fuel before, refuel after.'}
 ];
+const DAYS_OFF=[
+ {k:'sun',d:'SUN',role:'Recovery + Regeneration',tag:'easy',rel:'',desc:'Aerobic flush, mobility, prehab, soft tissue.'},
+ {k:'mon',d:'MON',role:'Lower · Max Strength',tag:'hard',rel:'Highest CNS',desc:'Heavy squat/DL, jumps, single-leg, sled, groin/hamstring.'},
+ {k:'tue',d:'TUE',role:'Upper · Strength + Plyos',tag:'hard',rel:'',desc:'Reactive plyos, press & pull, rotational power, shoulder/neck.'},
+ {k:'wed',d:'WED',role:'Speed + Change of Direction + Anaerobic',tag:'mod',rel:'',desc:'Sprints, COD, resisted sled, strength-speed, conditioning.'},
+ {k:'thu',d:'THU',role:'Lower Hypertrophy + Aerobic Base',tag:'easy',rel:'Low CNS',desc:'Leg muscle, tendon health, aerobic base.'},
+ {k:'fri',d:'FRI',role:'Total-Body Power / Contrast',tag:'power',rel:'',desc:'Olympic pulls, contrast pairs, throws, short sprints.'},
+ {k:'sat',d:'SAT',role:'Energy Systems + Skills',tag:'mod',rel:'',desc:'Block-matched conditioning + shooting/stickhandling.'}
+];
+const DAYS_TRANS=[
+ {k:'sun',d:'SUN',role:'Rest',tag:'easy',rel:'',desc:'Full rest — recover and recharge.'},
+ {k:'mon',d:'MON',role:'Light Full-Body',tag:'easy',rel:'',desc:'Easy RPE-6 full-body + mobility.'},
+ {k:'tue',d:'TUE',role:'Movement / Play',tag:'easy',rel:'',desc:'Fun activity — sport, hike, swim.'},
+ {k:'wed',d:'WED',role:'Light Full-Body',tag:'easy',rel:'',desc:'Second easy full-body touch.'},
+ {k:'thu',d:'THU',role:'Mobility + Aerobic',tag:'easy',rel:'',desc:'Restore movement, easy cardio, rehab.'},
+ {k:'fri',d:'FRI',role:'Play / Rest',tag:'easy',rel:'',desc:'Fun activity or rest.'},
+ {k:'sat',d:'SAT',role:'Play / Rest',tag:'easy',rel:'',desc:'Fun activity or rest.'}
+];
+const DAYS_SETS={in:DAYS_IN,off:DAYS_OFF,trans:DAYS_TRANS};
+function curDays(){return DAYS_SETS[curBlock().tmpl]||DAYS_IN;}
 function renderWeek(){
   const gameOn=LS.get('gameOn',true);
   const host=document.getElementById('weekList');host.innerHTML='';
-  DAYS.forEach(day=>{
+  curDays().forEach(day=>{
     let role=day.role,desc=day.desc,tag=day.tag,rel=day.rel;
-    if(day.k==='sat'&&!gameOn){role='Free Saturday';tag='mod';rel='No game';
+    if(day.k==='sat'&&curBlock().tmpl==='in'&&!gameOn){role='Free Saturday';tag='mod';rel='No game';
       desc='Extra Lower Power, a long conditioning session, or full rest — your call.';}
     const el=document.createElement('div');el.className='day';
     el.onclick=()=>{go('train');setTimeout(()=>{const t=document.getElementById('wk-'+day.k);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});},60);};
@@ -928,7 +973,7 @@ function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.
   renderWeek();if(document.getElementById('scheduleHost'))renderSchedule();}
 
 /* ============ FULL DAILY SCHEDULE ============ */
-const SCHED={
+const SCHED_IN={
  sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility flow + full rehab set (wrist/knee/shoulder iso) — ~15 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Recovery — Zone-2 bike/row 25–40 min; optional light stickhandling'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
@@ -951,6 +996,35 @@ const SCHED={
  sat:[{w:'—',t:'Game',i:'🥅',x:'GAME / SKATE — fuel 2–3h before, refuel within 60 min after'},
       {w:'—',t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed; otherwise rest it'}]
 };
+const SCHED_OFF={
+ sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + full rehab set — ~15 min'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Aerobic flush 30–40 min + soft tissue'}],
+ mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Lower max strength + jumps + sled; groin/hamstring prehab'}],
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) first, then upper strength + rotational power'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Sprints + change of direction + resisted sled, fresh'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic — ~12 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Lower hypertrophy + tendon health + aerobic base'}],
+ fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + activation — ~10 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Total-body power / contrast pairs + short sprints'}],
+ sat:[{w:'AM',t:'Skills',i:'🏒',x:'On-ice skills — shooting + stickhandling (no game to save for)'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Energy systems matched to the block'}]
+};
+const SCHED_TRANS={
+ sun:[{w:'—',t:'Rehab',i:'🩹',x:'Rest — optional gentle walk or stretch'}],
+ mon:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body (RPE 6) + mobility'}],
+ tue:[{w:'PM',t:'Skills',i:'🏒',x:'Movement / play — sport, hike, swim'}],
+ wed:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body (RPE 6)'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + any lingering rehab'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Easy aerobic — bike/walk/swim'}],
+ fri:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — your call'}],
+ sat:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — recharge'}]
+};
+const SCHED_SETS={in:SCHED_IN,off:SCHED_OFF,trans:SCHED_TRANS};
+function curSched(){return SCHED_SETS[curBlock().tmpl]||SCHED_IN;}
 const SCHED_LABELS={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 function schedTag(t){return {Gym:'ice',Speed:'power',Primer:'power',Agility:'power',Conditioning:'mod',Skills:'ice',Rehab:'easy',Game:'game'}[t]||'ice';}
 function schedWhenColor(w){return w==='AM'?'#c4b5fd':w==='PM'?'var(--ice)':'var(--dim)';}
@@ -959,8 +1033,8 @@ function renderSchedule(){
   const gameOn=LS.get('gameOn',true);
   const order=['sun','mon','tue','wed','thu','fri','sat'];
   host.innerHTML=order.map(k=>{
-    let blocks=SCHED[k];
-    if(k==='sat'&&!gameOn)blocks=[{w:'—',t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
+    let blocks=curSched()[k]||[];
+    if(k==='sat'&&curBlock().tmpl==='in'&&!gameOn)blocks=[{w:'—',t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
       {w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
       {w:'PM',t:'Skills',i:'🏒',x:'Great day for a longer skills session — shooting + stickhandling'}];
     const rows=blocks.map(b=>`<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(36,51,82,.4)"><span style="font-size:10.5px;font-weight:800;color:${schedWhenColor(b.w)};min-width:26px;padding-top:3px">${b.w}</span><span style="font-size:16px;line-height:1.3">${b.i}</span><div style="flex:1"><span class="tag t-${schedTag(b.t)}">${b.t}</span><div style="font-size:13px;color:var(--muted);margin-top:4px">${b.x}</div></div></div>`).join('');
@@ -971,7 +1045,7 @@ function renderSchedule(){
 /* ============ WORKOUTS ============ */
 /* scheme can be a string, or {hyp,str,pow} */
 function S(o){return typeof o==='object'?o[phase]:o;}
-const WK={
+const WK_IN={
  sun:{title:'Recovery + Aerobic',tag:'easy',time:'30–45 min',
   intro:'The day after your game. This is a session, not a formality — active recovery clears fatigue faster than sitting still. If the game truly wrecked you, take full rest instead.',
   blocks:[
@@ -998,9 +1072,8 @@ const WK={
      ['Back Squat or Trap-bar Deadlift',S({hyp:'4×6 @ 72–78%',str:'5×3–4 @ 84–90% · RPE 8',pow:'5×2 @ 88–92% + jump after each set'}),'Brace hard, control the descent, explode up. In Power phase, contrast each set with a jump.'],
      ['RFE Split Squat (Bulgarian)',S({hyp:'3×8 / leg',str:'3×6 / leg',pow:'3×5 / leg heavy'}),'Skating-specific single-leg strength. Stay tall; front knee tracks over toe.'],
      ['Romanian Deadlift','3×6–8','Hips back, long spine, feel the hamstrings load. Don’t chase weight over feel.']]},
-   {l:'Sled & carries (periodised)',c:'b-cond',items:[
-     ['Sled drag or Prowler push',S({hyp:'5×20m moderate',str:'6×15m heavy',pow:'5×15m fast &amp; light'}),'Acceleration force + posterior chain, low impact. Heavy drags in strength blocks; light &amp; fast in power blocks — doubles as low-CNS conditioning.'],
-     ['Backwards sled drag',S({hyp:'3×20m',str:'3×20m',pow:'3×15m'}),'Quad &amp; knee-friendly — bulletproofs the knees for stop-start skating.']]},
+   {l:'Sled primer (optional)',c:'b-cond',items:[
+     ['Sled push/drag (light)','3–4×15m','Sharpens the first step — light &amp; fast, low fatigue. In-season the games are your lower-body volume.']]},
    {l:'Injury-prevention isometrics',c:'b-prehab',items:[
      ['Copenhagen adduction','3×8–12 / side','The single most evidence-backed drill for cutting groin injuries in hockey.'],
      ['Nordic hamstring','3×4–6','Eccentric brake — lower as slow as you can. Big hamstring-strain reducer.']]},
@@ -1037,7 +1110,7 @@ const WK={
    {l:'Speed (fully recovered)',c:'b-power',items:[
      ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
      ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
-     ['Resisted sled sprint',S({hyp:'6×20m moderate',str:'6×15m heavy',pow:'6×15m light &amp; explosive'}),'Resisted acceleration — heavier for force in strength blocks, light &amp; fast in power/pre-season blocks.']]},
+     ['Resisted sled sprint (option)','5–6×15m light','Light resisted acceleration — sharpen the first step without heavy fatigue.']]},
    {l:'Strength-speed',c:'b-str',items:[
      ['Trap-bar jump or Jump squat','4×3 light','Move light load with max speed. Velocity is the whole point.'],
      ['Reverse lunge or Step-up','3×8 / leg','Controlled, powerful drive up.'],
@@ -1103,12 +1176,174 @@ const WK={
      ['OR Full rest','—','If the block was heavy, take it. Six quality days beats seven junk ones.']]}
   ]}
 };
+
+/* ---- OFF-SEASON weekly program (no games, higher volume) ---- */
+const WK_OFF={
+ sun:{title:'Recovery + Regeneration',tag:'easy',time:'30–45 min',
+  intro:'Off-season recovery day — clear fatigue, build the habits, keep the tissue healthy. Regeneration is a training day, not a day off.',
+  blocks:[
+   {l:'Aerobic flush',c:'b-cond',items:[
+     ['Zone-2 bike/row','30–40 min','Nose-breathing pace, HR ~130–150. Grows the aerobic base that underpins everything.']]},
+   {l:'Mobility flow',c:'b-warm',items:[
+     ['Full-body flow','12–15 min','Hips 90/90, adductor rock-backs, T-spine, couch stretch, ankle mobility.']]},
+   {l:'Prehab volume',c:'b-prehab',items:[
+     ['Copenhagen adduction','3×10 / side','Groin resilience.'],
+     ['Nordic hamstring (easy)','2×5','Slow eccentric only.'],
+     ['Hip airplane','2×6 / side','Hip control.'],
+     ['Band external rotation','2×15','Cuff health.'],
+     ['Neck isometrics','2×10s ea','Gentle, all directions.']]},
+   {l:'Soft tissue',c:'b-warm',items:[
+     ['Foam roll','5–8 min','Quads, adductors, glutes, T-spine.']]}
+  ]},
+ mon:{title:'Lower · Max Strength',tag:'hard',time:'70–80 min',
+  intro:'The strength anchor of the week. Off-season volume is higher — this is where you build the force behind every stride and shot. Power first while fresh, then heavy strength, sled, then protect the tissue.',
+  blocks:[
+   {l:'Power / potentiation',c:'b-power',items:[
+     ['Box jump or Broad jump',S({hyp:'4×4',str:'5×3',pow:'5×3 max intent'}),'Land soft, reset every rep. Full recovery.'],
+     ['Hang power clean or Trap-bar jump',S({hyp:'4×3 moderate',str:'4×3 fast',pow:'5×2 explosive'}),'Triple extension — bar speed is everything.']]},
+   {l:'Max strength',c:'b-str',items:[
+     ['Back Squat',S({hyp:'4×6–8 @ 72–78%',str:'5×3–4 @ 85–90% · RPE 8',pow:'5×2 @ 88–92% + jump'}),'Brace, control down, explode up. Contrast with a jump in the power block.'],
+     ['Trap-bar Deadlift',S({hyp:'3×6',str:'4×3 @ 85%+',pow:'4×2 fast'}),'Flat back, drive the floor away.'],
+     ['RFE Split Squat',S({hyp:'3×8 / leg',str:'3×6 / leg',pow:'3×5 / leg'}),'Skating-specific single-leg strength.'],
+     ['Romanian Deadlift','3×6–8','Hips back, feel the hamstrings.']]},
+   {l:'Sled & carries',c:'b-cond',items:[
+     ['Sled drag or Prowler push',S({hyp:'5×20m moderate',str:'6×15m heavy',pow:'5×15m fast &amp; light'}),'Acceleration force + posterior chain, low impact.'],
+     ['Backwards sled drag','3×20m','Quad &amp; knee-friendly — bulletproofs the knees.'],
+     ['Heavy carry (farmer/suitcase)','3×30–40m','Grip, trunk &amp; total-body tension.']]},
+   {l:'Injury prevention',c:'b-prehab',items:[
+     ['Copenhagen adduction','3×8–12 / side','Top groin-injury reducer.'],
+     ['Nordic hamstring','3×5–6','Eccentric brake — big hamstring protector.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Pallof press','3×10 / side','Anti-rotation for skating &amp; shooting.']]}
+  ]},
+ tue:{title:'Upper · Strength + Plyos',tag:'hard',time:'65–75 min',
+  intro:'Reactive plyos fresh up top, then upper strength and rotational power for your shot. Off-season adds volume — build the armour.',
+  blocks:[
+   {l:'Plyometrics — reactive & ankle stiffness (fresh)',c:'b-power',items:[
+     ['Pogo hops → single-leg pogos','3×10–12','Stiff, fast ankles.'],
+     ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Reactive bound onto a low box — stiff springy ankle, quiet landing.'],
+     ['RFE Reactive Foot-Taps','3×10–20s / leg','Reactive taps to a cue — see the Reactive panel above.'],
+     ['Reactive line / dot hops','3×15–20s','Fast feet.']]},
+   {l:'Rotational & upper power',c:'b-power',items:[
+     ['Rotational med-ball throw','4×4 / side','Shot power from the hips.'],
+     ['Overhead med-ball slam','3×5','Full-body extension.']]},
+   {l:'Strength — superset A',c:'b-str',items:[
+     ['Bench Press',S({hyp:'4×6–8 @ 72–78%',str:'4×4–5 @ 85–88%',pow:'5×3 @ 87–90% fast'}),'Set the blades, drive up.'],
+     ['Weighted Pull-up',S({hyp:'4×6–8',str:'4×4–5 heavy',pow:'4×3 heavy'}),'Full range, no kip.']]},
+   {l:'Strength — superset B',c:'b-str',items:[
+     ['Standing OH Press or Landmine','3×6–8','Robust, healthy shoulders.'],
+     ['Chest-supported Row','3×8–10','Squeeze the mid-back.']]},
+   {l:'Shoulder & neck durability',c:'b-prehab',items:[
+     ['Face pull + external rotation','3×15','Rear delts + cuff.'],
+     ['Prone Y-T-W','3×10 ea','Scap control.'],
+     ['Neck isometrics','3×10s ea','Impact protection.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Weighted plank / stir-the-pot','3×30–40s','Brace hard.']]}
+  ]},
+ wed:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'60–70 min',
+  intro:'Max-quality speed while fresh, then resisted acceleration and strength-speed, then energy-system work matched to the block. First-step quickness is trained here.',
+  blocks:[
+   {l:'Speed (fully recovered)',c:'b-power',items:[
+     ['Acceleration sprints','6–8×15–20m','Full recovery ~90s. Max quality.'],
+     ['Flying / build-up runs','3–4×30m','Top-speed mechanics, relaxed &amp; tall.'],
+     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction.']]},
+   {l:'Resisted acceleration',c:'b-power',items:[
+     ['Resisted sled sprint',S({hyp:'6×20m moderate',str:'6×15m heavy',pow:'6×15m light &amp; explosive'}),'Heavy for force early off-season, light &amp; fast pre-season.']]},
+   {l:'Strength-speed',c:'b-str',items:[
+     ['Trap-bar jump or Jump squat','4×3 light','Max speed, light load.'],
+     ['Reverse lunge or Step-up','3×8 / leg','Powerful drive up.'],
+     ['Single-leg RDL','3×8 / leg','Hamstring/glute + balance.']]},
+   {l:'Anaerobic conditioning',c:'b-cond',items:[
+     ['Energy-system work (see block)','per block','GPP: tempo/base · Max-Str: anaerobic capacity · Power: repeat-sprint. Full menu in the Cardio tab.']]},
+   {l:'Prehab',c:'b-prehab',items:[
+     ['Copenhagen adduction','2×10 / side','Groin.'],
+     ['Hip airplane','2×6 / side','Hip stability.']]}
+  ]},
+ thu:{title:'Lower Hypertrophy + Aerobic Base',tag:'easy',time:'60–70 min',
+  intro:'A lower-CNS building day: pack on quality leg muscle, feed the tendons, and grow the aerobic engine. This volume is what off-season is for.',
+  blocks:[
+   {l:'Lower hypertrophy',c:'b-str',items:[
+     ['Heels-elevated squat or Leg press','3×10–12','Slow, full stretch, chase the pump.'],
+     ['Walking lunge or Bulgarian','3×10 / leg','Loaded single-leg volume.'],
+     ['Leg curl / GHR','3×10–12','Hamstring hypertrophy.'],
+     ['Hip thrust','3×10','Glute strength &amp; size.']]},
+   {l:'Tendon & lower-leg health',c:'b-prehab',items:[
+     ['Spanish squat or Wall-sit (iso)','3×30–45s','Patellar-tendon health.'],
+     ['Tibialis raise + Calf raise','3×12–15','Ankle/shin resilience.']]},
+   {l:'Aerobic base',c:'b-cond',items:[
+     ['Zone-2 bike/row','20–30 min','Grow the engine — recover between everything.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Hollow hold','3×20–30s','Anterior-core tension.'],
+     ['Side plank','3×30s / side','Lateral stability.']]}
+  ]},
+ fri:{title:'Total-Body Power / Contrast',tag:'power',time:'55–65 min',
+  intro:'The explosive centrepiece — Olympic-style pulls, contrast pairs (heavy lift → matched jump/throw) and short sprints. High intent, full recovery, quality over quantity. This converts your strength into on-ice speed.',
+  blocks:[
+   {l:'Olympic / jump',c:'b-power',items:[
+     ['Power clean or Snatch-grip pull',S({hyp:'4×3 technique',str:'5×2 @ 80%',pow:'5×2 @ 82–85% explosive'}),'Aggressive triple extension — speed is the goal.'],
+     ['Box jump (max)','4×3','Crisp, powerful, full reset.']]},
+   {l:'Contrast pairs (complex)',c:'b-str',items:[
+     ['Heavy Squat → Broad jump',S({hyp:'4×(4+3)',str:'4×(3+3)',pow:'5×(2+3)'}),'Heavy set, rest 20–40s, then explosive jumps — potentiation.'],
+     ['Heavy Bench → Med-ball throw','4×(3+4)','Same idea, upper body.']]},
+   {l:'Throws & sprints',c:'b-power',items:[
+     ['Rotational + Overhead throw','3×4 ea','Total-body power output.'],
+     ['Short sprint','4×10–15m','Pure acceleration.']]},
+   {l:'Core',c:'b-str',items:[
+     ['Med-ball rotational / anti-rotation','3×8 / side','Transfer power through the trunk.']]}
+  ]},
+ sat:{title:'Energy Systems + Skills',tag:'mod',time:'45–60 min',
+  intro:'Build the engine and keep your hands. Match the conditioning to the block, then get on the ice (or turf) for skills while there’s no game to save for.',
+  blocks:[
+   {l:'Conditioning (match the block)',c:'b-cond',items:[
+     ['GPP → Tempo / threshold','4–6×3 min hard / 90s easy','Raise the aerobic ceiling.'],
+     ['Max-Str → Anaerobic capacity','10–15s hard / 20–40s rest ×8–12','Short-burst engine.'],
+     ['Power → Repeat-sprint (RSA)','8–10×30–40m on 25–30s','Sprint, recover, repeat — hockey-shift specific.']]},
+   {l:'On-ice / skills',c:'b-warm',items:[
+     ['Shooting','40–60 reps','Wrist/snap/one-timers — quality reps.'],
+     ['Stickhandling','15 min','Hands, deception, eyes up.']]},
+   {l:'Mobility',c:'b-warm',items:[
+     ['Cool-down flow','8–10 min','Hips, adductors, T-spine.']]}
+  ]}
+};
+
+/* ---- TRANSITION weekly program (active rest, 2–4 weeks) ---- */
+const WK_TRANS={
+ sun:{title:'Rest',tag:'easy',time:'—',intro:'Full rest. Sleep in, recover, do nothing structured.',
+  blocks:[{l:'Optional',c:'b-warm',items:[['Gentle walk or stretch','20–30 min','Only if you feel like moving.']]}]},
+ mon:{title:'Light Full-Body',tag:'easy',time:'40 min',intro:'Easy full-body session at RPE 6 — keep tissue and strength ticking over without stress.',
+  blocks:[{l:'Full-body (easy)',c:'b-str',items:[
+     ['Goblet squat or Leg press','3×10','Comfortable, controlled.'],
+     ['DB bench or Push-up','3×10','Easy.'],
+     ['Row / Pulldown','3×10','Easy.'],
+     ['Carry + Plank','3 rounds','Light farmer carry + plank.']]},
+   {l:'Mobility',c:'b-warm',items:[['Flow','10 min','Whole body.']]}]},
+ tue:{title:'Movement / Play',tag:'easy',time:'30–45 min',intro:'Do something fun and active — pickup sport, hike, swim, bike. Move for enjoyment.',
+  blocks:[{l:'Active fun',c:'b-cond',items:[['Any activity you enjoy','30–45 min','Low–moderate, no pressure.']]}]},
+ wed:{title:'Light Full-Body',tag:'easy',time:'40 min',intro:'Second easy full-body touch. Keep it light.',
+  blocks:[{l:'Full-body (easy)',c:'b-str',items:[
+     ['Trap-bar deadlift (light)','3×6','Easy, smooth.'],
+     ['Incline DB press','3×10','Easy.'],
+     ['Pull-up or row','3×8','Easy.'],
+     ['Core','3 sets','Hollow / side plank.']]}]},
+ thu:{title:'Mobility + Aerobic',tag:'easy',time:'30–40 min',intro:'Restore movement and flush with easy cardio. Nail any lingering rehab now.',
+  blocks:[{l:'Mobility',c:'b-warm',items:[['Full mobility routine','15 min','Address tight spots.']]},
+   {l:'Aerobic',c:'b-cond',items:[['Easy bike/walk/swim','20–25 min','Zone-1/2.']]},
+   {l:'Rehab',c:'b-prehab',items:[['Any ongoing rehab','—','Heal niggles while volume is low.']]}]},
+ fri:{title:'Play / Rest',tag:'easy',time:'—',intro:'Fun activity or rest — your call.',
+  blocks:[{l:'Optional',c:'b-cond',items:[['Sport / activity or rest','—','Whatever you fancy.']]}]},
+ sat:{title:'Play / Rest',tag:'easy',time:'—',intro:'Fun activity or rest.',
+  blocks:[{l:'Optional',c:'b-cond',items:[['Sport / activity or rest','—','Recharge, body and mind.']]}]}
+};
+
+const WK_SETS={in:WK_IN,off:WK_OFF,trans:WK_TRANS};
+function curWK(){return WK_SETS[curBlock().tmpl]||WK_IN;}
+
 function renderWorkouts(){
   const host=document.getElementById('workoutHost');host.innerHTML='';
   const order=['sun','mon','tue','wed','thu','fri','sat'];
   const labels={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
   order.forEach(k=>{
-    const w=WK[k];
+    const w=curWK()[k];
     let blocks='';
     w.blocks.forEach(b=>{
       let rows='';
@@ -1600,7 +1835,8 @@ function setBlock(k){
   document.querySelectorAll('#phaseSeg button').forEach(x=>x.classList.toggle('on',x.dataset.ph===phase));
   const pd=document.getElementById('phaseDesc');if(pd)pd.textContent=PHASES[phase].desc;
   const pt=document.getElementById('phaseTag2');if(pt)pt.textContent=PHASES[phase].name;
-  updatePill();renderWorkouts();renderBlockBanner();renderYear();
+  updatePill();renderWorkouts();renderBlockBanner();renderYear();renderWeek();updateWeekContext();
+  if(document.getElementById('scheduleHost'))renderSchedule();
 }
 function blockDetailHTML(b){
   return `<div class="card">
@@ -1615,7 +1851,15 @@ function blockDetailHTML(b){
     <div class="kv"><span class="k">Conditioning</span><span class="v" style="text-align:right;max-width:62%">${b.cond}</span></div>
     <div class="kv"><span class="k">Plyometrics</span><span class="v" style="text-align:right;max-width:62%">${b.plyo}</span></div>
     <div class="kv"><span class="k">Week structure</span><span class="v" style="text-align:right;max-width:62%">${b.week}</span></div>
+    <div class="kv"><span class="k">Recovery focus</span><span class="v" style="text-align:right;max-width:62%">${b.recovery}</span></div>
+    <div class="kv"><span class="k">Nutrition focus</span><span class="v" style="text-align:right;max-width:62%">${b.fuel}</span></div>
   </div>`;
+}
+function updateGameToggleVis(){const r=document.getElementById('gameToggleRow');if(r)r.style.display=curBlock().tmpl==='in'?'flex':'none';}
+function updateWeekContext(){
+  const s=document.getElementById('weekSub');const w=curBlock().tmpl;
+  if(s)s.innerHTML=w==='in'?'In-season — anchored to your <b style="color:#f87171">Saturday game</b>. Tap any day to open the full session.':w==='off'?'Off-season build — no games, higher volume, 6 training days. Tap any day to open the full session.':'Transition — active rest &amp; play. Tap any day for the light session.';
+  updateGameToggleVis();
 }
 function renderBlockBanner(){
   const host=document.getElementById('blockBanner');if(!host)return;
@@ -1645,7 +1889,7 @@ toggleGame();
 document.querySelectorAll('#phaseSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ph===phase));
 document.getElementById('phaseDesc').textContent=PHASES[phase].desc;
 document.getElementById('phaseTag2').textContent=PHASES[phase].name;
-updatePill();renderYear();renderBlockBanner();
+updatePill();renderYear();renderBlockBanner();updateWeekContext();
 document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===curSex));
 document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
 document.getElementById('intakeDate').value=new Date().toISOString().slice(0,10);
