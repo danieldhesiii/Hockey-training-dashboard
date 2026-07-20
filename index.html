@@ -301,21 +301,42 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 
   <div class="card">
-    <h3 style="margin-top:4px"><span class="bar"></span>12-week progression</h3>
-    <p style="font-size:13.5px;color:var(--muted);margin:0 0 8px">Run the same weekly template through three 4-week blocks; the emphasis of the strength/power work shifts. Deload every 4th week (cut working sets ~40%, keep it snappy). Use the phase toggle to change the loading targets shown in Workouts.</p>
+    <h3 style="margin-top:4px"><span class="bar"></span>Loading emphasis</h3>
+    <p style="font-size:13.5px;color:var(--muted);margin:0 0 8px">Your <b onclick="go('year')" style="color:var(--ice);cursor:pointer">Year Plan</b> block sets this automatically. Override here to run a specific loading style — e.g. a Base→Strength→Power cycle within a block. Deload every 4th week (cut working sets ~40%, keep it snappy).</p>
     <div class="seg" style="margin-bottom:8px" id="phaseSeg">
-      <button data-ph="hyp" onclick="setPhase('hyp')">Wk 1–4 · Base</button>
-      <button data-ph="str" class="on" onclick="setPhase('str')">Wk 5–8 · Strength</button>
-      <button data-ph="pow" onclick="setPhase('pow')">Wk 9–12 · Power</button>
+      <button data-ph="hyp" onclick="setPhase('hyp')">Base</button>
+      <button data-ph="str" class="on" onclick="setPhase('str')">Strength</button>
+      <button data-ph="pow" onclick="setPhase('pow')">Power</button>
     </div>
     <div id="phaseDesc" style="font-size:13px;color:var(--muted)"></div>
   </div>
 </section>
 
+<!-- ================= YEAR PLAN ================= -->
+<section class="page" id="p-year">
+  <h2 class="ttl">Year Plan</h2>
+  <p class="sub">Your training periodised across the season. The current block sets how the workouts load, and shifts the sled, conditioning &amp; plyo emphasis — pick the block that matches where you are.</p>
+
+  <div class="card">
+    <div class="field" style="margin:4px 0"><label>Current training block</label>
+      <select id="blockSel" onchange="setBlock(this.value)"></select>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin:6px 0 0" id="blockAuto"></div>
+  </div>
+
+  <div id="blockNow"></div>
+
+  <h3><span class="bar"></span>The full year</h3>
+  <div id="blockTimeline"></div>
+  <div class="note">A classic hockey macrocycle — build the base &amp; strength in the off-season, convert to power &amp; speed pre-season, maintain through the games, peak for playoffs, then recover. Dates are guides; shift them to your league's calendar.</div>
+</section>
+
 <!-- ================= WORKOUTS ================= -->
 <section class="page" id="p-train">
   <h2 class="ttl">Workouts</h2>
-  <p class="sub">Loading targets follow the phase you picked (<span id="phaseTag2" style="color:var(--ice);font-weight:700">Strength</span>). RPE = reps-in-reserve guide; RPE 8 ≈ 2 reps left.</p>
+  <p class="sub">Loading auto-follows your periodisation block (<span id="phaseTag2" style="color:var(--ice);font-weight:700">Strength</span> loading). RPE = reps-in-reserve guide; RPE 8 ≈ 2 reps left.</p>
+
+  <div id="blockBanner"></div>
 
   <div class="note"><b>Wrist injury?</b> Keep training — just use straps on pulls and neutral-grip / dumbbell pressing up top. Full swaps are in the <a href="#" onclick="go('rehab');return false;">Rehab</a> tab.</div>
 
@@ -773,11 +794,11 @@ details.acc .inner{padding:0 14px 14px}
 
 <script>
 /* ============ NAV (grouped hubs + sub-nav) ============ */
-const PAGE_LABELS={home:'Home',week:'Schedule',train:'Workouts',cardio:'Conditioning',
+const PAGE_LABELS={home:'Home',week:'Schedule',year:'Year Plan',train:'Workouts',cardio:'Conditioning',
  skills:'Skills',rehab:'Rehab',nutri:'Guide',kitchen:'Meals & Shop',calc:'Calculator',log:'Daily Log'};
 const HUBS=[
  {id:'home',  ic:'🏠', lb:'Home',      pages:['home']},
- {id:'plan',  ic:'📅', lb:'Plan',      pages:['week']},
+ {id:'plan',  ic:'📅', lb:'Plan',      pages:['week','year']},
  {id:'move',  ic:'💪', lb:'Train',     pages:['train','cardio','skills','rehab']},
  {id:'fuel',  ic:'🍽️', lb:'Nutrition', pages:['nutri','kitchen','calc']},
  {id:'track', ic:'📈', lb:'Track',     pages:['log']}
@@ -816,7 +837,57 @@ const PHASES={
  pow:{name:'Power',main:'2–3 reps · high intent',
    desc:'Turn strength into speed. Low-rep, high-intent lifts (87–92%), full-power jumps & throws, sprint focus, and contrast / complex pairs. Peak this into your competitive stretch.'}
 };
-let phase=LS.get('phase','str');
+
+/* ============ ANNUAL PERIODISATION (macrocycle) ============ */
+const BLOCKS=[
+ {k:'gpp',name:'Off-Season · General Prep',months:'Apr–May',load:'hyp',
+   focus:'Rebuild the base — muscle, work capacity and fix any asymmetries after the season. Highest training volume of the year.',
+   sled:'Moderate sled drags & pushes for work capacity — 4–6 controlled trips.',
+   cond:'Aerobic base (Zone-2) + tempo — build the engine while there’s no game to save for.',
+   plyo:'Extensive, low-intensity — pogos, box bounds, submax hops. Build tissue tolerance.',
+   week:'No games — Saturday becomes an extra strength or conditioning day.'},
+ {k:'maxstr',name:'Off-Season · Max Strength',months:'June',load:'str',
+   focus:'Get strong. Heavy compounds, lower reps — this is where your top-end strength for the year is built.',
+   sled:'Heavy sled drags / prowler pushes — build acceleration force. Slow, heavy, 6–8×15–20m.',
+   cond:'Aerobic base maintained + intro anaerobic capacity. Barbell comes first.',
+   plyo:'Build intensity — box jumps, broad jumps, low-amplitude bounds. Quality first.',
+   week:'No games — Saturday = extra lower or upper strength session.'},
+ {k:'power',name:'Pre-Season · Power & Speed',months:'Jul–Aug',load:'pow',
+   focus:'Convert strength to speed and power. Sprint, jump, throw, contrast pairs — peak your explosiveness for camp.',
+   sled:'Light, explosive sled sprints & marches — resisted acceleration (~10–20% BW). Fast, 6×15m.',
+   cond:'Repeat-sprint ability + anaerobic capacity — the hockey-shift energy system. Sharpen the engine.',
+   plyo:'Intensive & reactive — depth jumps (if earned), skater bounds, reactive box bounds. Max intent.',
+   week:'Scrimmages / camp may appear — treat them as the Saturday game and taper into them.'},
+ {k:'inseason',name:'In-Season · Maintain',months:'Sep–Feb',load:'str',
+   focus:'Maintain strength & power on lower volume, fresh for games. Two quality lifts/week is plenty — the games do the rest.',
+   sled:'Short acceleration sled as a primer — light, 3–4×10m, keeps the first step sharp without fatigue.',
+   cond:'Games ARE conditioning — keep just aerobic base + one anaerobic session. Don’t over-condition.',
+   plyo:'Low-dose reactive only — a few crisp contacts to stay springy. Never to fatigue.',
+   week:'Full game week — the Saturday-anchored schedule you see is built for this block.'},
+ {k:'peak',name:'Playoffs · Peak',months:'March',load:'pow',
+   focus:'Peak and hold. Minimal volume, maximal quality — primers and fast singles. Feel explosive and recovered.',
+   sled:'Optional light sled primer only — or drop it. Freshness beats everything now.',
+   cond:'Games only + light base flushes. Protect the legs.',
+   plyo:'Priming reactive touches — pogos, a few box jumps. Springy, never sore.',
+   week:'Every session serves the game. Cut volume ~40%, keep intensity crisp.'},
+ {k:'transition',name:'Off · Transition',months:'Post-season · 2–4 wks',load:'hyp',
+   focus:'Active rest. Heal niggles, do something fun, let the CNS reset before GPP starts again.',
+   sled:'Optional light sled walks if you feel like moving. No pressure.',
+   cond:'Easy, enjoyable movement — bike, hike, swim. Stay active, stay loose.',
+   plyo:'None required — just play.',
+   week:'Unstructured — train when you want, rest when you need.'}
+];
+function detectBlock(){const m=new Date().getMonth();
+  if(m>=3&&m<=4)return 'gpp';
+  if(m===5)return 'maxstr';
+  if(m>=6&&m<=7)return 'power';
+  if(m===2)return 'peak';
+  return 'inseason';}
+let block=LS.get('block',null)||detectBlock();
+function curBlock(){return BLOCKS.find(x=>x.k===block)||BLOCKS[3];}
+function loadTag(l){return {hyp:'easy',str:'ice',pow:'power'}[l]||'ice';}
+function updatePill(){const el=document.getElementById('phasePill');if(el)el.textContent=curBlock().name;}
+let phase=LS.get('phase',curBlock().load);
 
 /* ============ WEEKLY PLAN ============ */
 const DAYS=[
@@ -927,6 +998,9 @@ const WK={
      ['Back Squat or Trap-bar Deadlift',S({hyp:'4×6 @ 72–78%',str:'5×3–4 @ 84–90% · RPE 8',pow:'5×2 @ 88–92% + jump after each set'}),'Brace hard, control the descent, explode up. In Power phase, contrast each set with a jump.'],
      ['RFE Split Squat (Bulgarian)',S({hyp:'3×8 / leg',str:'3×6 / leg',pow:'3×5 / leg heavy'}),'Skating-specific single-leg strength. Stay tall; front knee tracks over toe.'],
      ['Romanian Deadlift','3×6–8','Hips back, long spine, feel the hamstrings load. Don’t chase weight over feel.']]},
+   {l:'Sled & carries (periodised)',c:'b-cond',items:[
+     ['Sled drag or Prowler push',S({hyp:'5×20m moderate',str:'6×15m heavy',pow:'5×15m fast &amp; light'}),'Acceleration force + posterior chain, low impact. Heavy drags in strength blocks; light &amp; fast in power blocks — doubles as low-CNS conditioning.'],
+     ['Backwards sled drag',S({hyp:'3×20m',str:'3×20m',pow:'3×15m'}),'Quad &amp; knee-friendly — bulletproofs the knees for stop-start skating.']]},
    {l:'Injury-prevention isometrics',c:'b-prehab',items:[
      ['Copenhagen adduction','3×8–12 / side','The single most evidence-backed drill for cutting groin injuries in hockey.'],
      ['Nordic hamstring','3×4–6','Eccentric brake — lower as slow as you can. Big hamstring-strain reducer.']]},
@@ -963,7 +1037,7 @@ const WK={
    {l:'Speed (fully recovered)',c:'b-power',items:[
      ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
      ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
-     ['Resisted sled sprint (option)','6×15m','Add if available — builds acceleration force.']]},
+     ['Resisted sled sprint',S({hyp:'6×20m moderate',str:'6×15m heavy',pow:'6×15m light &amp; explosive'}),'Resisted acceleration — heavier for force in strength blocks, light &amp; fast in power/pre-season blocks.']]},
    {l:'Strength-speed',c:'b-str',items:[
      ['Trap-bar jump or Jump squat','4×3 light','Move light load with max speed. Velocity is the whole point.'],
      ['Reverse lunge or Step-up','3×8 / leg','Controlled, powerful drive up.'],
@@ -1511,15 +1585,58 @@ function renderPR(){
 }
 function delPR(i){const prs=LS.get('pr',[]);prs.splice(i,1);LS.set('pr',prs);renderPR();}
 function resetAll(){if(confirm('Delete all logged weights, PRs and settings on this device?')){
-  ['bw','pr','phase','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
+  ['bw','pr','phase','block','sex','gameOn','intake','waterGoal','target','tdee','activity','meals','grocery'].forEach(k=>localStorage.removeItem('hk_'+k));location.reload();}}
 
 /* ============ PHASE CONTROL ============ */
 function setPhase(p){phase=p;LS.set('phase',p);
   document.querySelectorAll('#phaseSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ph===p));
   document.getElementById('phaseDesc').textContent=PHASES[p].desc;
   document.getElementById('phaseTag2').textContent=PHASES[p].name;
-  document.getElementById('phasePill').textContent='In-Season · '+PHASES[p].name;
-  renderWorkouts();
+  updatePill();renderWorkouts();renderBlockBanner();
+}
+function setBlock(k){
+  block=k;LS.set('block',k);
+  const b=curBlock();phase=b.load;LS.set('phase',phase);
+  document.querySelectorAll('#phaseSeg button').forEach(x=>x.classList.toggle('on',x.dataset.ph===phase));
+  const pd=document.getElementById('phaseDesc');if(pd)pd.textContent=PHASES[phase].desc;
+  const pt=document.getElementById('phaseTag2');if(pt)pt.textContent=PHASES[phase].name;
+  updatePill();renderWorkouts();renderBlockBanner();renderYear();
+}
+function blockDetailHTML(b){
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+      <h3 style="margin:2px 0"><span class="bar"></span>${b.name}</h3>
+      <span class="tag t-${loadTag(b.load)}">${PHASES[b.load].name} loading</span>
+    </div>
+    <div class="chip" style="margin:2px 0 8px">🗓 ${b.months}</div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px">${b.focus}</p>
+    <div class="kv"><span class="k">Main lifts</span><span class="v">${PHASES[b.load].main}</span></div>
+    <div class="kv"><span class="k">Sled work</span><span class="v" style="text-align:right;max-width:62%">${b.sled}</span></div>
+    <div class="kv"><span class="k">Conditioning</span><span class="v" style="text-align:right;max-width:62%">${b.cond}</span></div>
+    <div class="kv"><span class="k">Plyometrics</span><span class="v" style="text-align:right;max-width:62%">${b.plyo}</span></div>
+    <div class="kv"><span class="k">Week structure</span><span class="v" style="text-align:right;max-width:62%">${b.week}</span></div>
+  </div>`;
+}
+function renderBlockBanner(){
+  const host=document.getElementById('blockBanner');if(!host)return;
+  const b=curBlock();
+  host.innerHTML=`<div class="note"><b>${b.name}</b> — ${b.focus}<br><span style="color:var(--dim)">Loading: ${PHASES[b.load].name} (${PHASES[b.load].main}) · Sleds: ${b.sled}</span> <span onclick="go('year')" style="cursor:pointer;color:var(--ice);font-weight:700">Change block →</span></div>`;
+}
+function renderYear(){
+  const auto=detectBlock();
+  const sel=document.getElementById('blockSel');
+  if(sel)sel.innerHTML=BLOCKS.map(b=>`<option value="${b.k}" ${b.k===block?'selected':''}>${b.name} · ${b.months}</option>`).join('');
+  const am=document.getElementById('blockAuto');
+  if(am){const an=BLOCKS.find(x=>x.k===auto);
+    am.innerHTML=`Auto-suggested for today: <b style="color:var(--ice)">${an.name}</b>. `+(block===auto?'You’re on it.':`<span onclick="setBlock('${auto}')" style="cursor:pointer;color:var(--ice)">Use this →</span>`);}
+  const now=document.getElementById('blockNow');if(now)now.innerHTML=blockDetailHTML(curBlock());
+  const tl=document.getElementById('blockTimeline');
+  if(tl)tl.innerHTML=BLOCKS.map(b=>{const on=b.k===block;
+    return `<div class="card tight" style="cursor:pointer;${on?'border-color:var(--ice)':''}" onclick="setBlock('${b.k}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div><b style="font-size:14px;${on?'color:var(--ice)':''}">${b.name}</b><div style="font-size:12px;color:var(--dim)">${b.months} · ${PHASES[b.load].name} loading</div></div>
+        ${on?'<span class="tag t-ice">Current</span>':''}
+      </div></div>`;}).join('');
 }
 
 /* ============ INIT ============ */
@@ -1528,7 +1645,7 @@ toggleGame();
 document.querySelectorAll('#phaseSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ph===phase));
 document.getElementById('phaseDesc').textContent=PHASES[phase].desc;
 document.getElementById('phaseTag2').textContent=PHASES[phase].name;
-document.getElementById('phasePill').textContent='In-Season · '+PHASES[phase].name;
+updatePill();renderYear();renderBlockBanner();
 document.querySelectorAll('#sexSeg button').forEach(b=>b.classList.toggle('on',b.dataset.sex===curSex));
 document.getElementById('bwDate').value=new Date().toISOString().slice(0,10);
 document.getElementById('intakeDate').value=new Date().toISOString().slice(0,10);
