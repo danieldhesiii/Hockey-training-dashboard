@@ -267,8 +267,22 @@ details.acc .inner{padding:0 14px 14px}
     <span class="tag t-game">Game</span>
   </div>
 
+  <h3><span class="bar"></span>Your day (built around a 9–5)</h3>
+  <div class="card">
+    <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Two touch-points a day: a quick <b style="color:#c4b5fd">morning</b> micro-dose that doesn't cost recovery, then your <b style="color:var(--ice)">evening</b> main session once you've switched off from work.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="scheme">07:00</td><td>Optional 10–15 min — rehab isometrics + mobility (+ stickhandling on skill days). Greases the joints, primes the day, zero fatigue cost.</td></tr>
+      <tr><td class="scheme">09–17</td><td>Work. Hydrate, hit protein at each meal, short walk if you can.</td></tr>
+      <tr><td class="scheme">17:30</td><td>Decompress — a couple of hours to chill. Pre-training meal ~2h out (carbs + protein, low fat/fibre).</td></tr>
+      <tr><td class="scheme">19:30</td><td>Main session, 45–75 min. <b style="color:#fff">Plyos &amp; sprints first while fresh</b>, then strength/skills.</td></tr>
+      <tr><td class="scheme">21:00</td><td>Dinner + recovery — protein + carbs, then wind down.</td></tr>
+      <tr><td class="scheme">22:30</td><td>Sleep. Adaptation happens here — protect it, especially the night before a game.</td></tr>
+    </tbody></table></div>
+    <div class="note">Training this late? Keep the CNS work crisp (not to failure) and no big caffeine after ~4pm so sleep stays intact. Prefer training right after work? Just shift the evening block earlier and chill afterward instead.</div>
+  </div>
+
   <h3><span class="bar"></span>Full daily schedule</h3>
-  <p class="sub" style="margin-bottom:10px">Everything mapped onto the week — gym, sprints, change-of-direction, shooting, stickhandling and rehab. Tap the game toggle above to flip Saturday.</p>
+  <p class="sub" style="margin-bottom:10px">Everything mapped onto the week — gym, plyos, sprints, change-of-direction, shooting, stickhandling and rehab, split into <b style="color:#c4b5fd">AM</b> / <b style="color:var(--ice)">PM</b>. Tap the game toggle above to flip Saturday.</p>
   <div id="scheduleHost"></div>
 
   <div class="card">
@@ -308,7 +322,7 @@ details.acc .inner{padding:0 14px 14px}
   <details class="acc" id="plyoBox">
     <summary><span class="tag t-power">Reactive</span>&nbsp; Reactive plyometrics &amp; fast-twitch drills</summary>
     <div class="inner">
-      <p style="font-size:13px;color:var(--muted)">Trains the stretch-shortening cycle and read-and-react speed — your first step, edges and cuts. <b style="color:#fff">Rules: do them fresh, low volume, max quality, full recovery.</b> Slot them into a warm-up, Wednesday's speed day, or Friday's primer — never to fatigue.</p>
+      <p style="font-size:13px;color:var(--muted)">Trains the stretch-shortening cycle and read-and-react speed — your first step, edges and cuts. <b style="color:#fff">Rules: do them fresh, low volume, max quality, full recovery.</b> They're programmed up top on your <b style="color:#fff">Tuesday &amp; Thursday</b> sessions, and lightly in Friday's primer — never to fatigue.</p>
 
       <div class="blocklabel b-power">Your reactive tap drill — single-leg, rear-foot elevated</div>
       <div class="ex"><table><tbody>
@@ -319,6 +333,7 @@ details.acc .inner{padding:0 14px 14px}
       <div class="blocklabel b-power">Supporting reactive / fast-twitch drills</div>
       <div class="ex"><table><tbody>
         <tr><td class="exn">Pogo hops → single-leg pogos<span class="cue">Stiff ankles, straight legs, ground like it's hot. Double-leg first, then single.</span></td><td class="scheme">3×10–15</td></tr>
+        <tr><td class="exn">Single-leg box bounds (ankle stiffness)<span class="cue">Bound up onto a low box on one leg; land soft but springy with a <b>stiff, reactive ankle</b> and minimal ground-contact time. Quick, quiet pops — quality over height. Builds the ankle stiffness that transfers to a faster first stride.</span></td><td class="scheme">3×4–5 / leg</td></tr>
         <tr><td class="exn">Reactive line / dot hops<span class="cue">Quick-feet patterns (fwd-back, side-side, X). Speed of contacts is the point.</span></td><td class="scheme">3×15–20s</td></tr>
         <tr><td class="exn">Skater bounds (stick landings)<span class="cue">Lateral bound, stick &amp; hold 1s, then progress to continuous. Pure hockey edge power.</span></td><td class="scheme">3×4–6 / side</td></tr>
         <tr><td class="exn">Snap-down / drop-and-stick<span class="cue">Reactive deceleration — teaches you to absorb force and re-load fast.</span></td><td class="scheme">3×4</td></tr>
@@ -809,12 +824,12 @@ const DAYS=[
   desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
   desc:'Squat / trap-bar, jumps, single-leg, groin & hamstring isometrics.'},
- {k:'tue',d:'TUE',role:'Upper · Strength + Power',tag:'hard',rel:'',
-  desc:'Press & pull, rotational med-ball (shot power), shoulder & neck health.'},
- {k:'wed',d:'WED',role:'Speed + Anaerobic + Single-leg',tag:'mod',rel:'',
-  desc:'Sprints, agility, jump-strength, and your hardest conditioning.'},
- {k:'thu',d:'THU',role:'Upper Hypertrophy + Prehab',tag:'easy',rel:'Low CNS',
-  desc:'Pump work, posterior chain, tendon & tissue health.'},
+ {k:'tue',d:'TUE',role:'Upper · Strength + Power + Plyos',tag:'hard',rel:'',
+  desc:'Reactive plyos (ankle stiffness), press & pull, rotational med-ball, shoulder & neck.'},
+ {k:'wed',d:'WED',role:'Speed + Change of Direction + Conditioning',tag:'mod',rel:'',
+  desc:'Sprints, change of direction, jump-strength, and your hardest conditioning.'},
+ {k:'thu',d:'THU',role:'Upper Hypertrophy + Plyos + Prehab',tag:'mod',rel:'Low-ish CNS',
+  desc:'Reactive/stiffness plyos, pump work, posterior chain, tendon & tissue health.'},
  {k:'fri',d:'FRI',role:'CNS Primer (pre-game)',tag:'power',rel:'Day before game',
   desc:'Short & sharp — jumps, throws, fast singles. Leave springy.'},
  {k:'sat',d:'SAT',role:'GAME / SKATE',tag:'game',rel:'Compete',
@@ -843,40 +858,41 @@ function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.
 
 /* ============ FULL DAILY SCHEDULE ============ */
 const SCHED={
- sun:[{t:'Gym',i:'🏋️',x:'Recovery + aerobic — Zone-2 bike/row 25–40 min, mobility flow'},
-      {t:'Rehab',i:'🩹',x:'Full daily set: wrist iso, knee iso (Spanish squat/wall-sit), shoulder band'},
-      {t:'Skills',i:'🏒',x:'Optional light stickhandling 10–15 min — hands stay sharp, low fatigue'}],
- mon:[{t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps)'},
-      {t:'Rehab',i:'🩹',x:'Wrist isometrics; knee tendon iso after the lift'},
-      {t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after lifting (wrist/snap/one-timers)'}],
- tue:[{t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball'},
-      {t:'Rehab',i:'🩹',x:'Shoulder focus: cuff/band, face pulls, scap work; wrist iso'},
-      {t:'Skills',i:'🏒',x:'Stickhandling 15–20 min — tight dribbles, deception, hands'}],
- wed:[{t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
-      {t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, reactive first-step'},
-      {t:'Conditioning',i:'❤️',x:'Anaerobic intervals — assault bike or repeat runs'},
-      {t:'Rehab',i:'🩹',x:'Knee focus after sprints; wrist iso'}],
- thu:[{t:'Gym',i:'🏋️',x:'Upper hypertrophy + prehab (lower CNS)'},
-      {t:'Rehab',i:'🩹',x:'Knee isotonic (slow leg ext/step-downs) + wrist Phase-2'},
-      {t:'Skills',i:'🏒',x:'Skill day — shooting + stickhandling, fresher so quality is high'}],
- fri:[{t:'Primer',i:'⚡',x:'CNS primer — pogos, box jumps, 2–3 fast singles, 3×10m sprints'},
-      {t:'Skills',i:'🏒',x:'Light shooting/stickhandling touch — sharp, not tiring'},
-      {t:'Rehab',i:'🩹',x:'Wrist iso + mobility only — keep it light before the game'}],
- sat:[{t:'Game',i:'🥅',x:'GAME / SKATE — fuel 2–3h before, refuel within 60 min after'},
-      {t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed; otherwise rest it'}]
+ sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility flow + full rehab set (wrist/knee/shoulder iso) — ~15 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Recovery — Zone-2 bike/row 25–40 min; optional light stickhandling'}],
+ mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps); knee tendon iso after'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after the lift'}],
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min; optional stickhandling'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
+      {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, crossovers'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals — assault bike or repeat runs'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic (slow leg ext/step-downs) — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — ankle pogos, single-leg box bounds, skater bounds'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Upper hypertrophy + posterior-chain / tendon health'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Skill day — shooting + stickhandling, fresher so quality is high'}],
+ fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Light mobility + wrist iso only — keep it easy before the game'},
+      {w:'PM',t:'Primer',i:'⚡',x:'CNS primer (~30 min) — pogos, box jumps, 2–3 fast singles, 3×10m sprints'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Light shooting/stickhandling touch — sharp, not tiring'}],
+ sat:[{w:'—',t:'Game',i:'🥅',x:'GAME / SKATE — fuel 2–3h before, refuel within 60 min after'},
+      {w:'—',t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed; otherwise rest it'}]
 };
 const SCHED_LABELS={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 function schedTag(t){return {Gym:'ice',Speed:'power',Primer:'power',Agility:'power',Conditioning:'mod',Skills:'ice',Rehab:'easy',Game:'game'}[t]||'ice';}
+function schedWhenColor(w){return w==='AM'?'#c4b5fd':w==='PM'?'var(--ice)':'var(--dim)';}
 function renderSchedule(){
   const host=document.getElementById('scheduleHost');if(!host)return;
   const gameOn=LS.get('gameOn',true);
   const order=['sun','mon','tue','wed','thu','fri','sat'];
   host.innerHTML=order.map(k=>{
     let blocks=SCHED[k];
-    if(k==='sat'&&!gameOn)blocks=[{t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
-      {t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
-      {t:'Skills',i:'🏒',x:'Great day for a longer skills session — shooting + stickhandling'}];
-    const rows=blocks.map(b=>`<div style="display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(36,51,82,.4)"><span style="font-size:16px;line-height:1.4">${b.i}</span><div style="flex:1"><span class="tag t-${schedTag(b.t)}">${b.t}</span><div style="font-size:13px;color:var(--muted);margin-top:4px">${b.x}</div></div></div>`).join('');
+    if(k==='sat'&&!gameOn)blocks=[{w:'—',t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
+      {w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Great day for a longer skills session — shooting + stickhandling'}];
+    const rows=blocks.map(b=>`<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(36,51,82,.4)"><span style="font-size:10.5px;font-weight:800;color:${schedWhenColor(b.w)};min-width:26px;padding-top:3px">${b.w}</span><span style="font-size:16px;line-height:1.3">${b.i}</span><div style="flex:1"><span class="tag t-${schedTag(b.t)}">${b.t}</span><div style="font-size:13px;color:var(--muted);margin-top:4px">${b.x}</div></div></div>`).join('');
     return `<div class="card tight"><div style="font-weight:800;font-size:14px;margin-bottom:2px">${SCHED_LABELS[k]}</div>${rows}</div>`;
   }).join('');
 }
@@ -917,9 +933,14 @@ const WK={
    {l:'Core',c:'b-str',items:[
      ['Pallof press','3×10 / side','Anti-rotation — resist the twist, transfers straight to skating & shooting.']]}
   ]},
- tue:{title:'Upper · Strength + Power + Rotational',tag:'hard',time:'55–65 min',
-  intro:'Upper-body strength with rotational power for your shot. Paired push/pull supersets keep it under an hour, and the shoulder + neck work is your durability insurance.',
+ tue:{title:'Upper · Strength + Power + Plyos',tag:'hard',time:'60–70 min',
+  intro:'Opened with low-volume reactive plyos while your legs are fresh — springy, not deep, so it builds ankle/foot stiffness and a faster first step without adding fatigue. Then upper-body strength and rotational power for your shot. Paired push/pull supersets keep it tight, and the shoulder + neck work is your durability insurance.',
   blocks:[
+   {l:'Plyometrics — reactive & ankle stiffness (do fresh)',c:'b-power',items:[
+     ['Pogo hops → single-leg pogos','3×10–12','Stiff ankles, straight legs — like the ground is hot. Build to single-leg.'],
+     ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Bound up onto a low box on one leg; land soft but springy with a stiff, reactive ankle and minimal ground-contact. Quick quiet pops, not max height.'],
+     ['RFE Reactive Foot-Taps','3×10–20s / leg','Rear-foot-elevated reactive taps to a called cue — full detail in the Reactive panel at the top of this tab.'],
+     ['Reactive line / dot hops','3×15–20s','Fast-feet patterns — speed of contacts is the point.']]},
    {l:'Rotational & upper power',c:'b-power',items:[
      ['Rotational med-ball throw','4×4 / side','Shot power — drive from the hip and floor, whip through the torso.'],
      ['Overhead med-ball slam','3×5','Full-body extension into the slam. Explosive intent.']]},
@@ -936,16 +957,13 @@ const WK={
    {l:'Core',c:'b-str',items:[
      ['Weighted plank / stir-the-pot','3×30–40s','Brace like you’re about to take a hit.']]}
   ]},
- wed:{title:'Speed + Anaerobic + Single-leg',tag:'mod',time:'55–65 min',
-  intro:'Speed while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery.',
+ wed:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'55–65 min',
+  intro:'Sprints and change-of-direction while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery. (Reactive &amp; ankle-stiffness plyos now live on Tue &amp; Thu.)',
   blocks:[
    {l:'Speed (fully recovered)',c:'b-power',items:[
      ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
      ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
      ['Resisted sled sprint (option)','6×15m','Add if available — builds acceleration force.']]},
-   {l:'Reactive plyometrics (fresh)',c:'b-power',items:[
-     ['RFE Reactive Foot-Taps','3–4×10–20s / leg','Rear-foot-elevated reactive taps to a called cue. Full detail in the Reactive panel at the top of this tab.'],
-     ['Skater bounds','3×5 / side','Lateral edge power — stick the landing, then flow into continuous.']]},
    {l:'Strength-speed',c:'b-str',items:[
      ['Trap-bar jump or Jump squat','4×3 light','Move light load with max speed. Velocity is the whole point.'],
      ['Reverse lunge or Step-up','3×8 / leg','Controlled, powerful drive up.'],
@@ -957,9 +975,14 @@ const WK={
      ['Copenhagen adduction','2×10 / side','Groin.'],
      ['Hip airplane','2×6 / side','Hip stability.']]}
   ]},
- thu:{title:'Upper Hypertrophy + Prehab',tag:'easy',time:'50–60 min',
-  intro:'A deliberately lower-CNS day: build muscle with higher reps, feed tendons and connective tissue, and bank prehab volume. This is what lets you train hard six days a week.',
+ thu:{title:'Upper Hypertrophy + Plyos + Prehab',tag:'mod',time:'55–65 min',
+  intro:'Open with low-volume reactive & stiffness plyos while you’re fresh — extensive, springy work (not deep depth jumps), so it fits a lower-CNS day and keeps your ankles &amp; feet stiff between the heavy days. Then build muscle with higher reps and feed the tendons and tissue. This is what lets you train hard six days a week.',
   blocks:[
+   {l:'Plyometrics — reactive & ankle stiffness (do fresh)',c:'b-power',items:[
+     ['Ankle pogos (double → single)','3×12','Pure ankle/foot stiffness — minimal knee bend, fast off the floor.'],
+     ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Reactive single-leg bound onto a low box; stiff springy ankle, quiet landing, quick ground contact.'],
+     ['Skater bounds (stick landings)','3×4–6 / side','Lateral edge power — stick the landing 1s, then flow continuous.'],
+     ['Snap-down / drop-and-stick','3×4','Reactive deceleration — absorb force and re-load fast.']]},
    {l:'Hypertrophy',c:'b-str',items:[
      ['Incline DB Press','3×8–12','Controlled, full stretch. Chase a pump, not a max.'],
      ['Cable Row / Lat Pulldown','3×10–12','Back thickness & width.'],
