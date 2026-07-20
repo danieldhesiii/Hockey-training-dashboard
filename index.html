@@ -58,6 +58,15 @@ header.top{
 .tab.active{color:var(--ice);background:rgba(56,189,248,.10)}
 .tab:active{transform:scale(.94)}
 
+/* Sub-nav (sections within a hub) */
+.subnav{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;border-top:1px solid var(--line);scrollbar-width:none}
+.subnav::-webkit-scrollbar{display:none}
+.subnav:empty{display:none}
+.subnav button{flex:0 0 auto;background:var(--card2);border:1px solid var(--line);color:var(--muted);
+  font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;cursor:pointer;font-family:inherit;transition:.15s}
+.subnav button.on{background:var(--ice);color:#04121f;border-color:var(--ice)}
+.subnav button:active{transform:scale(.96)}
+
 section.page{display:none;padding:20px 0 10px;animation:fade .25s ease}
 section.page.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -190,6 +199,7 @@ details.acc .inner{padding:0 14px 14px}
     </div>
     <div class="phasepill" id="phasePill">In-Season · 6+Game</div>
   </div>
+  <div class="subnav" id="subnav"></div>
 </header>
 
 <div class="wrap">
@@ -747,21 +757,34 @@ details.acc .inner{padding:0 14px 14px}
 <div class="wrap"><p class="foot">Built for you — Kam · advanced hockey athlete. Not medical advice; train around any injuries and consult a professional for pain. Data stays on your device.</p></div>
 
 <script>
-/* ============ NAV ============ */
-const TABS=[
- ["home","🏠","Home"],["week","📅","Week"],["train","🏋️","Train"],
- ["cardio","❤️","Cardio"],["skills","🏒","Skills"],["rehab","🩹","Rehab"],
- ["nutri","🍽️","Fuel"],["kitchen","🛒","Kitchen"],["calc","🧮","Calc"],["log","📈","Log"]
+/* ============ NAV (grouped hubs + sub-nav) ============ */
+const PAGE_LABELS={home:'Home',week:'Schedule',train:'Workouts',cardio:'Conditioning',
+ skills:'Skills',rehab:'Rehab',nutri:'Guide',kitchen:'Meals & Shop',calc:'Calculator',log:'Daily Log'};
+const HUBS=[
+ {id:'home',  ic:'🏠', lb:'Home',      pages:['home']},
+ {id:'plan',  ic:'📅', lb:'Plan',      pages:['week']},
+ {id:'move',  ic:'💪', lb:'Train',     pages:['train','cardio','skills','rehab']},
+ {id:'fuel',  ic:'🍽️', lb:'Nutrition', pages:['nutri','kitchen','calc']},
+ {id:'track', ic:'📈', lb:'Track',     pages:['log']}
 ];
+function hubOf(page){return HUBS.find(h=>h.pages.indexOf(page)>=0)||HUBS[0];}
 const tabInner=document.getElementById('tabInner');
-TABS.forEach(([id,ic,lb])=>{
-  const b=document.createElement('button');b.className='tab';b.dataset.tab=id;
-  b.innerHTML=`<span class="ic">${ic}</span>${lb}`;b.onclick=()=>go(id);tabInner.appendChild(b);
+HUBS.forEach(h=>{
+  const b=document.createElement('button');b.className='tab';b.dataset.hub=h.id;
+  b.innerHTML=`<span class="ic">${h.ic}</span>${h.lb}`;b.onclick=()=>goHub(h.id);tabInner.appendChild(b);
 });
+const lastPage={};
+function goHub(hubId){const h=HUBS.find(x=>x.id===hubId);go(lastPage[hubId]||h.pages[0]);}
+function buildSubnav(hub,active){
+  const sn=document.getElementById('subnav');
+  sn.innerHTML=hub.pages.length<2?'':hub.pages.map(p=>`<button class="${p===active?'on':''}" onclick="go('${p}')">${PAGE_LABELS[p]}</button>`).join('');
+}
 function go(id){
+  const hub=hubOf(id);lastPage[hub.id]=id;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-'+id).classList.add('active');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.hub===hub.id));
+  buildSubnav(hub,id);
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
 
