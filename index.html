@@ -94,15 +94,13 @@ h4{font-size:14px;margin:18px 0 8px;color:var(--txt)}
 
 /* Weekly grid */
 .week{display:grid;gap:10px}
-.day{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
-  border-radius:14px;padding:13px 14px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.day{background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:13px 14px 10px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
 .day:hover{border-color:var(--ice2)}
 .day .accent{position:absolute;left:0;top:0;bottom:0;width:4px}
-.day .dname{min-width:46px;font-weight:800;font-size:13px;color:var(--muted);padding-left:6px}
-.day .dbody{flex:1}
-.day .dbody .role{font-weight:700;font-size:14.5px;margin-bottom:2px}
-.day .dbody .desc{font-size:12.5px;color:var(--muted)}
-.day .chev{color:var(--dim);align-self:center;font-size:20px}
+.day .dname{min-width:36px;font-weight:800;font-size:13px;color:var(--muted)}
+.day .role{font-weight:700;font-size:14.5px}
+.day .chev{color:var(--dim);font-size:20px;line-height:1}
 
 .acc-hard{background:var(--hard)} .acc-mod{background:var(--mod)} .acc-easy{background:var(--easy)}
 .acc-power{background:var(--power)} .acc-game{background:var(--game)}
@@ -997,17 +995,36 @@ function curDays(){return DAYS_SETS[curBlock().tmpl]||DAYS_IN;}
 function renderWeek(){
   const gameOn=LS.get('gameOn',true);
   const host=document.getElementById('weekList');host.innerHTML='';
+  const sched=curSched();
   curDays().forEach(day=>{
     let role=day.role,desc=day.desc,tag=day.tag,rel=day.rel;
-    if(day.k==='sat'&&curBlock().tmpl==='in'&&!gameOn){role='Free Saturday';tag='mod';rel='No game';
-      desc='Extra Lower Power, a long conditioning session, or full rest — your call.';}
+    let blocks=sched[day.k]||[];
+    if(day.k==='sat'&&curBlock().tmpl==='in'&&!gameOn){
+      role='Free Saturday';tag='mod';rel='No game';
+      desc='Extra Lower Power, a long conditioning session, or full rest — your call.';
+      blocks=[{w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
+               {w:'PM',t:'Gym',i:'🏋️',x:'Extra lower power or long conditioning'},
+               {w:'PM',t:'Skills',i:'🏒',x:'Longer skills session — shooting + stickhandling'}];}
+    const whenColor=w=>w==='AM'?'#c4b5fd':w==='PM'?'var(--ice)':'var(--dim)';
+    const actTagCls=t=>({Gym:'ice',Speed:'power',Primer:'power',Agility:'power',Conditioning:'mod',Skills:'ice',Rehab:'easy',Game:'game'}[t]||'ice');
+    const actRows=blocks.map(b=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid rgba(36,51,82,.35)">
+      <span style="font-size:10px;font-weight:800;color:${whenColor(b.w)};min-width:22px;padding-top:2px;flex-shrink:0">${b.w}</span>
+      <span style="font-size:14px;line-height:1.2;flex-shrink:0">${b.i}</span>
+      <div style="flex:1;min-width:0">
+        <span class="tag t-${actTagCls(b.t)}" style="font-size:10px;padding:2px 7px">${b.t}</span>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4">${b.x}</div>
+      </div></div>`).join('');
     const el=document.createElement('div');el.className='day';
+    el.style.cssText='display:block;padding:13px 14px 10px;cursor:pointer';
     el.onclick=()=>{go('train');setTimeout(()=>{const t=document.getElementById('wk-'+day.k);if(t)t.scrollIntoView({behavior:'smooth',block:'start'});},60);};
-    el.innerHTML=`<div class="accent acc-${tag}"></div><div class="dname">${day.d}</div>
-      <div class="dbody"><div class="role">${role}</div><div class="desc">${desc}</div>
-      <div style="margin-top:6px"><span class="tag t-${tag}">${tag==='easy'?'Recovery':tag==='power'?'Primer':tag==='game'?'Game':tag==='hard'?'Hard':'Moderate'}</span>
-      ${rel?`<span style="font-size:11px;color:var(--dim);margin-left:8px">${rel}</span>`:''}</div></div>
-      <div class="chev">›</div>`;
+    el.innerHTML=`<div class="accent acc-${tag}"></div>
+      <div style="display:flex;gap:12px;align-items:center;padding-left:6px;margin-bottom:8px">
+        <div class="dname" style="min-width:36px;padding-left:0">${day.d}</div>
+        <div style="flex:1"><div class="role">${role}</div></div>
+        <span class="tag t-${tag}" style="flex-shrink:0">${tag==='easy'?'Recovery':tag==='power'?'Primer':tag==='game'?'Game':tag==='hard'?'Hard':'Moderate'}</span>
+        <div class="chev" style="align-self:center">›</div>
+      </div>
+      <div style="padding-left:6px">${actRows}</div>`;
     host.appendChild(el);
   });
 }
@@ -1017,57 +1034,59 @@ function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.
 
 /* ============ FULL DAILY SCHEDULE ============ */
 const SCHED_IN={
- sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility flow + full rehab set (wrist/knee/shoulder iso) — ~15 min'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Conditioning day — aerobic base / tempo 30–45 min. Flush the game &amp; build the engine; keep it moderate the day after a game.'}],
- mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps); knee tendon iso after'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after the lift'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Optional if you have time — sprints (do fresh, before lifting)'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Optional if you have time — shooting 40–60 reps to finish'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
-      {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, reactive cuts'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals (HARD) — assault bike or repeat runs. Your main intense conditioning session.'}],
- thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic (slow leg ext/step-downs) — ~12 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — ankle pogos, single-leg box bounds, skater bounds'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Upper hypertrophy + posterior-chain / tendon health'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Skill day — shooting + stickhandling, fresher so quality is high'}],
- fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Light mobility + wrist iso only — keep it easy before the game'},
-      {w:'PM',t:'Primer',i:'⚡',x:'CNS primer (~30 min) — pogos, box jumps, 2–3 fast singles, 3×10m sprints'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Light shooting/stickhandling touch — sharp, not tiring'}],
- sat:[{w:'—',t:'Game',i:'🥅',x:'GAME / SKATE — fuel 2–3h before, refuel within 60 min after'},
-      {w:'—',t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed; otherwise rest it'}]
+ sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso (4×30–45s) · shoulder band ER (2×15) · knee wall-sit (3×30s) · hip 90/90 + adductor rocks · ~15 min'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Zone-2 bike or row 30–45 min @ nose-breathing pace (HR 130–150). Flush the game, build the aerobic engine. Soft tissue work (foam roll quads/adductors/glutes) after.'}],
+ mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist flexor/extensor iso 4×30s · ankle + hip mobility — ~10 min before work'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Box/broad jump 4×3–5 · Squat or Trap-bar DL (5×3–4 @ 84–90%) · Bulgarian split squat 3×6/leg · RDL 3×6–8 · Copenhagen adduction 3×10/side · Nordic hamstring 3×5 · Pallof press 3×10/side'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps (wrist/snap/one-timers/backhand). Do this right after the lift while you are still at the facility.'}],
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder: face pulls 2×15 · band ER 2×15 · neck iso 2×10s each direction · wrist flexor iso 3×30s — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'OPTIONAL — do fresh before lifting: Acceleration sprints 4–6×15–20m · full ~90s walk-back recovery · skip if legs are cooked from Monday or time is short'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Rotational med-ball throw 4×4/side · OH slam 3×5 · Bench Press 4×4–5 superset w/ Weighted Pull-up 4×4–5 · OH Press 3×6–8 superset w/ Chest-supported Row 3×8–10 · Face pull+ER 3×15 · Neck iso 3×10s · Weighted plank 3×30–40s'},
+      {w:'PM',t:'Skills',i:'🏒',x:'OPTIONAL skill finish — Shooting 40–60 reps (wrist/snap/backhand/one-timers). Only add this if you have time; quality over quantity.'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Knee: wall-sit iso 3×30–45s · slow step-downs 2×10 · wrist gentle iso 2×20s · thoracic + hip mobility — ~10 min. Stickhandling 5–10 min if feeling good (ball or puck, stationary patterns).'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Plyos FIRST while fresh — Pogo hops → single-leg pogos 3×10–12 · Single-leg box bounds 3×4–5/leg · RFE reactive foot-taps 3×10–20s/leg. ~10–12 min total, full rest between sets.'},
+      {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — Pro-agility 5-10-5 × 5 reps (walk back between) · Reactive cuts 4–6 reps (react to called direction). ~8 min.'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'HARD conditioning — pick one: Assault bike 10–15s max / 20–40s rest ×8–12 rounds · OR Repeat runs 1 min near-max / 2 min rest ×5–6. This is your main intense conditioning day. Finish with Copenhagen 2×10/side + hip airplane 2×6/side.'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2: slow eccentric wrist curls 3×10 · isotonic step-downs 2×10 · shoulder: Y-T-W 2×10 · knee: slow leg ext 2×12 — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Plyos fresh — Ankle pogos 3×12 · Single-leg box bounds 3×4–5/leg · Skater bounds stick-landing 3×4–6/side · Snap-down/drop-and-stick 3×4. ~10 min, full rest.'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Incline DB press 3×8–12 · Cable row / lat pulldown 3×10–12 · Lateral raise 3×12–15 · Rear-delt fly 3×15 · Biceps+Triceps 3×10–15 · Glute-ham raise 3×6–8 · Spanish squat iso 3×35s · Tibialis raise + calf raise 3×12–15 · Hollow hold 3×25s · Side plank 3×30s/side'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Shooting 30–50 reps (snap/one-timer focus — fresher after a pump day) · Stickhandling 10–15 min (toe drags, backhand flip, figure-8 lateral patterns).'}],
+ fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Light only — hip + ankle mobility 5 min · gentle wrist iso 2×20s · no heavy loading. Keep the CNS fresh for the game.'},
+      {w:'PM',t:'Primer',i:'⚡',x:'CNS primer ~25–30 min — Pogos 2×10 · Box jump 3×3 (crisp, not gassy) · 2–3 heavy singles on main lift (sub-max, feel the bar) · Acceleration sprints 3×10m · Done. Sharp, not tired.'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Light touch only — 20–30 reps shooting (wrist/snap, no heavy slaps) · stickhandling 5–8 min. Keep it sharp and confident, not tiring.'}],
+ sat:[{w:'—',t:'Game',i:'🥅',x:'GAME — fuel a full meal 2–3h before (carbs + protein). Refuel within 60 min post-game (protein shake + carbs). Hydrate through the day.'},
+      {w:'—',t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed — otherwise full rest post-game. Ice any sore joints.'}]
 };
 const SCHED_OFF={
- sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + full rehab set — ~15 min'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Conditioning day — aerobic base / tempo 30–45 min + soft tissue. Weekend time for steady engine work.'}],
- mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Lower max strength + jumps + sled; groin/hamstring prehab'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Upper strength + rotational power for shot power'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Optional if you have time — sprints (do fresh, before lifting)'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Optional if you have time — shooting 40–60 reps to finish'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) + change of direction, fresh'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning (HARD) — your main intense session.'}],
- thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic — ~12 min'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Lower hypertrophy + tendon health + aerobic base'}],
- fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + activation — ~10 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Total-body power / contrast pairs + short sprints'}],
- sat:[{w:'AM',t:'Skills',i:'🏒',x:'On-ice skills — shooting + stickhandling (no game to save for)'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Energy systems matched to the block (HARD).'}]
+ sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set — wrist iso 4×30–45s · shoulder band ER 2×15 · knee wall-sit 3×35s · Copenhagen 2×10/side · hip/ankle mobility — ~15 min'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Aerobic base + soft tissue — Zone-2 bike/row/run 35–45 min @ HR 130–155 (conversational). Foam roll quads, adductors, calves, T-spine after. Optional: extra prehab volume (Nordics 3×5, hip airplane 2×6/side).'}],
+ mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist flexor+extensor iso 3×30s · ankle mobility · hip opener — ~10 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Box/broad jump 5×3 · Back squat or Trap-bar DL (5×3–4 @ 84–92%) · Bulgarian split squat 3×6–8/leg · RDL 3×6–8 · Sled push 3–4×15m (explosive, light) · Copenhagen 3×10/side · Nordic hamstring 3×5 · Pallof press 3×10/side'}],
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder: face pulls 2×15 · band ER 2×15 · neck iso 2×10s ea · wrist iso 3×30s — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'OPTIONAL — do fresh, before lifting: Acceleration sprints 4–6×15–20m · walk-back ~90s recovery · skip if legs are cooked or time is short'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Rotational med-ball throw 4×4/side · OH slam 3×5 · Bench press 4×4–5 superset w/ Weighted pull-up 4×4–5 · OH press 3×6–8 superset w/ Chest-supported row 3×8–10 · Face pull+ER 3×15 · Neck iso 3×10s · Weighted plank 3×35s'},
+      {w:'PM',t:'Skills',i:'🏒',x:'OPTIONAL skill finish — Shooting 40–60 reps (wrist/snap/backhand). Add only if you have time left after sprints + lifting.'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Knee iso + hip mobility — wall-sit 3×30s · adductor rock-backs · wrist gentle 2×20s — ~10 min. Stickhandling 8–10 min (stationary ball, toe drag, backhand).'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos FIRST — Pogo hops → single-leg pogos 3×10–12 · Single-leg box bounds 3×5/leg · RFE foot-taps 3×15s/leg · then Pro-agility 5-10-5 ×5 · Reactive cuts 4–6 reps. ~15 min total.'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched HARD conditioning — Assault bike 10–15s max / 20–40s rest ×10–14 rounds · OR Repeat sprint 1 min/2 min rest ×6. Main intense conditioning session of the week. Prehab finish: Copenhagen 2×10/side.'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 eccentric curls 3×10 · knee isotonic step-downs 2×10 · shoulder Y-T-W 2×10 — ~12 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Incline DB press 3×8–12 · Cable row 3×10–12 · Lateral raise 3×12–15 · Rear-delt fly 3×15 · Biceps+Triceps 3×10–15 · Glute-ham raise 3×6–8 · Spanish squat iso 3×40s · Tibialis + calf raise 3×12–15 · Zone-2 bike 12–15 min finisher'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Shooting 40–50 reps · Stickhandling 12–15 min (figure-8, toe drag, backhand flip, lateral pattern). Great day for skill work — low CNS cost after hypertrophy.'}],
+ fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Hip + ankle mobility 5 min · wrist gentle iso 2×20s · shoulder band 1×15 — light activation only'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Total-body power / contrast — Hang power clean or trap-bar jump 5×2–3 · Box jump contrast ×3 · OH med-ball slam 4×4 · Acceleration sprints 4–6×15m (full recovery). Done in ~40 min, everything fast and fresh.'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Shooting 30–50 reps (shot power focus — after power session your hip drive is primed) · stickhandling 8–10 min.'}],
+ sat:[{w:'AM',t:'Skills',i:'🏒',x:'On-ice or off-ice skills — Shooting 50–70 reps (all shot types, move around the zone) · Stickhandling 15–20 min (full pattern work, no game to save for — go deep)'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched HARD conditioning — Off-season: Repeat sprints 1 min/2 min rest ×6–8 OR Assault bike extended (15–20s/30–40s rest ×12–16). Longer & harder than mid-week since no game tomorrow.'}]
 };
 const SCHED_TRANS={
- sun:[{w:'—',t:'Rehab',i:'🩹',x:'Rest — optional gentle walk or stretch'}],
- mon:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body (RPE 6) + mobility'}],
- tue:[{w:'PM',t:'Skills',i:'🏒',x:'Movement / play — sport, hike, swim'}],
- wed:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body (RPE 6)'}],
- thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + any lingering rehab'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Easy aerobic — bike/walk/swim'}],
- fri:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — your call'}],
- sat:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — recharge'}]
+ sun:[{w:'—',t:'Rehab',i:'🩹',x:'Full rest or gentle walk — wrist/shoulder/knee iso only if sore (1–2 sets, easy). No training targets, just move.'}],
+ mon:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body — goblet squat 3×10 · push-up 3×12 · row 3×10 · hip hinge 3×10 · RPE ~6, nothing to failure. Mobility cool-down 10 min.'}],
+ tue:[{w:'PM',t:'Skills',i:'🏒',x:'Active movement / play — sport (pick-up hockey, basketball, tennis) · hike · swim. Keep it fun, no structure needed.'}],
+ wed:[{w:'PM',t:'Gym',i:'🏋️',x:'Light full-body repeat — same as Monday, RPE ~6. Can add one or two exercises if feeling good. 45 min max.'}],
+ thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Full mobility + any lingering rehab (wrist iso 3×20s · knee wall-sit 2×30s · shoulder ER 2×15) — ~15 min'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Easy aerobic — Zone-1/2 bike, walk, or swim 30–45 min. Stay active, no intensity needed.'}],
+ fri:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — no pressure. If shooting, keep it loose and fun (20–30 reps max).'}],
+ sat:[{w:'—',t:'Skills',i:'🏒',x:'Play or rest — recharge and enjoy. Transition block ends here; next block ramps back up.'}]
 };
 const SCHED_SETS={in:SCHED_IN,off:SCHED_OFF,trans:SCHED_TRANS};
 function curSched(){return SCHED_SETS[curBlock().tmpl]||SCHED_IN;}
