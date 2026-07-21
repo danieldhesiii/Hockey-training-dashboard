@@ -397,8 +397,8 @@ details.acc .inner{padding:0 14px 14px}
   <p class="sub">Shooting, stickhandling, sprint speed and change-of-direction. The <b onclick="go('week')" style="color:var(--ice);cursor:pointer">schedule</b> tells you which day to do each.</p>
 
   <div class="card">
-    <h3 style="margin-top:4px"><span class="bar"></span>Shooting — Mon &amp; Thu</h3>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Quality over quantity — <b style="color:#fff">40–60 focused reps</b> beats 200 lazy ones. Do it after lifting on Monday, and as a fresher skill block on Thursday.</p>
+    <h3 style="margin-top:4px"><span class="bar"></span>Shooting — Mon, Tue &amp; Thu</h3>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Quality over quantity — <b style="color:#fff">40–60 focused reps</b> beats 200 lazy ones. After lifting on Monday, as an optional finish to Tuesday's upper day, and as a fresher skill block on Thursday.</p>
     <div class="ex"><table><tbody>
       <tr><td class="exn">Wrist shots<span class="cue">Weight transfer back-to-front, pull the puck, snap the top hand. Pick corners.</span></td><td class="scheme">2×15</td></tr>
       <tr><td class="exn">Snap shots<span class="cue">Quick release, minimal wind-up — flex the stick, fast hands.</span></td><td class="scheme">2×10</td></tr>
@@ -431,7 +431,7 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 
   <div class="card">
-    <h3 style="margin-top:4px"><span class="bar"></span>Change of direction &amp; agility — Tuesday</h3>
+    <h3 style="margin-top:4px"><span class="bar"></span>Change of direction &amp; agility — Wednesday</h3>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Plant, decelerate, re-accelerate — the skating skill of games. Pair it with the sprint work while you're fresh.</p>
     <div class="ex"><table><tbody>
       <tr><td class="exn">Pro-agility 5-10-5<span class="cue">Sprint 5, plant, 10 back, plant, 5 finish. Low hips, sharp cuts.</span></td><td class="scheme">4–5 reps</td></tr>
@@ -963,10 +963,10 @@ const DAYS_IN=[
   desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
   desc:'Squat / trap-bar, jumps, single-leg, groin & hamstring isometrics.'},
- {k:'tue',d:'TUE',role:'Speed + Change of Direction + Conditioning',tag:'mod',rel:'',
-  desc:'Sprints, change of direction, jump-strength, and your hardest conditioning.'},
- {k:'wed',d:'WED',role:'Upper · Strength + Power + Plyos',tag:'hard',rel:'',
-  desc:'Reactive plyos (ankle stiffness), press & pull, rotational med-ball, shoulder & neck.'},
+ {k:'tue',d:'TUE',role:'Upper · Strength + Sprints + Shooting',tag:'hard',rel:'',
+  desc:'Upper weights (press & pull, rotational), plus optional sprints & shooting if you have time.'},
+ {k:'wed',d:'WED',role:'Plyos + Change of Direction + Conditioning',tag:'mod',rel:'',
+  desc:'Reactive plyos (ankle stiffness), change of direction, and your main intense conditioning.'},
  {k:'thu',d:'THU',role:'Upper Hypertrophy + Plyos + Prehab',tag:'mod',rel:'Low-ish CNS',
   desc:'Reactive/stiffness plyos, pump work, posterior chain, tendon & tissue health.'},
  {k:'fri',d:'FRI',role:'CNS Primer (pre-game)',tag:'power',rel:'Day before game',
@@ -977,8 +977,8 @@ const DAYS_IN=[
 const DAYS_OFF=[
  {k:'sun',d:'SUN',role:'Recovery + Regeneration',tag:'easy',rel:'',desc:'Aerobic flush, mobility, prehab, soft tissue.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength',tag:'hard',rel:'Highest CNS',desc:'Heavy squat/DL, jumps, single-leg, sled, groin/hamstring.'},
- {k:'tue',d:'TUE',role:'Speed + Change of Direction + Anaerobic',tag:'mod',rel:'',desc:'Sprints, COD, resisted sled, strength-speed, conditioning.'},
- {k:'wed',d:'WED',role:'Upper · Strength + Plyos',tag:'hard',rel:'',desc:'Reactive plyos, press & pull, rotational power, shoulder/neck.'},
+ {k:'tue',d:'TUE',role:'Upper · Strength + Sprints + Shooting',tag:'hard',rel:'',desc:'Upper weights, plus optional sprints & shooting if you have time.'},
+ {k:'wed',d:'WED',role:'Plyos + Change of Direction + Conditioning',tag:'mod',rel:'',desc:'Reactive plyos, change of direction, resisted sled, intense conditioning.'},
  {k:'thu',d:'THU',role:'Lower Hypertrophy + Aerobic Base',tag:'easy',rel:'Low CNS',desc:'Leg muscle, tendon health, aerobic base.'},
  {k:'fri',d:'FRI',role:'Total-Body Power / Contrast',tag:'power',rel:'',desc:'Olympic pulls, contrast pairs, throws, short sprints.'},
  {k:'sat',d:'SAT',role:'Energy Systems + Skills',tag:'mod',rel:'',desc:'Block-matched conditioning + shooting/stickhandling.'}
@@ -1022,13 +1022,14 @@ const SCHED_IN={
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps); knee tendon iso after'},
       {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after the lift'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
-      {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, crossovers'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals (HARD) — assault bike or repeat runs. Your main intense conditioning session.'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min; optional stickhandling'},
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Optional if you have time — sprints (do fresh, before lifting)'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Optional if you have time — shooting 40–60 reps to finish'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
       {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'}],
+      {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, reactive cuts'},
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals (HARD) — assault bike or repeat runs. Your main intense conditioning session.'}],
  thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic (slow leg ext/step-downs) — ~12 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — ankle pogos, single-leg box bounds, skater bounds'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Upper hypertrophy + posterior-chain / tendon health'},
@@ -1044,11 +1045,13 @@ const SCHED_OFF={
       {w:'PM',t:'Conditioning',i:'❤️',x:'Conditioning day — aerobic base / tempo 30–45 min + soft tissue. Weekend time for steady engine work.'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower max strength + jumps + sled; groin/hamstring prehab'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Sprints + change of direction + resisted sled, fresh'},
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Upper strength + rotational power for shot power'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Optional if you have time — sprints (do fresh, before lifting)'},
+      {w:'PM',t:'Skills',i:'🏒',x:'Optional if you have time — shooting 40–60 reps to finish'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) + change of direction, fresh'},
       {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning (HARD) — your main intense session.'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) first, then upper strength + rotational power'}],
  thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic — ~12 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower hypertrophy + tendon health + aerobic base'}],
  fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + activation — ~10 min'},
@@ -1123,17 +1126,31 @@ const WK_IN={
    {l:'Core',c:'b-str',items:[
      ['Pallof press','3×10 / side','Anti-rotation — resist the twist, transfers straight to skating & shooting.']]}
   ]},
- wed:{title:'Upper · Strength + Power + Plyos',tag:'hard',time:'60–70 min',
-  intro:'Opened with low-volume reactive plyos while your legs are fresh — springy, not deep, so it builds ankle/foot stiffness and a faster first step without adding fatigue. Then upper-body strength and rotational power for your shot. Paired push/pull supersets keep it tight, and the shoulder + neck work is your durability insurance.',
+ wed:{title:'Plyos + Change of Direction + Conditioning',tag:'mod',time:'50–60 min',
+  intro:'Reactive plyos and change-of-direction while you’re fresh, then your main intense conditioning. The hockey-movement + engine day, placed away from the game.',
   blocks:[
-   {l:'Plyometrics — reactive & ankle stiffness (do fresh)',c:'b-power',items:[
+   {l:'Plyometrics — reactive & ankle stiffness (fresh)',c:'b-power',items:[
      ['Pogo hops → single-leg pogos','3×10–12','Stiff ankles, straight legs — like the ground is hot. Build to single-leg.'],
-     ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Bound up onto a low box on one leg; land soft but springy with a stiff, reactive ankle and minimal ground-contact. Quick quiet pops, not max height.'],
-     ['RFE Reactive Foot-Taps','3×10–20s / leg','Rear-foot-elevated reactive taps to a called cue — full detail in the Reactive panel at the top of this tab.'],
-     ['Reactive line / dot hops','3×15–20s','Fast-feet patterns — speed of contacts is the point.']]},
+     ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Bound up onto a low box on one leg; land soft but springy with a stiff, reactive ankle and minimal ground-contact.'],
+     ['RFE Reactive Foot-Taps','3×10–20s / leg','Rear-foot-elevated reactive taps to a called cue — full detail in the Reactive panel at the top of this tab.']]},
+   {l:'Change of direction & agility',c:'b-power',items:[
+     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
+     ['Reactive cuts','4–6 reps','React to a call/point and cut that way — adds the read to the movement.']]},
+   {l:'Anaerobic conditioning (HARD) — pick one',c:'b-cond',items:[
+     ['Assault bike intervals','10–15s max / 20–40s rest ×8–12','Your short-burst engine — the currency of a shift. See Cardio tab.'],
+     ['OR Repeat run','1 min near-max / 2 min rest ×5–6','Speed-endurance for long shifts & penalty kills. Brutal — 1×/week max.']]},
+   {l:'Prehab',c:'b-prehab',items:[
+     ['Copenhagen adduction','2×10 / side','Groin.'],
+     ['Hip airplane','2×6 / side','Hip stability.']]}
+  ]},
+ tue:{title:'Upper · Strength + Sprints + Shooting',tag:'hard',time:'55–70 min (flex)',
+  intro:'Your upper-body strength day, with speed and skill stacked on when you’ve got the time. If you include them, do the sprints first while fresh, then the lifting, then finish with shooting. Short on time? Just hit the upper strength — and log what you actually did.',
+  blocks:[
+   {l:'Sprints — optional, if you have time (do fresh)',c:'b-power',items:[
+     ['Acceleration sprints','4–6×15–20m','Full recovery ~90s. Max quality — skip if short on time or legs are cooked from Monday.']]},
    {l:'Rotational & upper power',c:'b-power',items:[
      ['Rotational med-ball throw','4×4 / side','Shot power — drive from the hip and floor, whip through the torso.'],
-     ['Overhead med-ball slam','3×5','Full-body extension into the slam. Explosive intent.']]},
+     ['Overhead med-ball slam','3×5','Explosive full-body extension into the slam.']]},
    {l:'Strength — superset A (push/pull)',c:'b-str',items:[
      ['Bench Press (or Football-bar / Incline)',S({hyp:'4×6–8 @ 72–78%',str:'4×4–5 @ 84–88% · RPE 8',pow:'5×3 @ 87–90% fast'}),'Shoulder blades set, controlled down, drive up. Superset with the pull-up.'],
      ['Weighted Pull-up',S({hyp:'4×6–8',str:'4×4–5 heavy',pow:'4×3 heavy'}),'Full range, no kip. Add load as you progress.']]},
@@ -1141,29 +1158,12 @@ const WK_IN={
      ['Standing OH Press or Landmine Press','3×6–8','Overhead strength = protected, robust shoulders.'],
      ['Chest-supported Row','3×8–10','Squeeze the mid-back, zero momentum.']]},
    {l:'Shoulder & neck durability',c:'b-prehab',items:[
-     ['Half-kneeling cable rotation','3×10 / side','Rotational core control under load.'],
      ['Face pull + external rotation','3×15','Rear delts + cuff — keeps shoulders healthy through a season of checks.'],
      ['Neck isometrics','3×10s each way','A stronger neck absorbs impact and helps mitigate concussion risk.']]},
+   {l:'Shooting — optional skill finish',c:'b-warm',items:[
+     ['Shooting','40–60 reps','Wrist/snap/one-timers/backhand — quality reps. Wrist sore? keep it light (see Rehab).']]},
    {l:'Core',c:'b-str',items:[
      ['Weighted plank / stir-the-pot','3×30–40s','Brace like you’re about to take a hit.']]}
-  ]},
- tue:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'55–65 min',
-  intro:'Sprints and change-of-direction while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery. (Reactive &amp; ankle-stiffness plyos are on Wed &amp; Thu.)',
-  blocks:[
-   {l:'Speed (fully recovered)',c:'b-power',items:[
-     ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
-     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction. Walk back between.'],
-     ['Resisted sled sprint (option)','5–6×15m light','Light resisted acceleration — sharpen the first step without heavy fatigue.']]},
-   {l:'Strength-speed',c:'b-str',items:[
-     ['Trap-bar jump or Jump squat','4×3 light','Move light load with max speed. Velocity is the whole point.'],
-     ['Reverse lunge or Step-up','3×8 / leg','Controlled, powerful drive up.'],
-     ['Single-leg RDL','3×8 / leg','Balance + hamstring/glute — bulletproofs the stride.']]},
-   {l:'Anaerobic conditioning — pick one',c:'b-cond',items:[
-     ['Assault bike intervals','10–15s max / 20–40s rest ×8–12','Your short-burst engine — the currency of a shift. See Cardio tab.'],
-     ['OR Repeat run','1 min near-max / 2 min rest ×5–6','Speed-endurance for long shifts & penalty kills. Brutal — 1×/week max.']]},
-   {l:'Prehab',c:'b-prehab',items:[
-     ['Copenhagen adduction','2×10 / side','Groin.'],
-     ['Hip airplane','2×6 / side','Hip stability.']]}
   ]},
  thu:{title:'Upper Hypertrophy + Plyos + Prehab',tag:'mod',time:'55–65 min',
   intro:'Open with low-volume reactive & stiffness plyos while you’re fresh — extensive, springy work (not deep depth jumps), so it fits a lower-CNS day and keeps your ankles &amp; feet stiff between the heavy days. Then build muscle with higher reps and feed the tendons and tissue. This is what lets you train hard six days a week.',
@@ -1259,14 +1259,32 @@ const WK_OFF={
    {l:'Core',c:'b-str',items:[
      ['Pallof press','3×10 / side','Anti-rotation for skating &amp; shooting.']]}
   ]},
- wed:{title:'Upper · Strength + Plyos',tag:'hard',time:'65–75 min',
-  intro:'Reactive plyos fresh up top, then upper strength and rotational power for your shot. Off-season adds volume — build the armour.',
+ wed:{title:'Plyos + Change of Direction + Conditioning',tag:'mod',time:'55–65 min',
+  intro:'Reactive plyos and change-of-direction while fresh, then resisted acceleration and your main intense conditioning matched to the block. The hockey-movement + engine day.',
   blocks:[
    {l:'Plyometrics — reactive & ankle stiffness (fresh)',c:'b-power',items:[
      ['Pogo hops → single-leg pogos','3×10–12','Stiff, fast ankles.'],
      ['Single-leg box bounds (ankle stiffness)','3×4–5 / leg','Reactive bound onto a low box — stiff springy ankle, quiet landing.'],
      ['RFE Reactive Foot-Taps','3×10–20s / leg','Reactive taps to a cue — see the Reactive panel above.'],
      ['Reactive line / dot hops','3×15–20s','Fast feet.']]},
+   {l:'Change of direction & agility',c:'b-power',items:[
+     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction.'],
+     ['L-drill / box cuts','4 reps','90° and 45° cuts — decelerate under control, drive out hard.'],
+     ['Reactive cuts','4–6 reps','React to a call/point and cut that way.']]},
+   {l:'Resisted acceleration (optional)',c:'b-power',items:[
+     ['Resisted sled sprint',S({hyp:'6×20m moderate',str:'6×15m heavy',pow:'6×15m light &amp; explosive'}),'Heavy for force early off-season, light &amp; fast pre-season.']]},
+   {l:'Anaerobic conditioning (HARD)',c:'b-cond',items:[
+     ['Energy-system work (see block)','per block','GPP: tempo/base · Max-Str: anaerobic capacity · Power: repeat-sprint. Full menu in the Cardio tab.']]},
+   {l:'Prehab',c:'b-prehab',items:[
+     ['Copenhagen adduction','2×10 / side','Groin.'],
+     ['Hip airplane','2×6 / side','Hip stability.']]}
+  ]},
+ tue:{title:'Upper · Strength + Sprints + Shooting',tag:'hard',time:'65–80 min (flex)',
+  intro:'Upper-body strength day with speed and skill stacked on when time allows. Sprints first while fresh, then the lifting, then shooting. Short on time? Just do the upper strength and log it.',
+  blocks:[
+   {l:'Sprints — optional, if you have time (do fresh)',c:'b-power',items:[
+     ['Acceleration sprints','6–8×15–20m','Full recovery ~90s. Max quality — skip if short on time.'],
+     ['Flying / build-up runs','3–4×30m','Top-speed mechanics, relaxed &amp; tall.']]},
    {l:'Rotational & upper power',c:'b-power',items:[
      ['Rotational med-ball throw','4×4 / side','Shot power from the hips.'],
      ['Overhead med-ball slam','3×5','Full-body extension.']]},
@@ -1280,27 +1298,10 @@ const WK_OFF={
      ['Face pull + external rotation','3×15','Rear delts + cuff.'],
      ['Prone Y-T-W','3×10 ea','Scap control.'],
      ['Neck isometrics','3×10s ea','Impact protection.']]},
+   {l:'Shooting — optional skill finish',c:'b-warm',items:[
+     ['Shooting','40–60 reps','Wrist/snap/one-timers — quality reps.']]},
    {l:'Core',c:'b-str',items:[
      ['Weighted plank / stir-the-pot','3×30–40s','Brace hard.']]}
-  ]},
- tue:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'60–70 min',
-  intro:'Max-quality speed while fresh, then resisted acceleration and strength-speed, then energy-system work matched to the block. First-step quickness is trained here.',
-  blocks:[
-   {l:'Speed (fully recovered)',c:'b-power',items:[
-     ['Acceleration sprints','6–8×15–20m','Full recovery ~90s. Max quality.'],
-     ['Flying / build-up runs','3–4×30m','Top-speed mechanics, relaxed &amp; tall.'],
-     ['Pro-agility 5-10-5','5 reps','Sharp plant-and-drive change of direction.']]},
-   {l:'Resisted acceleration',c:'b-power',items:[
-     ['Resisted sled sprint',S({hyp:'6×20m moderate',str:'6×15m heavy',pow:'6×15m light &amp; explosive'}),'Heavy for force early off-season, light &amp; fast pre-season.']]},
-   {l:'Strength-speed',c:'b-str',items:[
-     ['Trap-bar jump or Jump squat','4×3 light','Max speed, light load.'],
-     ['Reverse lunge or Step-up','3×8 / leg','Powerful drive up.'],
-     ['Single-leg RDL','3×8 / leg','Hamstring/glute + balance.']]},
-   {l:'Anaerobic conditioning',c:'b-cond',items:[
-     ['Energy-system work (see block)','per block','GPP: tempo/base · Max-Str: anaerobic capacity · Power: repeat-sprint. Full menu in the Cardio tab.']]},
-   {l:'Prehab',c:'b-prehab',items:[
-     ['Copenhagen adduction','2×10 / side','Groin.'],
-     ['Hip airplane','2×6 / side','Hip stability.']]}
   ]},
  thu:{title:'Lower Hypertrophy + Aerobic Base',tag:'easy',time:'60–70 min',
   intro:'A lower-CNS building day: pack on quality leg muscle, feed the tendons, and grow the aerobic engine. This volume is what off-season is for.',
@@ -1430,12 +1431,12 @@ function renderCardio(){
   map.innerHTML=`<h3 style="margin-top:4px"><span class="bar"></span>Your conditioning week</h3>
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px">These sessions are demanding — treat them as real training. Fuel with carbs beforehand, and never stack a hard one the day before your game.</p>
     <div class="ex"><table><tbody>
-      <tr><td class="exn">Tuesday &nbsp;<span class="tag t-hard">Hard</span><span class="cue">Anaerobic capacity or repeat-sprint — your main intense session, run with the speed day while you're already switched on.</span></td><td class="scheme">Main</td></tr>
+      <tr><td class="exn">Wednesday &nbsp;<span class="tag t-hard">Hard</span><span class="cue">Anaerobic capacity or repeat-sprint — your main intense session, run with the plyos & change-of-direction day.</span></td><td class="scheme">Main</td></tr>
       <tr><td class="exn">Sunday &nbsp;<span class="tag t-mod">Mod–Hard</span><span class="cue">Weekend engine session — you've got the time. In-season keep it aerobic/tempo to flush the game; off-season push a harder capacity / repeat-sprint session.</span></td><td class="scheme">2nd</td></tr>
       <tr><td class="exn">Thursday &nbsp;<span class="tag t-easy">Easy</span><span class="cue">Optional aerobic-base flush — light, aids recovery, grows the engine.</span></td><td class="scheme">Optional</td></tr>
       <tr><td class="exn">Alactic power &nbsp;<span class="tag t-power">Alactic</span><span class="cue">Short finisher on a strength day or inside Friday's primer — pure speed, full rest.</span></td><td class="scheme">Add-on</td></tr>
     </tbody></table></div>
-    <div class="note warn"><b>In-season:</b> the games ARE conditioning — keep just <b>Tuesday (hard)</b> + <b>Sunday (aerobic)</b>. <b>Off-season:</b> add the Saturday energy-system session. Cut a session if your readiness is red.</div>
+    <div class="note warn"><b>In-season:</b> the games ARE conditioning — keep just <b>Wednesday (hard)</b> + <b>Sunday (aerobic)</b>. <b>Off-season:</b> add the Saturday energy-system session. Cut a session if your readiness is red.</div>
     <div class="note"><b>Why this mix:</b> a shift is ~40–60s of high intensity with roughly 1:2–1:3 rest. So you train the short bursts (alactic + anaerobic capacity) plus a strong aerobic base to recover between them — not long slow steady-state alone.</div>`;
   host.appendChild(map);
   CARDIO.forEach(c=>{
