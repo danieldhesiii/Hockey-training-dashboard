@@ -1018,14 +1018,14 @@ function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.
 /* ============ FULL DAILY SCHEDULE ============ */
 const SCHED_IN={
  sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility flow + full rehab set (wrist/knee/shoulder iso) — ~15 min'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Recovery — Zone-2 bike/row 25–40 min; optional light stickhandling'}],
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Conditioning day — aerobic base / tempo 30–45 min. Flush the game &amp; build the engine; keep it moderate the day after a game.'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps); knee tendon iso after'},
       {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after the lift'}],
  tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
       {w:'PM',t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
       {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, crossovers'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals — assault bike or repeat runs'}],
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals (HARD) — assault bike or repeat runs. Your main intense conditioning session.'}],
  wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min; optional stickhandling'},
       {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'}],
@@ -1041,12 +1041,12 @@ const SCHED_IN={
 };
 const SCHED_OFF={
  sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + full rehab set — ~15 min'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Aerobic flush 30–40 min + soft tissue'}],
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Conditioning day — aerobic base / tempo 30–45 min + soft tissue. Weekend time for steady engine work.'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower max strength + jumps + sled; groin/hamstring prehab'}],
  tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Sprints + change of direction + resisted sled, fresh'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning'}],
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning (HARD) — your main intense session.'}],
  wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) first, then upper strength + rotational power'}],
  thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic — ~12 min'},
@@ -1054,7 +1054,7 @@ const SCHED_OFF={
  fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + activation — ~10 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Total-body power / contrast pairs + short sprints'}],
  sat:[{w:'AM',t:'Skills',i:'🏒',x:'On-ice skills — shooting + stickhandling (no game to save for)'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Energy systems matched to the block'}]
+      {w:'PM',t:'Conditioning',i:'❤️',x:'Energy systems matched to the block (HARD).'}]
 };
 const SCHED_TRANS={
  sun:[{w:'—',t:'Rehab',i:'🩹',x:'Rest — optional gentle walk or stretch'}],
@@ -1427,14 +1427,16 @@ const CARDIO=[
 function renderCardio(){
   const host=document.getElementById('cardioHost');host.innerHTML='';
   const map=document.createElement('div');map.className='card';
-  map.innerHTML=`<h3 style="margin-top:4px"><span class="bar"></span>How to place it</h3>
-    <ul class="clean">
-      <li><b>Tuesday</b> is your main anaerobic day — pick Anaerobic Capacity or Lactic Power.</li>
-      <li><b>Sunday</b> (+ optional Thursday finisher) is aerobic base — the recovery engine.</li>
-      <li><b>Alactic power</b> fits as a short finisher on a strength day, or inside the Friday primer.</li>
-      <li><b>In-season the games ARE conditioning</b> — cut volume and keep just base + one anaerobic session. Off-season, add a session.</li>
-    </ul>
-    <div class="note"><b>Why this mix:</b> a shift is ~40–60s of high intensity with roughly 1:2–1:3 rest. So you train the short bursts (alactic + anaerobic capacity) and a strong aerobic base to recover between them — not long slow steady-state alone.</div>`;
+  map.innerHTML=`<h3 style="margin-top:4px"><span class="bar"></span>Your conditioning week</h3>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px">These sessions are demanding — treat them as real training. Fuel with carbs beforehand, and never stack a hard one the day before your game.</p>
+    <div class="ex"><table><tbody>
+      <tr><td class="exn">Tuesday &nbsp;<span class="tag t-hard">Hard</span><span class="cue">Anaerobic capacity or repeat-sprint — your main intense session, run with the speed day while you're already switched on.</span></td><td class="scheme">Main</td></tr>
+      <tr><td class="exn">Sunday &nbsp;<span class="tag t-mod">Mod–Hard</span><span class="cue">Weekend engine session — you've got the time. In-season keep it aerobic/tempo to flush the game; off-season push a harder capacity / repeat-sprint session.</span></td><td class="scheme">2nd</td></tr>
+      <tr><td class="exn">Thursday &nbsp;<span class="tag t-easy">Easy</span><span class="cue">Optional aerobic-base flush — light, aids recovery, grows the engine.</span></td><td class="scheme">Optional</td></tr>
+      <tr><td class="exn">Alactic power &nbsp;<span class="tag t-power">Alactic</span><span class="cue">Short finisher on a strength day or inside Friday's primer — pure speed, full rest.</span></td><td class="scheme">Add-on</td></tr>
+    </tbody></table></div>
+    <div class="note warn"><b>In-season:</b> the games ARE conditioning — keep just <b>Tuesday (hard)</b> + <b>Sunday (aerobic)</b>. <b>Off-season:</b> add the Saturday energy-system session. Cut a session if your readiness is red.</div>
+    <div class="note"><b>Why this mix:</b> a shift is ~40–60s of high intensity with roughly 1:2–1:3 rest. So you train the short bursts (alactic + anaerobic capacity) plus a strong aerobic base to recover between them — not long slow steady-state alone.</div>`;
   host.appendChild(map);
   CARDIO.forEach(c=>{
     const tn={power:'Alactic',hard:'Hard',mod:'Moderate',easy:'Base'}[c.tag];
