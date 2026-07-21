@@ -358,7 +358,7 @@ details.acc .inner{padding:0 14px 14px}
   <details class="acc" id="plyoBox">
     <summary><span class="tag t-power">Reactive</span>&nbsp; Reactive plyometrics &amp; fast-twitch drills</summary>
     <div class="inner">
-      <p style="font-size:13px;color:var(--muted)">Trains the stretch-shortening cycle and read-and-react speed — your first step, edges and cuts. <b style="color:#fff">Rules: do them fresh, low volume, max quality, full recovery.</b> They're programmed up top on your <b style="color:#fff">Tuesday &amp; Thursday</b> sessions, and lightly in Friday's primer — never to fatigue.</p>
+      <p style="font-size:13px;color:var(--muted)">Trains the stretch-shortening cycle and read-and-react speed — your first step, edges and cuts. <b style="color:#fff">Rules: do them fresh, low volume, max quality, full recovery.</b> They're programmed up top on your <b style="color:#fff">Wednesday &amp; Thursday</b> sessions, and lightly in Friday's primer — never to fatigue.</p>
 
       <div class="blocklabel b-power">Your reactive tap drill — single-leg, rear-foot elevated</div>
       <div class="ex"><table><tbody>
@@ -421,7 +421,7 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 
   <div class="card">
-    <h3 style="margin-top:4px"><span class="bar"></span>Sprint speed — Wednesday</h3>
+    <h3 style="margin-top:4px"><span class="bar"></span>Sprint speed — Tuesday</h3>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Do it <b style="color:#fff">fresh</b>, full recovery, max intent — nervous-system work, not conditioning. First-step quickness wins hockey.</p>
     <div class="ex"><table><tbody>
       <tr><td class="exn">Acceleration sprints<span class="cue">Powerful first 3 steps, aggressive arm drive, forward lean. Walk back ~90s.</span></td><td class="scheme">6–8×15–20m</td></tr>
@@ -431,7 +431,7 @@ details.acc .inner{padding:0 14px 14px}
   </div>
 
   <div class="card">
-    <h3 style="margin-top:4px"><span class="bar"></span>Change of direction &amp; agility — Wednesday</h3>
+    <h3 style="margin-top:4px"><span class="bar"></span>Change of direction &amp; agility — Tuesday</h3>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px">Plant, decelerate, re-accelerate — the skating skill of games. Pair it with the sprint work while you're fresh.</p>
     <div class="ex"><table><tbody>
       <tr><td class="exn">Pro-agility 5-10-5<span class="cue">Sprint 5, plant, 10 back, plant, 5 finish. Low hips, sharp cuts.</span></td><td class="scheme">4–5 reps</td></tr>
@@ -963,10 +963,10 @@ const DAYS_IN=[
   desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
   desc:'Squat / trap-bar, jumps, single-leg, groin & hamstring isometrics.'},
- {k:'tue',d:'TUE',role:'Upper · Strength + Power + Plyos',tag:'hard',rel:'',
-  desc:'Reactive plyos (ankle stiffness), press & pull, rotational med-ball, shoulder & neck.'},
- {k:'wed',d:'WED',role:'Speed + Change of Direction + Conditioning',tag:'mod',rel:'',
+ {k:'tue',d:'TUE',role:'Speed + Change of Direction + Conditioning',tag:'mod',rel:'',
   desc:'Sprints, change of direction, jump-strength, and your hardest conditioning.'},
+ {k:'wed',d:'WED',role:'Upper · Strength + Power + Plyos',tag:'hard',rel:'',
+  desc:'Reactive plyos (ankle stiffness), press & pull, rotational med-ball, shoulder & neck.'},
  {k:'thu',d:'THU',role:'Upper Hypertrophy + Plyos + Prehab',tag:'mod',rel:'Low-ish CNS',
   desc:'Reactive/stiffness plyos, pump work, posterior chain, tendon & tissue health.'},
  {k:'fri',d:'FRI',role:'CNS Primer (pre-game)',tag:'power',rel:'Day before game',
@@ -977,8 +977,8 @@ const DAYS_IN=[
 const DAYS_OFF=[
  {k:'sun',d:'SUN',role:'Recovery + Regeneration',tag:'easy',rel:'',desc:'Aerobic flush, mobility, prehab, soft tissue.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength',tag:'hard',rel:'Highest CNS',desc:'Heavy squat/DL, jumps, single-leg, sled, groin/hamstring.'},
- {k:'tue',d:'TUE',role:'Upper · Strength + Plyos',tag:'hard',rel:'',desc:'Reactive plyos, press & pull, rotational power, shoulder/neck.'},
- {k:'wed',d:'WED',role:'Speed + Change of Direction + Anaerobic',tag:'mod',rel:'',desc:'Sprints, COD, resisted sled, strength-speed, conditioning.'},
+ {k:'tue',d:'TUE',role:'Speed + Change of Direction + Anaerobic',tag:'mod',rel:'',desc:'Sprints, COD, resisted sled, strength-speed, conditioning.'},
+ {k:'wed',d:'WED',role:'Upper · Strength + Plyos',tag:'hard',rel:'',desc:'Reactive plyos, press & pull, rotational power, shoulder/neck.'},
  {k:'thu',d:'THU',role:'Lower Hypertrophy + Aerobic Base',tag:'easy',rel:'Low CNS',desc:'Leg muscle, tendon health, aerobic base.'},
  {k:'fri',d:'FRI',role:'Total-Body Power / Contrast',tag:'power',rel:'',desc:'Olympic pulls, contrast pairs, throws, short sprints.'},
  {k:'sat',d:'SAT',role:'Energy Systems + Skills',tag:'mod',rel:'',desc:'Block-matched conditioning + shooting/stickhandling.'}
@@ -1022,13 +1022,13 @@ const SCHED_IN={
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min before work'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower · max strength + power (squat/trap-bar, jumps); knee tendon iso after'},
       {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps after the lift'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min; optional stickhandling'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
-      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min; optional stickhandling'},
       {w:'PM',t:'Speed',i:'⚡',x:'Sprints — 6–8×15–20m accelerations, full recovery (do fresh)'},
       {w:'PM',t:'Agility',i:'🔀',x:'Change of direction — pro-agility 5-10-5, cuts, crossovers'},
       {w:'PM',t:'Conditioning',i:'❤️',x:'Anaerobic intervals — assault bike or repeat runs'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + face pulls + wrist iso — ~12 min; optional stickhandling'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — pogos, single-leg box bounds (ankle stiffness), RFE taps'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'Upper · strength + power + rotational med-ball for shot power'}],
  thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic (slow leg ext/step-downs) — ~12 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Plyos first, fresh — ankle pogos, single-leg box bounds, skater bounds'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Upper hypertrophy + posterior-chain / tendon health'},
@@ -1044,11 +1044,11 @@ const SCHED_OFF={
       {w:'PM',t:'Conditioning',i:'❤️',x:'Aerobic flush 30–40 min + soft tissue'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso + mobility — ~10 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower max strength + jumps + sled; groin/hamstring prehab'}],
- tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
-      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) first, then upper strength + rotational power'}],
- wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
+ tue:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + knee iso — ~10 min'},
       {w:'PM',t:'Speed',i:'⚡',x:'Sprints + change of direction + resisted sled, fresh'},
       {w:'PM',t:'Conditioning',i:'❤️',x:'Block-matched anaerobic conditioning'}],
+ wed:[{w:'AM',t:'Rehab',i:'🩹',x:'Shoulder cuff/band + wrist iso — ~12 min'},
+      {w:'PM',t:'Speed',i:'⚡',x:'Reactive plyos (ankle stiffness) first, then upper strength + rotational power'}],
  thu:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist Phase-2 + knee isotonic — ~12 min'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Lower hypertrophy + tendon health + aerobic base'}],
  fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Mobility + activation — ~10 min'},
@@ -1123,7 +1123,7 @@ const WK_IN={
    {l:'Core',c:'b-str',items:[
      ['Pallof press','3×10 / side','Anti-rotation — resist the twist, transfers straight to skating & shooting.']]}
   ]},
- tue:{title:'Upper · Strength + Power + Plyos',tag:'hard',time:'60–70 min',
+ wed:{title:'Upper · Strength + Power + Plyos',tag:'hard',time:'60–70 min',
   intro:'Opened with low-volume reactive plyos while your legs are fresh — springy, not deep, so it builds ankle/foot stiffness and a faster first step without adding fatigue. Then upper-body strength and rotational power for your shot. Paired push/pull supersets keep it tight, and the shoulder + neck work is your durability insurance.',
   blocks:[
    {l:'Plyometrics — reactive & ankle stiffness (do fresh)',c:'b-power',items:[
@@ -1147,8 +1147,8 @@ const WK_IN={
    {l:'Core',c:'b-str',items:[
      ['Weighted plank / stir-the-pot','3×30–40s','Brace like you’re about to take a hit.']]}
   ]},
- wed:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'55–65 min',
-  intro:'Sprints and change-of-direction while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery. (Reactive &amp; ankle-stiffness plyos now live on Tue &amp; Thu.)',
+ tue:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'55–65 min',
+  intro:'Sprints and change-of-direction while you’re fresh, then jump-strength, then your hardest conditioning of the week. First-step quickness wins hockey — treat the sprints like main lifts, with full recovery. (Reactive &amp; ankle-stiffness plyos are on Wed &amp; Thu.)',
   blocks:[
    {l:'Speed (fully recovered)',c:'b-power',items:[
      ['Acceleration sprints','6–8×15–20m','Full recovery ~90s between. First-step quickness — max quality every rep.'],
@@ -1259,7 +1259,7 @@ const WK_OFF={
    {l:'Core',c:'b-str',items:[
      ['Pallof press','3×10 / side','Anti-rotation for skating &amp; shooting.']]}
   ]},
- tue:{title:'Upper · Strength + Plyos',tag:'hard',time:'65–75 min',
+ wed:{title:'Upper · Strength + Plyos',tag:'hard',time:'65–75 min',
   intro:'Reactive plyos fresh up top, then upper strength and rotational power for your shot. Off-season adds volume — build the armour.',
   blocks:[
    {l:'Plyometrics — reactive & ankle stiffness (fresh)',c:'b-power',items:[
@@ -1283,7 +1283,7 @@ const WK_OFF={
    {l:'Core',c:'b-str',items:[
      ['Weighted plank / stir-the-pot','3×30–40s','Brace hard.']]}
   ]},
- wed:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'60–70 min',
+ tue:{title:'Speed + Change of Direction + Anaerobic',tag:'mod',time:'60–70 min',
   intro:'Max-quality speed while fresh, then resisted acceleration and strength-speed, then energy-system work matched to the block. First-step quickness is trained here.',
   blocks:[
    {l:'Speed (fully recovered)',c:'b-power',items:[
@@ -1429,7 +1429,7 @@ function renderCardio(){
   const map=document.createElement('div');map.className='card';
   map.innerHTML=`<h3 style="margin-top:4px"><span class="bar"></span>How to place it</h3>
     <ul class="clean">
-      <li><b>Wednesday</b> is your main anaerobic day — pick Anaerobic Capacity or Lactic Power.</li>
+      <li><b>Tuesday</b> is your main anaerobic day — pick Anaerobic Capacity or Lactic Power.</li>
       <li><b>Sunday</b> (+ optional Thursday finisher) is aerobic base — the recovery engine.</li>
       <li><b>Alactic power</b> fits as a short finisher on a strength day, or inside the Friday primer.</li>
       <li><b>In-season the games ARE conditioning</b> — cut volume and keep just base + one anaerobic session. Off-season, add a session.</li>
@@ -1892,9 +1892,11 @@ function setRowEl(n,w,r){
 function makeExRow(name,target,presets){
   const row=document.createElement('div');row.className='exLogRow';row.dataset.name=name;
   row.style.cssText='border-bottom:1px solid rgba(36,51,82,.4);padding:10px 0';
+  const last=lastLoggedFor(name);
+  const hint=progHint(last?last.sets:null,window._readyTier||'amber');
   const head=document.createElement('div');
   head.style.cssText='display:flex;justify-content:space-between;align-items:baseline;gap:8px';
-  head.innerHTML=`<div><div style="font-weight:600;font-size:13.5px">${name}</div>${target?`<div style="font-size:11.5px;color:var(--dim)">Target: ${target}</div>`:''}</div><span class="del rmRow" style="cursor:pointer;font-size:11.5px">remove</span>`;
+  head.innerHTML=`<div style="flex:1"><div style="font-weight:600;font-size:13.5px">${name}</div>${target?`<div style="font-size:11.5px;color:var(--dim)">Target: ${target}</div>`:''}${last?`<div style="font-size:11px;color:var(--dim)">Last (${last.d}): ${fmtSets(last.sets)}</div>`:''}<div style="font-size:11.5px;color:${hint.cls};margin-top:2px">${hint.txt}</div></div><span class="del rmRow" style="cursor:pointer;font-size:11.5px">remove</span>`;
   head.querySelector('.rmRow').onclick=()=>row.remove();
   const sets=document.createElement('div');sets.className='setsWrap';
   const addBtn=document.createElement('button');addBtn.className='btn ghost';addBtn.textContent='+ set';
@@ -1932,6 +1934,7 @@ function addExerciseToWorkout(name){
 }
 function loadSessionForm(){
   const sel=document.getElementById('sessSel'),host=document.getElementById('sessForm');if(!sel||!host)return;
+  window._readyTier=readinessInfo().tier;
   host.innerHTML='';
   const wrap=document.createElement('div');wrap.id='exRows';host.appendChild(wrap);
   const k=sel.value;
@@ -1988,6 +1991,7 @@ function todayReady(){const d=new Date().toISOString().slice(0,10);return LS.get
 function setReady(field,val){
   const d=new Date().toISOString().slice(0,10),r=LS.get('readiness',[]);let it=r.find(x=>x.d===d);
   if(!it){it={d};r.push(it);}it[field]=val;LS.set('readiness',r);renderReadiness();renderRecommendation();
+  if(document.getElementById('exRows')&&![...document.querySelectorAll('#exRows .sw,#exRows .sr')].some(i=>i.value.trim()))loadSessionForm();
 }
 function renderReadiness(){
   const host=document.getElementById('readyInputs');if(!host)return;
@@ -1998,32 +2002,54 @@ function renderReadiness(){
   }).join('');
 }
 function lastSession(){const s=LS.get('sessions',[]).slice().sort((a,b)=>a.d<b.d?1:-1);return s[0];}
+function lastLoggedFor(name){
+  const s=LS.get('sessions',[]).slice().sort((a,b)=>a.d<b.d?1:-1);
+  for(const sess of s){const e=(sess.ex||[]).find(x=>x.name===name&&x.sets&&x.sets.length);if(e)return {sets:e.sets,d:sess.d};}
+  return null;
+}
+function topWeight(sets){let m=0;sets.forEach(s=>{const w=parseFloat(s.w);if(!isNaN(w))m=Math.max(m,w);});return m;}
+function round2p5(x){return Math.round(x/2.5)*2.5;}
+function progHint(last,tier){
+  if(!last||!last.length)return {txt:'First time logged — set a solid, controlled baseline you can build on.',cls:'var(--dim)'};
+  const tw=topWeight(last);
+  if(tier==='green'){const nxt=tw>0?round2p5(tw*1.025+0.01):0;
+    return {txt:`↑ Beat last time — ${tw>0?`try ~${nxt} kg on your top set, or `:''}add a rep. You’re fresh.`,cls:'var(--easy)'};}
+  if(tier==='red')return {txt:`↓ Back off — hold or drop ~10%${tw>0?` (~${round2p5(tw*0.9)} kg)`:''}, or cut a set. Protect recovery.`,cls:'var(--hard)'};
+  return {txt:`→ Match last${tw>0?` (~${tw} kg)`:''} and add a rep where it feels strong. Steady progression.`,cls:'var(--mod)'};
+}
+function readinessInfo(){
+  const t=todayReady(),last=lastSession();
+  if(!t||[t.sleep,t.sore,t.energy,t.mood].some(v=>v==null))return {complete:false,tier:'amber'};
+  let score=t.sleep+t.energy+t.mood+(6-t.sore);
+  if(last&&last.rpe>=9)score-=1;
+  if(last&&last.feel==='rough')score-=1;
+  const tier=(score>=16&&t.sore<=3)?'green':(score>=11?'amber':'red');
+  return {complete:true,tier,score};
+}
 function renderRecommendation(){
   const host=document.getElementById('recBox');if(!host)return;
   const t=todayReady(),last=lastSession(),b=curBlock();
   const feelTxt={great:'felt great',ok:'felt OK',rough:'felt rough'};
   const lastLine=last?`Last session (${last.d}): <b style="color:#fff">${last.title}</b>${last.rpe?` · RPE ${last.rpe}`:''}${last.feel?` · ${feelTxt[last.feel]}`:''}.`:'No previous session logged yet.';
-  if(!t||[t.sleep,t.sore,t.energy,t.mood].some(v=>v==null)){
-    host.innerHTML=`<div class="note">${lastLine}<br>Fill in all four readiness scores for today’s recommendation.</div>`;return;
+  const info=readinessInfo();
+  if(!info.complete){
+    host.innerHTML=`<div class="note">${lastLine}<br>Fill in all four readiness scores for today’s recommendation &amp; per-exercise targets.</div>`;return;
   }
-  let score=t.sleep+t.energy+t.mood+(6-t.sore); // 4..20
-  if(last&&last.rpe>=9)score-=1;
-  if(last&&last.feel==='rough')score-=1;
   let color,label,advice;
-  if(score>=16&&t.sore<=3){color='var(--easy)';label='🟢 Green — go for it';
-    advice='You’re fresh. Attack today’s session — chase your top-end loads at full intent, and add a back-off set if the bar is flying. Great day to push a PR.';}
-  else if(score>=11){color='var(--mod)';label='🟡 Amber — as planned';
-    advice='Solid readiness. Train the session as written — hit your prescribed sets & reps at the target RPE, no need to force extra.';}
+  if(info.tier==='green'){color='var(--easy)';label='🟢 Green — go for it';
+    advice='You’re fresh. Attack today’s session — chase your top-end loads at full intent and beat last time: add weight or a rep on your key lifts.';}
+  else if(info.tier==='amber'){color='var(--mod)';label='🟡 Amber — as planned';
+    advice='Solid readiness. Train the session as written — match or slightly beat last time at the target RPE.';}
   else{color='var(--hard)';label='🔴 Red — auto-regulate';
     advice='You’re run down. Cut volume ~30–40%, drop the heaviest top sets and keep bar speed crisp — or swap to a mobility/recovery session. Backing off today protects the whole week.';}
   let extra='';
   if(b.tmpl==='in'||b.k==='peak')extra=' In-season/peak: when in doubt, prioritise freshness for the game over grinding a lift.';
-  if(last&&last.rpe>=9&&color!=='var(--hard)')extra+=' Last session was very hard — lean toward the lighter end of today’s range.';
+  if(last&&last.rpe>=9&&info.tier!=='red')extra+=' Last session was very hard — lean toward the lighter end of today’s range.';
   const todayW=curWK()[todayKey()];
   host.innerHTML=`<div class="note" style="border-color:${color}"><div style="font-weight:800;color:${color};margin-bottom:4px">${label}</div>
-    <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Readiness ${score}/20 · ${lastLine}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Readiness ${info.score}/20 · ${lastLine}</div>
     <div style="font-size:13px;color:var(--txt)">${advice}${extra}</div>
-    <div style="font-size:12px;color:var(--dim);margin-top:6px">Today’s planned session: <b>${todayW.title}</b>.</div></div>`;
+    <div style="font-size:12px;color:var(--dim);margin-top:6px">Today’s planned session: <b>${todayW.title}</b>. Each exercise below shows your <b>last numbers</b> and a suggested next target based on how you feel.</div></div>`;
 }
 
 function addPR(){
