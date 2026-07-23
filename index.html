@@ -185,6 +185,42 @@ details.acc .inner{padding:0 14px 14px}
 .switch .sl:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--muted);border-radius:50%;transition:.2s}
 .switch input:checked+.sl{background:rgba(56,189,248,.3);border-color:var(--ice)}
 .switch input:checked+.sl:before{transform:translateX(20px);background:var(--ice)}
+/* ---- CHATBOT ---- */
+#chatBtn{position:fixed;bottom:100px;right:16px;z-index:60;width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--ice),var(--deep));border:none;cursor:pointer;
+  font-size:20px;box-shadow:0 4px 20px rgba(56,189,248,.45);transition:.18s;display:grid;place-items:center;}
+#chatBtn:active{transform:scale(.92)}
+#chatPanel{position:fixed;bottom:158px;right:16px;z-index:61;width:308px;max-width:calc(100vw - 24px);
+  height:440px;max-height:calc(100vh - 190px);background:var(--card);border:1px solid var(--line);
+  border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.55);
+  transform:scale(.92) translateY(12px);transform-origin:bottom right;transition:.2s ease;opacity:0;pointer-events:none;}
+#chatPanel.open{transform:none;opacity:1;pointer-events:all;}
+#chatHead{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;flex-shrink:0}
+#chatHead .ctitle{font-weight:700;font-size:13.5px;flex:1}
+#chatClose{background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;padding:0;line-height:1}
+#chatMessages{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;
+  scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.cmsg{max-width:90%;padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.45;word-break:break-word}
+.cmsg.bot{background:var(--card2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.cmsg.user{background:linear-gradient(135deg,var(--ice2),var(--deep));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.cchips{display:flex;flex-wrap:wrap;gap:4px;margin:1px 0 3px;align-self:flex-start;max-width:100%}
+.cchip{display:inline-block;background:var(--bg2);border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;color:var(--ice);cursor:pointer;white-space:nowrap}
+.cchip:active{transform:scale(.95);background:rgba(56,189,248,.12)}
+#chatInputRow{padding:8px 10px;border-top:1px solid var(--line);display:flex;gap:7px;flex-shrink:0}
+#chatInput{flex:1;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:9px 12px;
+  border-radius:10px;font-size:13px;font-family:inherit;outline:none}
+#chatInput:focus{border-color:var(--ice)}
+#chatSendBtn{background:var(--ice);border:none;color:#04121f;width:36px;height:36px;border-radius:9px;
+  font-size:16px;cursor:pointer;flex-shrink:0;display:grid;place-items:center;font-weight:800}
+#chatSendBtn:active{transform:scale(.94)}
+/* ---- SESSION EDIT ---- */
+.editTa{width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:10px 12px;
+  border-radius:11px;font-size:13px;font-family:inherit;resize:vertical;outline:none}
+.editTa:focus{border-color:var(--ice)}
+.editInp{width:100%;background:var(--bg2);border:1px solid var(--line);color:#fff;padding:10px 12px;
+  border-radius:11px;font-size:14px;font-family:inherit;outline:none}
+.editInp:focus{border-color:var(--ice)}
 </style>
 </head>
 <body>
@@ -846,6 +882,21 @@ details.acc .inner{padding:0 14px 14px}
 
 <div class="wrap"><p class="foot">Built for you — Kam · advanced hockey athlete. Not medical advice; train around any injuries and consult a professional for pain. Data stays on your device.</p></div>
 
+<!-- CHATBOT -->
+<button id="chatBtn" onclick="chatToggle()" title="Plan Assistant">💬</button>
+<div id="chatPanel">
+  <div id="chatHead">
+    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--ice),var(--deep));display:grid;place-items:center;font-size:16px;flex-shrink:0">🏒</div>
+    <span class="ctitle">Plan Assistant</span>
+    <button id="chatClose" onclick="chatToggle()">✕</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" placeholder="Ask about today, log an exercise…" onkeydown="if(event.key==='Enter')chatSend()">
+    <button id="chatSendBtn" onclick="chatSend()">↑</button>
+  </div>
+</div>
+
 <script>
 /* ============ NAV (grouped hubs + sub-nav) ============ */
 const PAGE_LABELS={home:'Home',week:'Schedule',year:'Year Plan',train:'Workouts',cardio:'Conditioning',
@@ -957,8 +1008,8 @@ let phase=LS.get('phase',curBlock().load);
 
 /* ============ WEEKLY PLAN ============ */
 const DAYS_IN=[
- {k:'sun',d:'SUN',role:'Recovery + Aerobic',tag:'easy',rel:'Day after game',
-  desc:'Zone-2 bike, mobility & prehab volume — flush and regenerate.'},
+ {k:'sun',d:'SUN',role:'Cardio',tag:'easy',rel:'Day after game',
+  desc:'One job: Zone-2 cardio 30–40 min. Flush the game, grow the aerobic engine. Nothing else required.'},
  {k:'mon',d:'MON',role:'Lower · Max Strength + Power',tag:'hard',rel:'Highest CNS day',
   desc:'Squat / trap-bar, jumps, single-leg, groin & hamstring isometrics.'},
  {k:'tue',d:'TUE',role:'Upper · Strength + Sprints + Shooting',tag:'hard',rel:'',
@@ -969,8 +1020,8 @@ const DAYS_IN=[
   desc:'Reactive/stiffness plyos, pump work, posterior chain, tendon & tissue health.'},
  {k:'fri',d:'FRI',role:'CNS Primer (pre-game)',tag:'power',rel:'Day before game',
   desc:'Short & sharp — jumps, throws, fast singles. Leave springy.'},
- {k:'sat',d:'SAT',role:'GAME / SKATE',tag:'game',rel:'Compete',
-  desc:'Highest-intensity session of the week. Fuel before, refuel after.'}
+ {k:'sat',d:'SAT',role:'Game / Practice — Evening',tag:'game',rel:'Compete',
+  desc:'Evening practice or game — morning is super light (10 min mobility max, or skip it). Save everything for tonight.'}
 ];
 const DAYS_OFF=[
  {k:'sun',d:'SUN',role:'Recovery + Regeneration',tag:'easy',rel:'',desc:'Aerobic flush, mobility, prehab, soft tissue.'},
@@ -1034,8 +1085,7 @@ function toggleGame(){const on=document.getElementById('gameToggle').checked;LS.
 
 /* ============ FULL DAILY SCHEDULE ============ */
 const SCHED_IN={
- sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist iso (4×30–45s) · shoulder band ER (2×15) · knee wall-sit (3×30s) · hip 90/90 + adductor rocks · ~15 min'},
-      {w:'PM',t:'Conditioning',i:'❤️',x:'Zone-2 bike or row 30–45 min @ nose-breathing pace (HR 130–150). Flush the game, build the aerobic engine. Soft tissue work (foam roll quads/adductors/glutes) after.'}],
+ sun:[{w:'AM/PM',t:'Conditioning',i:'❤️',x:'Cardio — Zone-2 bike or row 30–40 min @ nose-breathing pace (HR 130–150). One job: flush yesterday\'s game and build the aerobic engine. Foam roll after if you feel like it — that\'s it.'}],
  mon:[{w:'AM',t:'Rehab',i:'🩹',x:'Wrist flexor/extensor iso 4×30s · ankle + hip mobility — ~10 min before work'},
       {w:'PM',t:'Gym',i:'🏋️',x:'Box/broad jump 4×3–5 · Squat or Trap-bar DL (5×3–4 @ 84–90%) · Bulgarian split squat 3×6/leg · RDL 3×6–8 · Copenhagen adduction 3×10/side · Nordic hamstring 3×5 · Pallof press 3×10/side'},
       {w:'PM',t:'Skills',i:'🏒',x:'Shooting — 40–60 quality reps (wrist/snap/one-timers/backhand). Do this right after the lift while you are still at the facility.'}],
@@ -1053,9 +1103,10 @@ const SCHED_IN={
       {w:'PM',t:'Skills',i:'🏒',x:'Shooting 30–50 reps (snap/one-timer focus — fresher after a pump day) · Stickhandling 10–15 min (toe drags, backhand flip, figure-8 lateral patterns).'}],
  fri:[{w:'AM',t:'Rehab',i:'🩹',x:'Light only — hip + ankle mobility 5 min · gentle wrist iso 2×20s · no heavy loading. Keep the CNS fresh for the game.'},
       {w:'PM',t:'Primer',i:'⚡',x:'CNS primer ~25–30 min — Pogos 2×10 · Box jump 3×3 (crisp, not gassy) · 2–3 heavy singles on main lift (sub-max, feel the bar) · Acceleration sprints 3×10m · Done. Sharp, not tired.'},
-      {w:'PM',t:'Skills',i:'🏒',x:'Light touch only — 20–30 reps shooting (wrist/snap, no heavy slaps) · stickhandling 5–8 min. Keep it sharp and confident, not tiring.'}],
- sat:[{w:'—',t:'Game',i:'🥅',x:'GAME — fuel a full meal 2–3h before (carbs + protein). Refuel within 60 min post-game (protein shake + carbs). Hydrate through the day.'},
-      {w:'—',t:'Rehab',i:'🩹',x:'Gentle wrist iso only if needed — otherwise full rest post-game. Ice any sore joints.'}]
+      {w:'PM',t:'Skills',i:'🏒',x:'Light touch only — 20–30 reps shooting (wrist/snap, no heavy slaps) · stickhandling 5–8 min. Keep it sharp and confident, not tiring.'},
+      {w:'PM',t:'Gym',i:'🏋️',x:'OPTIONAL add-on (only if feeling good) — pick one: Upper pump · face pull 3×15 · lateral raise 3×12 · bicep+tricep 2×12 (no heavy pressing, zero CNS cost). OR Zone-2 cardio 10–15 min bike @ HR 130–140 (flushes residual fatigue, legs feel lighter tomorrow). OR skip it entirely — freshness for the game beats everything.'}],
+ sat:[{w:'AM',t:'Rehab',i:'🩹',x:'Super light morning — 10 min hip + ankle mobility only (90/90 hips, ankle circles, couch stretch). No CNS, no lifting, no sprints. If still sore from the week, skip it entirely.'},
+      {w:'PM',t:'Game',i:'🥅',x:'PRACTICE / GAME (evening) — dynamic warm-up 15–20 min before. Fuel 2–3h ahead (carbs + protein, low fat/fibre). Refuel within 60 min post-session (protein + carbs + fluids). Ice any sore spots.'}]
 };
 const SCHED_OFF={
  sun:[{w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set — wrist iso 4×30–45s · shoulder band ER 2×15 · knee wall-sit 3×35s · Copenhagen 2×10/side · hip/ankle mobility — ~15 min'},
@@ -1111,21 +1162,14 @@ function renderSchedule(){
 /* scheme can be a string, or {hyp,str,pow} */
 function S(o){return typeof o==='object'?o[phase]:o;}
 const WK_IN={
- sun:{title:'Recovery + Aerobic',tag:'easy',time:'30–45 min',
-  intro:'The day after your game. This is a session, not a formality — active recovery clears fatigue faster than sitting still. If the game truly wrecked you, take full rest instead.',
+ sun:{title:'Cardio',tag:'easy',time:'30–40 min',
+  intro:'Day after the game — keep it dead simple. One job: get your cardio done. Zone-2 aerobic work clears yesterday\'s fatigue faster than sitting still. Nothing heavy, nothing structured beyond that. If the game completely wrecked you, an easy walk or full rest is fine.',
   blocks:[
-   {l:'Aerobic base',c:'b-cond',items:[
-     ['Zone-2 bike or row','25–40 min','Nose-breathing pace, HR ~130–150. Builds the aerobic engine that clears fatigue between shifts.']]},
-   {l:'Mobility flow',c:'b-warm',items:[
-     ['Full-body flow','10 min','Hips 90/90, adductor rock-backs, thoracic rotations, couch stretch, ankle mobility.']]},
-   {l:'Prehab volume',c:'b-prehab',items:[
-     ['Copenhagen adduction','3×10 / side','Groin resilience — keep it controlled and pain-free today.'],
-     ['Nordic hamstring (easy)','2×5','Slow eccentric only.'],
-     ['Hip airplane','2×6 / side','Hip control & single-leg stability.'],
-     ['Band external rotation','2×15','Rotator-cuff health.'],
-     ['Neck isometrics','2×10s each way','Gentle — flexion, extension, both sides.']]},
-   {l:'Soft tissue',c:'b-warm',items:[
-     ['Foam roll','5 min','Quads, adductors, glutes, T-spine.']]}
+   {l:'Cardio — your one job',c:'b-cond',items:[
+     ['Zone-2 bike or row','30–40 min','Nose-breathing pace, HR ~130–150. Flush the game, grow the aerobic base.'],
+     ['OR easy run / walk','30 min','Same principle — conversational pace. Just move and recover.']]},
+   {l:'Optional finish',c:'b-warm',items:[
+     ['Light foam roll','5 min','Quads, adductors, glutes — only if you feel like it. Not required.']]}
   ]},
  mon:{title:'Lower · Max Strength + Power',tag:'hard',time:'60–65 min',
   intro:'Your heaviest, highest-CNS day — placed ~48h after the game when you’re recovered and fresh. Power first while the nervous system is primed, then max strength, then protect the tissue that hockey punishes most.',
@@ -1208,10 +1252,10 @@ const WK_IN={
    {l:'Optional aerobic finisher',c:'b-cond',items:[
      ['Zone-2 bike','10–15 min','Adds to your base without touching recovery.']]}
   ]},
- fri:{title:'CNS Primer (pre-game)',tag:'power',time:'~30 min',
-  intro:'The day before your game. The goal is to wake up the nervous system without creating fatigue — a little fast, explosive work leaves you feeling springy on Saturday, not flat. Done right, this is a secret weapon. Keep it short and crisp.',
+ fri:{title:'CNS Primer + Optional Upper / Cardio',tag:'power',time:'~30–45 min',
+  intro:'The day before your game. Wake the nervous system without creating fatigue — a short, sharp primer leaves you springy tomorrow, not flat. That\'s the non-negotiable part. After that, pick one optional add-on if you feel good, or skip it entirely.',
   blocks:[
-   {l:'Prime',c:'b-power',items:[
+   {l:'Primer — always do this',c:'b-power',items:[
      ['Pogo hops','3×10','Stiff, fast ankles — reactive.'],
      ['RFE Reactive Foot-Taps','2×10s / leg','Light and sharp — primes fast-twitch without fatigue.'],
      ['Box jump','3×3','Crisp and powerful, full recovery.'],
@@ -1219,23 +1263,30 @@ const WK_IN={
    {l:'Potentiate',c:'b-str',items:[
      ['One main lift — fast singles','2–3 singles @ ~85%','No grinding. Remind the CNS what heavy & fast feels like, then stop.'],
      ['Short sprint','3×10m','Pure acceleration, easy on the volume.']]},
-   {l:'Mobility & activation',c:'b-prehab',items:[
-     ['Dynamic flow + glute/adductor activation','~10 min','Leave the gym feeling ready, not tired. If in doubt, do less.']]}
+   {l:'Optional add-on — pick one or skip',c:'b-prehab',items:[
+     ['Upper body pump (light)','~15 min','Face pull 3×15 · lateral raise 3×12 · bicep + tricep 2×12. No heavy pressing — low CNS cost, keeps muscle ticking.'],
+     ['Zone-2 cardio','10–15 min','Easy bike @ HR 130–140 — flushes residual fatigue, legs feel lighter tomorrow. Stop if it starts to drain you.'],
+     ['Nothing — just the primer','—','If yesterday was hard or you feel flat, skip the add-on entirely. Freshness for the game beats everything today.']]},
+   {l:'Finish',c:'b-warm',items:[
+     ['Dynamic flow + activation','~8 min','Leave the gym feeling ready and springy, not tired.']]}
   ]},
- sat:{title:'GAME / SKATE',tag:'game',time:'Match day',
-  intro:'The highest-intensity session of your week — and it counts as training. Everything else was built to make this better.',
+ sat:{title:’Game / Practice — Evening’,tag:’game’,time:’Evening’,
+  intro:’Your practice or game is in the evening. The morning is off — 10 min light mobility at most, or skip it if sore. Everything this week was built to make tonight better.’,
   blocks:[
-   {l:'Pre-game',c:'b-warm',items:[
-     ['Dynamic warm-up + activation','15–20 min','Raise temperature, fire glutes & hips, a few build-up sprints.'],
-     ['Caffeine (optional)','3–6 mg/kg, ~45 min before','If you use it — improves sprint power & alertness.'],
-     ['Fuel','2–3h before','Carb-focused meal + moderate protein, low fat/fibre. Hydrate + sodium.']]},
-   {l:'Post-game — start recovery',c:'b-cond',items:[
-     ['Refuel window','within ~60 min','30–40g protein + a big dose of carbs + fluids/electrolytes. This kicks off the whole week’s recovery.'],
-     ['Wind down','evening','Light stretch, then prioritise sleep — adaptation happens tonight.']]},
-   {l:'No game this week?',c:'b-str',items:[
-     ['Extra Lower Power','~45 min','Trimmed version of Monday — bank another quality stimulus.'],
-     ['OR Long conditioning','~30 min','Repeat-sprint + aerobic finisher while there’s no game to save for.'],
-     ['OR Full rest','—','If the block was heavy, take it. Six quality days beats seven junk ones.']]}
+   {l:’Morning — super light only’,c:’b-warm’,items:[
+     [‘Hip + ankle mobility’,’10 min’,’Gentle 90/90 hips, ankle circles, couch stretch. That is it — no CNS, no lifting, no sprints.’],
+     [‘Skip if sore / tired’,’—‘,’Extra rest beats a morning session every time when the game is tonight.’]]},
+   {l:’Pre-game (2–3h before)’,c:’b-warm’,items:[
+     [‘Fuel’,’2–3h before’,’Carb-focused meal + moderate protein, low fat & fibre. Hydrate + sodium.’],
+     [‘Dynamic warm-up + activation’,’15–20 min before’,’Raise temperature, fire glutes & hips, a few build-up strides.’],
+     [‘Caffeine (optional)’,’3–6 mg/kg, ~45 min before’,’If you use it — sprint power & alertness.’]]},
+   {l:’Post-game — start recovery’,c:’b-cond’,items:[
+     [‘Refuel window’,’within ~60 min’,’30–40g protein + carbs + fluids/electrolytes. Kicks off the whole week recovery.’],
+     [‘Wind down’,’evening’,’Light stretch, then sleep — adaptation happens tonight.’]]},
+   {l:’No game this week?’,c:’b-str’,items:[
+     [‘Extra Lower Power’,’~45 min’,’Trimmed version of Monday — bank another quality stimulus.’],
+     [‘OR Long conditioning’,’~30 min’,’Repeat-sprint + aerobic finisher while there is no game to save for.’],
+     [‘OR Full rest’,’—‘,’If the block was heavy, take it. Six quality days beats seven junk ones.’]]}
   ]}
 };
 
@@ -1996,11 +2047,75 @@ function renderSessionHistory(){
   if(!s.length){host.innerHTML='<p style="color:var(--dim);font-size:13px;text-align:center;padding:6px">No workouts logged yet.</p>';return;}
   const fic={great:'💪',ok:'🙂',rough:'😪'};
   host.innerHTML=s.map(x=>{
-    const exList=x.ex.filter(e=>(e.sets&&e.sets.length)||e.did).map(e=>`<div style="font-size:12.5px;color:var(--muted);padding:2px 0">${e.name}: <span style="color:var(--txt);font-weight:600">${e.sets?fmtSets(e.sets):e.did}</span></div>`).join('');
-    return `<details class="acc"><summary>${x.d} — ${x.title}${x.rpe?` · RPE ${x.rpe}`:''} ${fic[x.feel]||''}</summary>
-      <div class="inner">${exList||'<div style="font-size:12px;color:var(--dim)">No exercises recorded.</div>'}${x.note?`<div class="note" style="margin-top:8px">${x.note}</div>`:''}
-      <div class="del" style="margin-top:10px;display:inline-block" onclick="delSession('${x.id}')">✕ Delete</div></div></details>`;
+    const exList=(x.ex||[]).filter(e=>(e.sets&&e.sets.length)||e.did).map(e=>`<div style="font-size:12.5px;color:var(--muted);padding:2px 0">${e.name}: <span style="color:var(--txt);font-weight:600">${e.sets?fmtSets(e.sets):e.did}</span></div>`).join('');
+    return `<details class="acc" id="shd_${x.id}"><summary>${x.d} — ${x.title}${x.rpe?` · RPE ${x.rpe}`:''} ${fic[x.feel]||''}</summary>
+      <div class="inner" id="shi_${x.id}">
+        ${exList||'<div style="font-size:12px;color:var(--dim);margin-bottom:6px">No exercises recorded.</div>'}
+        ${x.note?`<div class="note" style="margin-top:6px">${x.note}</div>`:''}
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+          <button class="btn ghost" style="width:auto;padding:8px 14px;font-size:12.5px;margin:0" onclick="editSession('${x.id}')">✏️ Edit</button>
+          <span class="del" style="font-size:13px;cursor:pointer" onclick="delSession('${x.id}')">✕ Delete</span>
+        </div>
+      </div></details>`;
   }).join('');
+}
+function parseExText(raw){
+  if(!raw||!raw.trim())return[];
+  return raw.split('\n').filter(l=>l.trim()).map(line=>{
+    const ci=line.indexOf(':');let name,setsStr;
+    if(ci>0){name=line.slice(0,ci).trim();setsStr=line.slice(ci+1).trim();}
+    else{const m=line.match(/^([\w\s\-\/&]+?)\s{2,}(.*)$/) || line.match(/^([\w\s\-\/&]+?)\s+(\d.*)$/);
+      if(m){name=m[1].trim();setsStr=m[2].trim();}else{name=line.trim();setsStr='';}}
+    const sets=[];const rx=/(\d+(?:\.\d+)?)\s*[x×]\s*(\d+)/gi;let r;
+    while((r=rx.exec(setsStr))!==null)sets.push({w:r[1],r:r[2]});
+    if(!sets.length&&setsStr.trim())sets.push({w:'',r:setsStr.trim()});
+    return{name,sets};
+  }).filter(e=>e.name);
+}
+function exToText(ex){
+  return (ex||[]).filter(e=>e.name).map(e=>{
+    const s=e.sets?e.sets.map(s=>`${s.w||'?'}×${s.r||'?'}`).join(', '):(e.did||'');
+    return `${e.name}: ${s}`;
+  }).join('\n');
+}
+function editSession(id){
+  const sessions=LS.get('sessions',[]);const x=sessions.find(s=>s.id===id);if(!x)return;
+  const host=document.getElementById('shi_'+id);if(!host)return;
+  const exT=exToText(x.ex);
+  const feelOpts=['great','ok','rough'].map(f=>`<option value="${f}" ${x.feel===f?'selected':''}>${{great:'💪 Great',ok:'🙂 OK',rough:'😪 Rough'}[f]}</option>`).join('');
+  const sessOpts=DOW.map(k=>`<option value="${k}" ${x.key===k?'selected':''}>${DAY_FULL[k].slice(0,3)} — ${curWK()[k].title}</option>`).join('')+`<option value="custom" ${x.key==='custom'?'selected':''}>Custom / other</option>`;
+  const fldSty=`style="background:var(--bg2);border:1px solid var(--line);color:#fff;padding:10px 12px;border-radius:11px;font-size:13.5px;font-family:inherit;width:100%;outline:none"`;
+  host.innerHTML=`
+    <div class="field" style="margin:6px 0"><label>Session</label><select id="eT_${id}" ${fldSty.replace('font-size:13.5px','font-size:14px')}>${sessOpts}</select></div>
+    <div class="field" style="margin:6px 0"><label>Date</label><input type="date" id="eD_${id}" value="${x.d}" ${fldSty}></div>
+    <div class="field" style="margin:6px 0">
+      <label>Exercises <span style="color:var(--dim);font-weight:400;font-size:11px">— one per line: Exercise: weight×reps, …</span></label>
+      <textarea id="eEx_${id}" rows="6" class="editTa">${exT}</textarea>
+    </div>
+    <div class="grid g2" style="gap:8px;margin:4px 0">
+      <div class="field" style="margin:4px 0"><label>RPE (1–10)</label><input type="number" id="eR_${id}" value="${x.rpe||''}" min="1" max="10" ${fldSty}></div>
+      <div class="field" style="margin:4px 0"><label>Felt</label><select id="eF_${id}" ${fldSty.replace('font-size:13.5px','font-size:14px')}>${feelOpts}</select></div>
+    </div>
+    <div class="field" style="margin:6px 0"><label>Notes</label><textarea id="eN_${id}" rows="2" class="editTa">${x.note||''}</textarea></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn" style="flex:1;margin:0" onclick="updateSession('${id}')">Save changes</button>
+      <button class="btn ghost" style="width:auto;padding:0 14px;margin:0" onclick="renderSessionHistory()">Cancel</button>
+    </div>`;
+  document.getElementById('shd_'+id).open=true;
+}
+function updateSession(id){
+  const sessions=LS.get('sessions',[]);const x=sessions.find(s=>s.id===id);if(!x)return;
+  const key=document.getElementById('eT_'+id).value;
+  const d=document.getElementById('eD_'+id).value||x.d;
+  const ex=parseExText(document.getElementById('eEx_'+id).value);
+  const rpe=parseInt(document.getElementById('eR_'+id).value)||null;
+  const feel=document.getElementById('eF_'+id).value;
+  const note=document.getElementById('eN_'+id).value.trim();
+  const title=key==='custom'?'Custom session':(curWK()[key]?curWK()[key].title:'Session');
+  Object.assign(x,{key,d,title,rpe,feel,note,ex});
+  LS.set('sessions',sessions);
+  renderSessionHistory();renderToday();
+  setTimeout(()=>{const det=document.getElementById('shd_'+id);if(det)det.open=true;},50);
 }
 /* ---- Readiness + recommendation ---- */
 const READY_FIELDS=[
@@ -2171,6 +2286,106 @@ renderSchedule();renderMeals();renderGrocery();
 document.getElementById('sessDate').value=new Date().toISOString().slice(0,10);
 buildSessionSelect();loadSessionForm();renderToday();renderReadiness();renderRecommendation();renderSessionHistory();
 go('home');
+
+/* ============ CHATBOT ============ */
+let chatReady=false;
+function chatToggle(){
+  const p=document.getElementById('chatPanel');p.classList.toggle('open');
+  if(p.classList.contains('open')&&!chatReady){chatReady=true;chatBotMsg('Hey Kam! 👋 What do you need?',['Today\'s session','Show Friday','Log note: ___','Quick-log exercise','Help']);}
+  if(p.classList.contains('open'))setTimeout(()=>{const i=document.getElementById('chatInput');if(i)i.focus();},150);
+}
+function chatSend(){
+  const inp=document.getElementById('chatInput');const txt=(inp.value||'').trim();if(!txt)return;
+  inp.value='';
+  const um=document.createElement('div');um.className='cmsg user';um.textContent=txt;
+  document.getElementById('chatMessages').appendChild(um);chatScroll();
+  setTimeout(()=>chatProcess(txt),120);
+}
+function chatBotMsg(txt,chips){
+  const msgs=document.getElementById('chatMessages');if(!msgs)return;
+  const div=document.createElement('div');div.className='cmsg bot';
+  div.innerHTML=txt.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  msgs.appendChild(div);
+  if(chips&&chips.length){
+    const row=document.createElement('div');row.className='cchips';
+    chips.forEach(c=>{const b=document.createElement('span');b.className='cchip';b.textContent=c;
+      b.onclick=()=>{if(!c.endsWith('___')&&!c.endsWith('…')){const um=document.createElement('div');um.className='cmsg user';um.textContent=c;msgs.appendChild(um);chatScroll();setTimeout(()=>chatProcess(c),120);}
+        else{const i=document.getElementById('chatInput');if(i){i.value=c.replace(/___.*$/,'').replace(/…$/,'');i.focus();}}};
+      row.appendChild(b);});
+    msgs.appendChild(row);}
+  chatScroll();
+}
+function chatScroll(){const m=document.getElementById('chatMessages');if(m)m.scrollTop=m.scrollHeight;}
+const CHAT_NAVMAP={
+  workout:['train','Workouts'],train:['train','Workouts'],lift:['train','Workouts'],gym:['train','Workouts'],
+  plan:['week','Schedule'],schedule:['week','Schedule'],week:['week','Schedule'],
+  cardio:['cardio','Conditioning'],conditioning:['cardio','Conditioning'],
+  nutrition:['nutri','Nutrition'],food:['nutri','Nutrition'],fuel:['nutri','Nutrition'],
+  rehab:['rehab','Rehab'],injury:['rehab','Rehab'],
+  'workout log':['wlog','Workout Log'],'wlog':['wlog','Workout Log'],
+  log:['wlog','Workout Log'],track:['log','Progress'],progress:['log','Progress'],
+  meal:['kitchen','Meals'],kitchen:['kitchen','Meals'],
+  calculator:['calc','Calculator'],calorie:['calc','Calculator'],
+  year:['year','Year Plan']
+};
+const DAYMAP={monday:'mon',tuesday:'tue',wednesday:'wed',thursday:'thu',friday:'fri',saturday:'sat',sunday:'sun',mon:'mon',tue:'tue',wed:'wed',thu:'thu',fri:'fri',sat:'sat',sun:'sun'};
+function chatProcess(raw){
+  const txt=raw.trim();const lo=txt.toLowerCase();
+  /* greeting */
+  if(/^(hi|hello|hey|sup|yo)\b/.test(lo)){chatBotMsg('What do you need?',['Today','Show Friday','Log session','Help']);return;}
+  /* help */
+  if(/\b(help|commands|what can you)\b/.test(lo)){
+    chatBotMsg('Here\'s what I can do:\n• **Today** — show today\'s planned session\n• **Show [day]** — e.g. "Show Friday"\n• **Go to [section]** — workouts, plan, cardio, rehab, etc\n• **Log note: text** — save a quick note to today\n• **Exercise 100×5 105×3** — quick-log sets to today\n• **Last session** — see what you did most recently\n• **History** — jump to your full log');return;}
+  /* navigate — check multi-word keys first */
+  for(const [kw,[page,label]] of Object.entries(CHAT_NAVMAP)){
+    if(lo.includes(kw)){go(page);chatBotMsg(`Opened **${label}**. ✓`);return;}}
+  /* today */
+  if(/\btoday\b/.test(lo)||lo==='now'){
+    const k=todayKey(),w=curWK()[k];
+    chatBotMsg(`**${DAY_FULL[k]} — ${w.title}** (${w.time})\n${w.intro.split('.')[0]}.`,['Log this session','Go to workouts']);return;}
+  /* specific day */
+  for(const [name,k] of Object.entries(DAYMAP)){
+    if(lo.includes(name)){const w=curWK()[k];chatBotMsg(`**${DAY_FULL[k]} — ${w.title}** (${w.time})\n${w.intro.split('.')[0]}.`,['Go to workouts']);return;}}
+  /* quick note */
+  const nm=txt.match(/^(?:log\s+)?notes?\s*[:\-]\s*(.+)/i);
+  if(nm){chatQuickNote(nm[1].trim());chatBotMsg(`Note saved to today ✓`,['Go to workout log']);return;}
+  /* last session */
+  if(/last session|last workout|previous session|what did i do/.test(lo)){
+    const s=LS.get('sessions',[]).slice().sort((a,b)=>a.d<b.d?1:-1);
+    if(!s.length){chatBotMsg('No sessions logged yet.',['Go to workout log']);return;}
+    const last=s[0];const fic={great:'💪',ok:'🙂',rough:'😪'};
+    const ex=(last.ex||[]).slice(0,5).map(e=>`${e.name}: ${fmtSets(e.sets)}`).join('\n');
+    chatBotMsg(`**Last: ${last.d} — ${last.title}**${last.rpe?' · RPE '+last.rpe:''} ${fic[last.feel]||''}\n${ex||'No exercises logged.'}`,['History','Go to workout log']);return;}
+  /* history */
+  if(/history|past sessions|all sessions/.test(lo)){go('wlog');chatBotMsg('Opened **Workout Log** — scroll to History. ✓');return;}
+  /* log session */
+  if(/\b(log today|log session|log this|log workout|start log)\b/.test(lo)){go('wlog');chatBotMsg('Opened **Workout Log** — scroll to **Log a session**. ✓');return;}
+  /* quick exercise log — "squat 100x5 105x3" or "bench press: 80x8, 85x6" */
+  const exM=txt.match(/^([\w\s\-\/&:]+?)\s*[:\-]?\s*(\d[\d\s.×xX,]+\d+)$/);
+  if(exM){
+    const name=exM[1].replace(/[:\-]\s*$/,'').trim();const setsStr=exM[2];
+    const sets=[];const rx=/(\d+(?:\.\d+)?)\s*[x×X]\s*(\d+)/gi;let r;
+    while((r=rx.exec(setsStr))!==null)sets.push({w:r[1],r:r[2]});
+    if(sets.length){chatQuickEx(name,sets);chatBotMsg(`Added **${name}** — ${sets.map(s=>`${s.w}×${s.r}`).join(', ')} ✓`,['Log another','Go to workout log']);return;}}
+  /* fallback */
+  chatBotMsg("Try: **Today**, **Show Friday**, **Log note: text**, or **Squat 100×5 105×3** to quick-log.",['Today','Help','Show plan']);
+}
+function chatQuickNote(note){
+  const d=new Date().toISOString().slice(0,10);const sessions=LS.get('sessions',[]);
+  const today=sessions.find(x=>x.d===d);
+  if(today){today.note=(today.note?today.note+'\n':'')+note;}
+  else{sessions.push({id:Date.now()+'r',d,block:curBlock().k,key:'custom',title:'Notes',rpe:null,feel:'ok',note,ex:[]});}
+  LS.set('sessions',sessions);renderSessionHistory();renderToday();
+}
+function chatQuickEx(name,sets){
+  const d=new Date().toISOString().slice(0,10);const sessions=LS.get('sessions',[]);
+  let today=sessions.find(x=>x.d===d);
+  if(!today){today={id:Date.now()+'q',d,block:curBlock().k,key:'custom',title:'Quick log',rpe:null,feel:'ok',note:'',ex:[]};sessions.push(today);}
+  const existing=(today.ex||[]).find(e=>e.name.toLowerCase()===name.toLowerCase());
+  if(existing)existing.sets=[...(existing.sets||[]),...sets];
+  else{today.ex=today.ex||[];today.ex.push({name,sets});}
+  LS.set('sessions',sessions);renderSessionHistory();renderToday();
+}
 
 /* offline service worker — registers only when hosted over http(s); ignored when opened as a local file */
 if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
