@@ -1502,13 +1502,48 @@ const WK_TRANS={
 
 const WK_SETS={in:WK_IN,off:WK_OFF,trans:WK_TRANS};
 function curWK(){return WK_SETS[curBlock().tmpl]||WK_IN;}
+/* ---- Exercise-edit layer (chatbot-editable, persisted, global) ---- */
+function effectiveWK(k){
+  const base=curWK()[k];if(!base)return base;
+  const day=JSON.parse(JSON.stringify(base));
+  const swaps=LS.get('exSwaps',{});
+  const remMap=LS.get('exRemoves',{});
+  const removes=[...(remMap[k]||[]),...(remMap.all||[])].map(x=>x.toLowerCase());
+  day.blocks.forEach(b=>{
+    b.items=b.items.filter(it=>!removes.some(r=>{const n=it[0].toLowerCase();return n===r||n.includes(r)||r.includes(n);}))
+      .map(it=>{
+        const key=it[0].toLowerCase();
+        const s=swaps[key];
+        if(s)return [s.name, s.scheme||S(it[1]), s.cue||it[2]];
+        return it;
+      });
+  });
+  day.blocks=day.blocks.filter(b=>b.items.length);
+  const adds=(LS.get('exAdds',{})[k])||[];
+  if(adds.length){
+    day.blocks.push({l:'Custom — added via assistant',c:'b-power',items:adds.map(a=>[a.name,a.scheme||'—',a.cue||'Added by you'])});
+  }
+  return day;
+}
+function exLibraryHas(name){
+  const n=name.toLowerCase().trim();if(!n)return false;
+  return exerciseLibrary().some(x=>{const l=x.toLowerCase();return l===n||l.includes(n)||n.includes(l);});
+}
+function refreshPlanViews(){
+  if(typeof renderWorkouts==='function'&&document.getElementById('workoutHost'))renderWorkouts();
+  if(typeof renderWeek==='function'&&document.getElementById('weekList'))renderWeek();
+  if(typeof renderSchedule==='function'&&document.getElementById('scheduleHost'))renderSchedule();
+  if(typeof renderToday==='function'&&document.getElementById('todaySession'))renderToday();
+  if(typeof loadSessionForm==='function'&&document.getElementById('sessForm'))loadSessionForm();
+  if(typeof renderRecommendation==='function'&&document.getElementById('recBox'))renderRecommendation();
+}
 
 function renderWorkouts(){
   const host=document.getElementById('workoutHost');host.innerHTML='';
   const order=['sun','mon','tue','wed','thu','fri','sat'];
   const labels={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
   order.forEach(k=>{
-    const w=curWK()[k];
+    const w=effectiveWK(k);
     let blocks='';
     w.blocks.forEach(b=>{
       let rows='';
@@ -2068,7 +2103,7 @@ function loadSessionForm(){
   host.innerHTML='';
   const wrap=document.createElement('div');wrap.id='exRows';host.appendChild(wrap);
   const k=sel.value;
-  if(k!=='custom'){curWK()[k].blocks.forEach(b=>b.items.forEach(it=>wrap.appendChild(makeExRow(it[0],S(it[1])))));}
+  if(k!=='custom'){effectiveWK(k).blocks.forEach(b=>b.items.forEach(it=>wrap.appendChild(makeExRow(it[0],S(it[1])))));}
   host.appendChild(buildAddExerciseUI());
 }
 function fmtSets(sets){return sets.map(s=>`${s.w?s.w:''}${s.w&&s.r?'×':s.w?'':''}${s.r?s.r:''}`.trim()||'✓').join(', ');}
@@ -2249,7 +2284,7 @@ function renderRecommendation(){
   let extra='';
   if(b.tmpl==='in'||b.k==='peak')extra=' In-season/peak: when in doubt, prioritise freshness for the game over grinding a lift.';
   if(last&&last.rpe>=9&&info.tier!=='red')extra+=' Last session was very hard — lean toward the lighter end of today’s range.';
-  const todayW=curWK()[todayKey()];
+  const todayW=effectiveWK(todayKey());
   host.innerHTML=`<div class="note" style="border-color:${color}"><div style="font-weight:800;color:${color};margin-bottom:4px">${label}</div>
     <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px">Readiness ${info.score}/20 · ${lastLine}</div>
     <div style="font-size:13px;color:var(--txt)">${advice}${extra}</div>
@@ -2585,6 +2620,80 @@ function chatLogWeight(raw){
   chatBotMsg('Logged bodyweight: <b>'+w+' kg</b> for today.',['Go to Progress']);
   return true;
 }
+function chatSwapExercise(raw){
+  let m=raw.match(/^\s*(?:swap|replace)\s+(.+?)\s+(?:for|with|to)\s+(.+?)\s*$/i);
+  if(!m){
+    const m2=raw.match(/^\s*(?:change|switch)\s+(.+?)\s+(?:to|for|with)\s+(.+?)\s*$/i);
+    if(m2){
+      const subj=m2[1].trim().toLowerCase();
+      if(!findDayKey(subj)&&exLibraryHas(subj))m=m2;
+    }
+  }
+  if(!m)return false;
+  let oldN=m[1].trim().replace(/\s+(the\s+)?exercises?$/i,'').replace(/^the\s+/i,'');
+  let rest=m[2].trim();
+  let scheme='',newN=rest;
+  const colon=rest.indexOf(':');
+  if(colon>0){newN=rest.slice(0,colon).trim();scheme=rest.slice(colon+1).trim();}
+  const swaps=LS.get('exSwaps',{});
+  swaps[oldN.toLowerCase()]={name:newN,scheme:scheme,cue:''};
+  LS.set('exSwaps',swaps);
+  refreshPlanViews();
+  chatBotMsg('Swapped <b>'+oldN+'</b> &rarr; <b>'+newN+'</b>'+(scheme?' ('+scheme+')':'')+' everywhere it appears in your plan.',['Go to Workouts','Undo swaps']);
+  return true;
+}
+function chatAddExercise(raw){
+  const m=raw.match(/^\s*add\s+(.+?)\s+to\s+(?:the\s+|my\s+)?([A-Za-z]+)(?:'s)?\b\s*:?\s*(.*)$/i);
+  if(!m)return false;
+  let dayWord=m[2].toLowerCase();
+  let dk=(/^today$/.test(dayWord))?todayKey():findDayKey(dayWord);
+  if(!dk)return false;
+  let name=m[1].trim();let after=(m[3]||'').trim();
+  let scheme='',cue='';
+  const c1=name.indexOf(':');
+  if(c1>0){scheme=name.slice(c1+1).trim();name=name.slice(0,c1).trim();}
+  else if(after){
+    const c2=after.indexOf('cue:');
+    if(c2>=0){scheme=after.slice(0,c2).trim();cue=after.slice(c2+4).trim();}
+    else scheme=after;
+  }
+  name=name.replace(/^(a|an|the)\s+/i,'').replace(/\s+(exercise)$/i,'');
+  if(!name){chatBotMsg('What exercise should I add?');return true;}
+  const adds=LS.get('exAdds',{});
+  adds[dk]=adds[dk]||[];
+  adds[dk].push({name,scheme:scheme||'—',cue:cue||''});
+  LS.set('exAdds',adds);
+  const bank=LS.get('exbank',[]);
+  if(!bank.some(n=>n.toLowerCase()===name.toLowerCase())){bank.push(name);LS.set('exbank',bank);}
+  refreshPlanViews();
+  chatBotMsg('Added <b>'+name+'</b>'+(scheme?' ('+scheme+')':'')+' to <b>'+SCHED_LABELS[dk]+'</b>. It now shows in the plan and in your logging targets.',['Go to Workouts']);
+  return true;
+}
+function chatRemoveExercise(raw){
+  const m=raw.match(/^\s*(?:remove|delete|take out|drop)\s+(?:the\s+)?(.+?)(?:\s+(?:exercise))?(?:\s+from\s+(?:the\s+|my\s+)?([A-Za-z]+))?\s*$/i);
+  if(!m)return false;
+  const subj=m[1].trim();
+  if(findDayKey(subj.toLowerCase()))return false;      // "remove sunday pm" -> plan-day edit
+  if(!exLibraryHas(subj))return false;
+  const scope=m[2]?(findDayKey(m[2].toLowerCase())||'all'):'all';
+  const rem=LS.get('exRemoves',{});
+  rem[scope]=rem[scope]||[];
+  if(!rem[scope].some(x=>x.toLowerCase()===subj.toLowerCase()))rem[scope].push(subj);
+  LS.set('exRemoves',rem);
+  refreshPlanViews();
+  chatBotMsg('Removed <b>'+subj+'</b> from '+(scope==='all'?'your whole plan':SCHED_LABELS[scope])+'.',['Go to Workouts','Undo removes']);
+  return true;
+}
+function chatUndoExEdits(raw){
+  const t=raw.toLowerCase();
+  if(/undo swaps|reset swaps|clear swaps/.test(t)){LS.set('exSwaps',{});refreshPlanViews();chatBotMsg('Cleared all exercise swaps — back to the original exercises.',['Go to Workouts']);return true;}
+  if(/undo removes|reset removes|restore/.test(t)){LS.set('exRemoves',{});refreshPlanViews();chatBotMsg('Restored all removed exercises.',['Go to Workouts']);return true;}
+  if(/undo (all )?(exercise )?(edits|changes)|reset (all )?exercises/.test(t)){
+    LS.set('exSwaps',{});LS.set('exRemoves',{});LS.set('exAdds',{});refreshPlanViews();
+    chatBotMsg('Reset all exercise edits (swaps, adds, removes) back to the original plan.',['Go to Workouts']);return true;
+  }
+  return false;
+}
 function chatProcess(raw){
   const t=raw.toLowerCase().trim();
   // greeting
@@ -2599,6 +2708,11 @@ function chatProcess(raw){
       '• "Change Friday PM to Primer: pogos + box jumps"<br>'+
       '• "Add Saturday AM: 10 min stretch"<br>'+
       '• "Remove Sunday PM" • "Reset Friday" • "Reset plan"<br>'+
+      '<b>&#x1F3CB;&#xFE0F; Change exercises</b> (updates the whole plan)<br>'+
+      '• "Swap Box jump for Depth jump"<br>'+
+      '• "Add Suitcase carry to Monday: 3×30s/side"<br>'+
+      '• "Remove Bench press from Thursday"<br>'+
+      '• "Undo swaps" / "Reset all exercises"<br>'+
       '<b>&#x1F504; Switch training block</b><br>'+
       '• "Switch to In-Season" / Pre-Season / Off-Season / Playoffs<br>'+
       '<b>&#x1F3D2; Game week</b><br>'+
@@ -2623,7 +2737,12 @@ function chatProcess(raw){
   if(chatGameToggle(raw))return;
   if(chatWaterGoal(raw))return;
   if(chatLogWeight(raw))return;
-  // EDIT THE PLAN (must run before nav + day handlers)
+  // EXERCISE-level edits (swap/add/remove specific exercises in the plan)
+  if(chatUndoExEdits(raw))return;
+  if(chatSwapExercise(raw))return;
+  if(chatAddExercise(raw))return;
+  if(chatRemoveExercise(raw))return;
+  // EDIT THE PLAN (day-level schedule; must run before nav + day handlers)
   if(chatEditPlan(raw))return;
   // navigate
   for(const[kw,[pg,label]] of Object.entries(CHAT_NAVMAP)){
