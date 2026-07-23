@@ -1143,13 +1143,32 @@ function curSched(){return SCHED_SETS[curBlock().tmpl]||SCHED_IN;}
 const SCHED_LABELS={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 function schedTag(t){return {Gym:'ice',Speed:'power',Primer:'power',Agility:'power',Conditioning:'mod',Skills:'ice',Rehab:'easy',Game:'game'}[t]||'ice';}
 function schedWhenColor(w){return w==='AM'?'#c4b5fd':w==='PM'?'var(--ice)':'var(--dim)';}
+/* ---- Plan override layer (chatbot-editable, persisted) ---- */
+function planKey(k){return curBlock().tmpl+'.'+k;}
+function dayBlocks(k){
+  const edits=LS.get('planEdits',{});
+  const key=planKey(k);
+  if(edits[key])return edits[key].map(b=>({...b}));
+  return (curSched()[k]||[]).map(b=>({...b}));
+}
+function setDayBlocks(k,blocks){
+  const edits=LS.get('planEdits',{});
+  edits[planKey(k)]=blocks;
+  LS.set('planEdits',edits);
+}
+function resetDay(k){
+  const edits=LS.get('planEdits',{});
+  delete edits[planKey(k)];
+  LS.set('planEdits',edits);
+}
+function hasDayEdit(k){return !!LS.get('planEdits',{})[planKey(k)];}
 function renderSchedule(){
   const host=document.getElementById('scheduleHost');if(!host)return;
   const gameOn=LS.get('gameOn',true);
   const order=['sun','mon','tue','wed','thu','fri','sat'];
   host.innerHTML=order.map(k=>{
-    let blocks=curSched()[k]||[];
-    if(k==='sat'&&curBlock().tmpl==='in'&&!gameOn)blocks=[{w:'—',t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
+    let blocks=dayBlocks(k);
+    if(!hasDayEdit(k)&&k==='sat'&&curBlock().tmpl==='in'&&!gameOn)blocks=[{w:'—',t:'Gym',i:'🏋️',x:'No game — extra lower power, long conditioning, or full rest'},
       {w:'AM',t:'Rehab',i:'🩹',x:'Full rehab set, no time pressure'},
       {w:'PM',t:'Skills',i:'🏒',x:'Great day for a longer skills session — shooting + stickhandling'}];
     const rows=blocks.map(b=>`<div style="display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(36,51,82,.4)"><span style="font-size:10.5px;font-weight:800;color:${schedWhenColor(b.w)};min-width:26px;padding-top:3px">${b.w}</span><span style="font-size:16px;line-height:1.3">${b.i}</span><div style="flex:1"><span class="tag t-${schedTag(b.t)}">${b.t}</span><div style="font-size:13px;color:var(--muted);margin-top:4px">${b.x}</div></div></div>`).join('');
@@ -2359,31 +2378,133 @@ const DAYMAP={
   friday:'fri',saturday:'sat',sunday:'sun',
   mon:'mon',tue:'tue',wed:'wed',thu:'thu',fri:'fri',sat:'sat',sun:'sun'
 };
+const TYPE_ICONS={Gym:'🏋️',Lift:'🏋️',Speed:'⚡',Primer:'⚡',Power:'⚡',Agility:'🔀',Conditioning:'❤️',Cardio:'❤️',Skills:'🏒',Skill:'🏒',Rehab:'🩹',Mobility:'🧘',Stretch:'🧘',Easy:'🧘',Game:'🥅',Rest:'😴',Off:'😴',Note:'📝'};
+function chatCap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
+function findDayKey(t){
+  for(const[word,dk] of Object.entries(DAYMAP)){if(t.includes(word))return dk;}
+  return null;
+}
+function detectSlot(t){
+  if(/\b(am|morning)\b/.test(t))return 'AM';
+  if(/\b(pm|evening|afternoon|night)\b/.test(t))return 'PM';
+  return null;
+}
+function guessType(txt){
+  const s=txt.toLowerCase();
+  if(/\b(rest|off|nothing|skip)\b/.test(s))return 'Rest';
+  if(/cardio|zone.?2|zone 2|bike|row|jog|aerobic|conditioning/.test(s))return 'Cardio';
+  if(/primer|cns|potentiat/.test(s))return 'Primer';
+  if(/sprint|plyo|speed|jump|bound|explosive|power/.test(s))return 'Speed';
+  if(/agility|cut|change of direction|5-10-5/.test(s))return 'Agility';
+  if(/gym|lift|squat|bench|deadlift|press|row weight|hypertrophy/.test(s))return 'Gym';
+  if(/shoot|stick|skill|puck/.test(s))return 'Skills';
+  if(/rehab|mobility|stretch|foam|activation|prehab/.test(s))return 'Rehab';
+  if(/game|match|skate/.test(s))return 'Game';
+  return 'Note';
+}
+function chatEditPlan(raw){
+  const t=raw.toLowerCase().trim();
+  if(/\bnote\b/.test(t))return false;
+  const isEdit=/\b(change|set|update|edit|make|add|remove|delete|clear|reset|replace|swap|put)\b/.test(t);
+  if(!isEdit)return false;
+  // reset whole plan
+  if(/reset\s+(the\s+)?(plan|everything|all|schedule|week)/.test(t)){
+    LS.set('planEdits',{});renderSchedule();
+    chatBotMsg('Done — reset the whole plan back to default.',['Go to Schedule']);return true;
+  }
+  const dk=findDayKey(t);
+  if(!dk)return false;
+  const label=SCHED_LABELS[dk];
+  // reset single day
+  if(/\breset\b/.test(t)){
+    resetDay(dk);renderSchedule();
+    chatBotMsg(label+' reset to default.',['Go to Schedule']);return true;
+  }
+  const slot=detectSlot(t);
+  let blocks=dayBlocks(dk);
+  // remove / delete / clear
+  if(/\b(remove|delete|clear)\b/.test(t)){
+    if(slot){
+      const before=blocks.length;
+      blocks=blocks.filter(b=>b.w!==slot);
+      if(blocks.length===before){chatBotMsg('No '+slot+' block found on '+label+'.',['Show '+label]);return true;}
+      setDayBlocks(dk,blocks);renderSchedule();
+      chatBotMsg('Removed the '+slot+' block from '+label+'.',['Show '+label,'Reset '+label]);
+    }else{
+      setDayBlocks(dk,[]);renderSchedule();
+      chatBotMsg('Cleared everything on '+label+'. Say "Reset '+label+'" to restore the default.',['Reset '+label]);
+    }
+    return true;
+  }
+  // extract content after 'to' or ':' — otherwise strip command/day/slot words
+  let content;
+  const cut=raw.search(/(:|\bto\s)/i);
+  if(cut>=0){
+    content=raw.slice(cut).replace(/^\s*:\s*/,'').replace(/^\s*to\s+/i,'').trim();
+  }else{
+    content=raw.replace(/\b(change|set|update|edit|make|add|replace|swap|put|the|on|for|my|a|an)\b/gi,' ')
+      .replace(/\b(am|pm|morning|evening|afternoon|night)\b/gi,' ')
+      .replace(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)\b/gi,' ')
+      .replace(/\s+/g,' ').trim();
+  }
+  if(!content){chatBotMsg('What should '+label+(slot?' '+slot:'')+' be? Try: "Change '+label+' PM to Cardio: 30 min easy bike".');return true;}
+  // parse "Label: detail" or just detail
+  let type,detail;
+  const colon=content.indexOf(':');
+  if(colon>0&&colon<=16){type=content.slice(0,colon).trim();detail=content.slice(colon+1).trim();}
+  else{detail=content;type=guessType(content);}
+  type=chatCap(type);
+  const icon=TYPE_ICONS[type]||'📝';
+  const newBlock={w:slot||'—',t:type,i:icon,x:detail};
+  const isAdd=/\badd\b/.test(t);
+  if(isAdd){
+    blocks.push(newBlock);setDayBlocks(dk,blocks);renderSchedule();
+    chatBotMsg('Added to <b>'+label+'</b>'+(slot?' ('+slot+')':'')+': '+icon+' <b>'+type+'</b> — '+detail,['Show '+label,'Reset '+label]);
+  }else{
+    if(slot){
+      const i=blocks.findIndex(b=>b.w===slot);
+      if(i>=0)blocks[i]=newBlock;else blocks.push(newBlock);
+    }else{blocks=[newBlock];}
+    setDayBlocks(dk,blocks);renderSchedule();
+    chatBotMsg('Updated <b>'+label+'</b>'+(slot?' ('+slot+')':'')+': '+icon+' <b>'+type+'</b> — '+detail,['Show '+label,'Reset '+label]);
+  }
+  return true;
+}
 function chatProcess(raw){
   const t=raw.toLowerCase().trim();
   // greeting
   if(/^(hi|hey|hello|sup|yo)[\s!.]*$/.test(t)){
-    chatBotMsg('Hey! Ask me about any day\'s session, log a note, or navigate the app.',
-      ['Today\'s session','Show Friday','Log note: ___','Help']);return;
+    chatBotMsg('Hey! I can change your plan, answer questions, or log workouts. Try "Change Friday PM to Cardio: 30 min bike".',
+      ['Today\'s session','Change a day','Log note: ___','Help']);return;
   }
   // help
-  if(/help/.test(t)){
+  if(/help|what can you|commands/.test(t)){
     chatBotMsg('Here\'s what I can do:<br>'+
-      '<b>Today</b> — show today\'s plan<br>'+
-      '<b>Show [day]</b> — e.g. Show Friday<br>'+
-      '<b>Go to [section]</b> — e.g. Go to Log<br>'+
-      '<b>Log note: [text]</b> — quick note for today<br>'+
-      '<b>Last session</b> — show your last logged workout<br>'+
-      '<b>History</b> — open workout log<br>'+
-      '<b>[Exercise] [weight]x[reps]</b> — e.g. Squat 100x5',
-      ['Today\'s session','Last session','History']);return;
+      '<b>&#x1F4DD; Change the plan</b><br>'+
+      '• "Change Friday PM to Primer: pogos + box jumps"<br>'+
+      '• "Add Saturday AM: 10 min stretch"<br>'+
+      '• "Remove Sunday PM"<br>'+
+      '• "Reset Friday" or "Reset plan"<br>'+
+      '<b>&#x1F4C5; Ask about the plan</b><br>'+
+      '• "Today" — today\'s session<br>'+
+      '• "Show Friday" — any day<br>'+
+      '<b>&#x270F;&#xFE0F; Log</b><br>'+
+      '• "Log note: felt strong"<br>'+
+      '• "Squat 100x5 105x3"<br>'+
+      '• "Last session" • "History"<br>'+
+      '<b>&#x1F9ED; Navigate</b> — "Go to Nutrition"',
+      ['Today\'s session','Change a day','Last session']);return;
   }
+  // change-a-day prompt helper
+  if(/^change a day$/.test(t)){
+    chatBotMsg('Which day, and what to? For example:<br>• "Change Friday PM to Primer: pogos, box jumps, heavy singles"<br>• "Change Saturday AM to Rest"<br>• "Add Wednesday PM: extra conditioning"',
+      ['Show Friday','Show Saturday']);return;
+  }
+  // EDIT THE PLAN (must run before nav + day handlers)
+  if(chatEditPlan(raw))return;
   // navigate
   for(const[kw,[pg,label]] of Object.entries(CHAT_NAVMAP)){
-    if(t.includes(kw)){
-      go(pg);
-      chatBotMsg('Heading to <b>'+label+'</b> now.');return;
-    }
+    if(t.includes(kw)){go(pg);chatBotMsg('Heading to <b>'+label+'</b> now.');return;}
   }
   // today
   if(/\btoday\b/.test(t)&&!/log|note/.test(t)){
@@ -2404,7 +2525,7 @@ function chatProcess(raw){
         const blks=info.blocks.map(b=>b.l).join(' \xb7 ');
         chatBotMsg('<b>'+word.charAt(0).toUpperCase()+word.slice(1)+': '+info.title+'</b><br>'+
           info.time+' \xb7 '+blks+'<br><small>'+info.intro.slice(0,120)+'...</small>',
-          ['Go to Schedule']);
+          ['Go to Schedule','Change '+SCHED_LABELS[dk]+' ___']);
       }else{chatBotMsg('No plan found for '+word);}
       return;
     }
@@ -2441,8 +2562,8 @@ function chatProcess(raw){
     chatQuickEx(name,sets);return;
   }
   // fallback
-  chatBotMsg('I\'m not sure about that. Try asking about a specific day, or use one of these:',
-    ['Today\'s session','Show Friday','Log note: ___','Help']);
+  chatBotMsg('I\'m not sure about that. I can <b>change your plan</b> ("Change Friday PM to..."), answer questions, or log workouts.',
+    ['Change a day','Today\'s session','Help']);
 }
 function chatQuickNote(note){
   if(!note){chatBotMsg('What\'s the note?');return;}
