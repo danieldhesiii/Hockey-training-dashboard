@@ -209,6 +209,9 @@ label.fl{font-size:12px;color:var(--muted);font-weight:600}
       <div class="s"><b id="stWeek">0/7</b><span>this week</span></div>
       <div class="s"><b id="stTotal">0</b><span>sessions done</span></div>
     </div>
+    <div class="card tight" id="skillsCard" style="cursor:pointer" onclick="startSkills()">
+      <div id="skillsCardInner"></div>
+    </div>
     <div class="card tight" style="cursor:pointer" onclick="go('program')">
       <h3 style="margin:0"><span class="bar"></span>This week's plan →</h3>
       <div class="small muted" id="todayBlockLine"></div>
@@ -357,7 +360,7 @@ const LS={get:(k,d)=>{try{const v=localStorage.getItem('ht_'+k);return v==null?d
           set:(k,v)=>{try{localStorage.setItem('ht_'+k,JSON.stringify(v))}catch(e){}}};
 /* track data changes so cloud sync can push them (see SYNC module) */
 (function(){const _set=LS.set;LS.set=(k,v)=>{_set(k,v);
-  if(k==='state'||k==='logs'||k==='customEx'||k==='ovr'||k==='prcount'||/^(pr_|tl_|hist_)/.test(k))onDataChanged();};})();
+  if(k==='state'||k==='logs'||k==='skillsLogs'||k==='customEx'||k==='ovr'||k==='prcount'||/^(pr_|tl_|hist_)/.test(k))onDataChanged();};})();
 
 /* ---------- exercise library ---------- */
 const EX = {
@@ -475,6 +478,23 @@ const EX = {
     cue:'Tight hands, head up, protect & attack. Small-area control under pressure.'},
   'ice-game':{n:'Small-Area Games / Compete',cat:'ice',ic:'🏒',
     cue:'Battles, reads, transition. Where skills become game-speed hockey.'},
+  /* off-ice skill work */
+  'sk-stick':{n:'Stickhandling',cat:'skills',ic:'🏒',
+    cue:'Toe drags, wide dekes, figure-8s and around obstacles with a ball or puck. Head up, hands away from the body, both forehand & backhand. Use-it-or-lose-it — get daily touches.'},
+  'sk-quick':{n:'Quick Hands',cat:'skills',ic:'⚡',
+    cue:'Small, rapid touches as fast as you can while keeping control. Builds hand speed for tight-area puck protection and dekes.'},
+  'sk-shoot':{n:'Shooting Reps (off-ice)',cat:'skills',ic:'🥅',
+    cue:'Wrist, snap & one-timers into a net or target. Prioritise a quick, deceptive release and accuracy (pick corners) over raw power. High volume — shooting is a numbers game.'},
+  'sk-pass':{n:'One-Touch Passing',cat:'skills',ic:'🎯',
+    cue:'Give-and-go off a rebounder or wall, forehand & backhand. Soft hands to receive, firm accurate return. Trains the one-touch game.'},
+  'sk-react':{n:'Reaction & Vision',cat:'skills',ic:'👁️',
+    cue:'React to an external cue — partner call-outs, ball drops off a wall, or a reaction-light app — then handle/move accordingly. Trains processing speed and heads-up play.'},
+  'sk-tennis':{n:'Tennis-Ball Coordination',cat:'skills',ic:'🎾',
+    cue:'Bounce/juggle tennis balls against a wall, progressing 1 → 2 → 3 balls as you smooth out. Big hand-eye, rhythm and peripheral-vision builder.'},
+  'sk-bosu':{n:'BOSU Balance',cat:'skills',ic:'🔵',
+    cue:'Single- and double-leg balance holds on the BOSU (both flat and dome side). Soft knee, quiet foot, braced trunk — ankle/knee stability for skating.'},
+  'sk-bosu-ball':{n:'BOSU + Ball Combo',cat:'skills',ic:'🤹',
+    cue:'Balance on the BOSU while bouncing/catching a tennis ball off a wall. Coordination and reaction under instability — carries straight to balance in traffic.'},
 };
 
 function it(ex,scheme,load,note,wave){return {ex,scheme,load:load||'',note:note||'',wave:wave||null}}
@@ -604,6 +624,26 @@ const WEEK = {
 const DAYS=['mon','tue','wed','thu','fri','sat','sun'];
 const DAYLABEL={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
 
+/* standalone daily off-ice skills session (not tied to a weekday) */
+const SKILLS={name:'Daily Skills',load:'skill',est:'12–18 min',
+  intro:'Off-ice touches — do this most days (evenings are perfect). Keeps your hands, shot & coordination sharp between ice sessions. Short by design; rotate the balance block in a few times a week.',
+  groups:[
+    G('circuit','minimal',[
+      it('sk-stick','5 min','ball or puck','Toe drags, wide dekes, figure-8s, around obstacles — head up.'),
+      it('sk-quick','3 × 30s','fast & tight','Quick hands — small sharp touches, as fast as you can control.'),
+    ],'Stickhandling'),
+    G('straight','',[ it('sk-shoot','40–60 shots','quick release','Into a net/target. Work the release & accuracy, not just power.') ]),
+    G('superset','',[
+      it('sk-pass','3 × 20','rebounder / wall','One-touch give-and-go, forehand & backhand.'),
+      it('sk-react','3 × 30s','','Partner call-outs, ball drops, or a reaction app — react & move.'),
+    ],'Passing & reaction'),
+    G('circuit','',[
+      it('sk-tennis','3–5 min','1 → 2 → 3 balls','Bounce/juggle against a wall; build from 1 to 3 balls as you smooth out.'),
+      it('sk-bosu','3 × 40s','','Single- & double-leg balance holds on the BOSU.'),
+      it('sk-bosu-ball','3 × 30s','','Balance on the BOSU while bouncing/catching a tennis ball.'),
+    ],'Coordination & balance · rotate 2–3×/wk'),
+  ]};
+
 const BLOCKS=[
   {k:'a',name:'Block A · Power-Strength Base',weeks:4,emphasis:'Build the foundation — heavy iso strength, trap-bar power, and your jump/med-ball engine. Highest general volume.'},
   {k:'b',name:'Block B · Speed-Power',weeks:4,emphasis:'Convert strength to speed — lighter/faster bar speed (5×3, 6×2), more sprint, sled & jump volume, denser 10/20 intervals. Iso trimmed to redirect into explosive output.'},
@@ -709,12 +749,14 @@ function renderToday(){
   document.getElementById('stWeek').textContent=stats.weekDone+'/7';
   document.getElementById('stTotal').textContent=stats.total;
   document.getElementById('todayBlockLine').textContent=`${blk.name} — ${WEEK_LABELS[wIdx()]}`;
+  const sdone=(LS.get('skillsLogs',{})[todayISO()]||{}).done;
+  document.getElementById('skillsCardInner').innerHTML=`<h3 style="margin:0"><span class="bar"></span>🏒 Daily Skills ${sdone?'<span class="badge b-recover">✓ done</span>':'<span class="badge b-ice">~15 min</span>'}</h3><div class="small muted" style="margin-top:3px">Off-ice stickhandling, shooting, passing, reaction &amp; balance. ${sdone?'Nice — touches in for today.':'Tap to get your daily touches in.'}</div>`;
   const ii=iceInfo();
   document.getElementById('iceHint').innerHTML=`🧊 <b>${ST.iceDays} ice day${ST.iceDays>1?'s':''}/week.</b> ${ii.desc} <span class="dim">(change in More)</span>`;
 }
 function loadBadge(load){
   const m={big:['b-big','🔴 Big day'],light:['b-light','🟢 Light'],mixed:['b-mixed','🟡 Speed/Cond'],
-    recover:['b-recover','⚪ Recovery'],ice:['b-ice','⛸️ Ice']};
+    recover:['b-recover','⚪ Recovery'],ice:['b-ice','⛸️ Ice'],skill:['b-ice','🏒 Skills']};
   const x=m[load]||m.light;return `<span class="badge ${x[0]}">${x[1]}</span>`;
 }
 function computeStats(){
@@ -768,7 +810,7 @@ function openSession(dk){
   s.groups.forEach((g,gi)=>{
     html+=`<div class="grouphdr">${groupLabel(g)} ${g.tag?`<span class="gtag">${g.tag}</span>`:''}<span class="ln"></span></div>`;
     g.items.forEach((item,ii)=>{
-      const ex=exOf(dk,gi,ii,item);
+      const ex=exOf(todayISO(dateForWeekday(dk)),'logs',gi,ii,item);
       const pres=prescription(dk,gi,ii,item);
       html+=`<div class="exrow"><div class="idx">${ii+1}</div><div>
         <div class="en">${ex.n}${pres.edited?' <span class="gtag">edited</span>':''}</div>
@@ -786,16 +828,24 @@ function groupLabel(g){
 
 /* ---------- WORKOUT PLAYER ---------- */
 let PL=null;
-function flatten(dk){
-  const s=sessionFor(dk);const flat=[];
+function buildFlat(s,iso,store){
+  const flat=[];
   s.groups.forEach((g,gi)=>g.items.forEach((item,ii)=>{
-    flat.push({gi,ii,item,ex:exOf(dk,gi,ii,item),grp:g});
+    flat.push({gi,ii,item,ex:exOf(iso,store,gi,ii,item),grp:g});
   }));
-  return {s,flat};
+  return flat;
 }
 function startPlayer(dk){
-  const {s,flat}=flatten(dk);
-  PL={day:dk,session:s,flat,idx:0};
+  const s=sessionFor(dk);const iso=todayISO(dateForWeekday(dk));const store='logs';
+  PL={day:dk,mode:'gym',session:s,iso,store,flat:buildFlat(s,iso,store),idx:0};
+  openPlayer();
+}
+function startSkills(){
+  const iso=todayISO();const store='skillsLogs';
+  PL={day:'skills',mode:'skills',session:SKILLS,iso,store,flat:buildFlat(SKILLS,iso,store),idx:0};
+  openPlayer();
+}
+function openPlayer(){
   document.getElementById('player').classList.add('on');
   document.body.style.overflow='hidden';
   renderPlayer();
@@ -812,7 +862,7 @@ function renderPlayer(){
   document.getElementById('plBar').style.width=(idx/(flat.length-1||1)*100)+'%';
 
   const key=itemKey(f.gi,f.ii);
-  const logged=currentSets(PL.day,key);
+  const logged=currentSets(key);
   const pres=prescription(PL.day,f.gi,f.ii,item);
   const prev=lastLog(item.ex);
   const sug=suggest(item.ex,pres);
@@ -852,7 +902,7 @@ function renderPlayer(){
 }
 function weightLabel(ex){
   if(ex.cat==='plyo')return 'load';
-  if(ex.cat==='conditioning'||ex.cat==='ice'||ex.cat==='mobility')return 'level';
+  if(ex.cat==='conditioning'||ex.cat==='ice'||ex.cat==='mobility'||ex.cat==='skills')return 'level';
   return 'kg';
 }
 function parseSets(scheme){
@@ -907,36 +957,36 @@ function maybeAdvance(){
     msg='🏆 Block complete! Starting '+BLOCKS.find(b=>b.k===ST.block).name+' — Week 1.';}
   saveST();return msg;
 }
-function currentSets(day,key){
-  const logs=getLogs();const iso=todayISO(dateForWeekday(day));
+function currentSets(key){
+  const logs=LS.get(PL.store,{});const iso=PL.iso;
   return (logs[iso]&&logs[iso].sets&&logs[iso].sets[key])||[];
 }
 function writeSets(arr){
-  const {day,flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
-  const logs=getLogs();const iso=todayISO(dateForWeekday(day));
-  if(!logs[iso])logs[iso]={day,block:ST.block,week:ST.week,sets:{},swaps:{},done:false};
+  const {flat,idx,iso,store,day,mode}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
+  const logs=LS.get(store,{});
+  if(!logs[iso])logs[iso]={day,mode,block:ST.block,week:ST.week,sets:{},swaps:{},done:false};
   if(!logs[iso].sets)logs[iso].sets={};
-  logs[iso].sets[key]=arr;setLogs(logs);
+  logs[iso].sets[key]=arr;LS.set(store,logs);
 }
 function editSet(i,field,val){
-  const {day,flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
-  const arr=currentSets(day,key);while(arr.length<=i)arr.push({});
+  const {flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
+  const arr=currentSets(key);while(arr.length<=i)arr.push({});
   arr[i][field]=val===''?null:(field==='w'?parseFloat(val):parseInt(val));writeSets(arr);
 }
 function tickSet(i){
-  const {day,flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
-  const arr=currentSets(day,key);while(arr.length<=i)arr.push({});
+  const {flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
+  const arr=currentSets(key);while(arr.length<=i)arr.push({});
   arr[i].done=!arr[i].done;writeSets(arr);
   document.getElementById('setrow_'+i).classList.toggle('done',arr[i].done);
   if(arr[i].done){startRest(flat[idx].grp.rest,flat[idx].ex.n)}
 }
 function addSetRow(){
-  const {day,flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
-  const arr=currentSets(day,key);arr.push({});writeSets(arr);renderPlayer();
+  const {flat,idx}=PL;const key=itemKey(flat[idx].gi,flat[idx].ii);
+  const arr=currentSets(key);arr.push({});writeSets(arr);renderPlayer();
 }
 function removeSetRow(){
   const {day,flat,idx}=PL;const f=flat[idx];const key=itemKey(f.gi,f.ii);
-  const arr=currentSets(day,key);
+  const arr=currentSets(key);
   if(arr.length)arr.pop();writeSets(arr);
   /* if prescribed sets exceed what's left, drop the prescribed count too */
   const pres=prescription(day,f.gi,f.ii,f.item);
@@ -966,16 +1016,17 @@ function playerNext(){
 }
 function playerPrev(){if(PL.idx>0){PL.idx--;stopRest();renderPlayer();document.getElementById('plBody').scrollTop=0}}
 function finishSession(){
-  const {day,session}=PL;const logs=getLogs();const iso=todayISO(dateForWeekday(day));
-  if(!logs[iso])logs[iso]={day,block:ST.block,week:ST.week,sets:{},swaps:{}};
-  logs[iso].done=true;logs[iso].finishedAt=Date.now();setLogs(logs);
-  const prs=detectPRs(day);
-  const adv=maybeAdvance();
+  const {day,session,iso,store,mode}=PL;const logs=LS.get(store,{});
+  if(!logs[iso])logs[iso]={day,mode,block:ST.block,week:ST.week,sets:{},swaps:{}};
+  logs[iso].done=true;logs[iso].finishedAt=Date.now();LS.set(store,logs);
+  const prs=detectPRs();
+  const adv=mode==='gym'?maybeAdvance():null;
+  const whenLabel=mode==='skills'?'today':DAYLABEL[day];
   sheet(`<div class="grab"></div>
     <div style="text-align:center;padding:6px 0">
       <div style="font-size:46px">🏒</div>
       <h3 style="font-size:20px;margin:6px 0">${session.name} — done!</h3>
-      <p class="small muted">Logged for ${DAYLABEL[day]}. Nice work.</p>
+      <p class="small muted">Logged for ${whenLabel}. Nice work.</p>
       ${prs.length?`<div class="card" style="text-align:left;margin-top:12px"><b>🏆 New PRs</b>${prs.map(p=>`<div class="small">${p}</div>`).join('')}</div>`:''}
       ${adv?`<div class="card" style="text-align:left;margin-top:12px;border-color:rgba(56,189,248,.4)"><b>${adv}</b></div>`:''}
       <button class="btn btn-primary" style="margin-top:14px" onclick="closeModal();closePlayer();go('today')">Back to Today</button>
@@ -991,18 +1042,18 @@ function openSwap(){
     <p class="small muted">Same category, so the training stays on target.</p>${opts}`);
 }
 function doSwap(exId){
-  const {day,flat,idx}=PL;const f=flat[idx];const key=itemKey(f.gi,f.ii);
-  const logs=getLogs();const iso=todayISO(dateForWeekday(day));
-  if(!logs[iso])logs[iso]={day,block:ST.block,week:ST.week,sets:{},swaps:{}};
-  if(!logs[iso].swaps)logs[iso].swaps={};logs[iso].swaps[key]=exId;setLogs(logs);
+  const {flat,idx,iso,store,day,mode}=PL;const f=flat[idx];const key=itemKey(f.gi,f.ii);
+  const logs=LS.get(store,{});
+  if(!logs[iso])logs[iso]={day,mode,block:ST.block,week:ST.week,sets:{},swaps:{}};
+  if(!logs[iso].swaps)logs[iso].swaps={};logs[iso].swaps[key]=exId;LS.set(store,logs);
   const all={...EX,...LS.get('customEx',{})};f.ex=all[exId];closeModal();renderPlayer();
 }
-function exOf(dk,gi,ii,item){
-  const logs=getLogs();const iso=todayISO(dateForWeekday(dk));
+function exOf(iso,store,gi,ii,item){
+  const logs=LS.get(store,{});
   const sw=logs[iso]&&logs[iso].swaps&&logs[iso].swaps[itemKey(gi,ii)];
   const all={...EX,...LS.get('customEx',{})};
   if(sw&&all[sw])return all[sw];
-  return EX[item.ex]||{n:item.ex,cat:'strength',ic:'▪️',cue:''};
+  return all[item.ex]||{n:item.ex,cat:'strength',ic:'▪️',cue:''};
 }
 
 /* ---------- REST TIMER ---------- */
@@ -1026,8 +1077,8 @@ function stopRest(){clearInterval(restInt);document.getElementById('restBar').cl
 function e1rm(w,r){if(!w||!r)return 0;return w*(1+r/30)}
 function lastLog(exId){return LS.get('hist_'+exId,null)}
 function saveHist(exId,sets){LS.set('hist_'+exId,{date:todayISO(),sets})}
-function detectPRs(day){
-  const {flat}=PL;const prs=[];const logs=getLogs();const iso=todayISO(dateForWeekday(day));
+function detectPRs(){
+  const {flat,iso,store}=PL;const prs=[];const logs=LS.get(store,{});
   const L=logs[iso];if(!L||!L.sets)return prs;
   flat.forEach(f=>{const key=itemKey(f.gi,f.ii);const sets=L.sets[key];if(!sets)return;
     const exId=(L.swaps&&L.swaps[key])||f.item.ex;const ex=EX[exId]||LS.get('customEx',{})[exId];
@@ -1053,14 +1104,17 @@ function renderProgress(){
   if(!tracked.length){sel.innerHTML='<option>Log some lifts first…</option>';
     document.getElementById('pgChartHost').innerHTML='<div class="emptyq">Complete a session and your tracked lifts chart here.</div>';}
   else{sel.innerHTML=tracked.map(k=>`<option value="${k}">${all[k].n}</option>`).join('');renderExChart();}
-  const dates=Object.keys(logs).sort().reverse().slice(0,12);
-  document.getElementById('pgHistory').innerHTML=dates.length?dates.map(d=>{
-    const L=logs[d];const s=WEEK[L.day];const nm=s?s.name:L.day;
-    const cnt=L.sets?Object.values(L.sets).reduce((a,x)=>a+x.filter(y=>y.done).length,0):0;
-    return `<div class="exrow"><div class="idx">${L.done?'✓':'·'}</div><div>
-      <div class="en">${prettyDate(d)} · ${nm}</div>
-      <div class="es">${cnt} sets logged${L.done?' · completed':''}</div></div></div>`;
-  }).join(''):'<div class="emptyq">No sessions logged yet.</div>';
+  const skl=LS.get('skillsLogs',{});
+  const rows=[];
+  Object.keys(logs).forEach(d=>{const L=logs[d];const s=WEEK[L.day];
+    rows.push({d,nm:s?s.name:L.day,done:L.done,cnt:cntSets(L)});});
+  Object.keys(skl).forEach(d=>{const L=skl[d];
+    rows.push({d:d+' ',nm:'🏒 Daily Skills',done:L.done,cnt:cntSets(L),iso:d});});
+  rows.sort((a,b)=>(b.iso||b.d).localeCompare(a.iso||a.d));
+  document.getElementById('pgHistory').innerHTML=rows.length?rows.slice(0,14).map(r=>
+    `<div class="exrow"><div class="idx">${r.done?'✓':'·'}</div><div>
+      <div class="en">${prettyDate((r.iso||r.d).trim())} · ${r.nm}</div>
+      <div class="es">${r.cnt} sets logged${r.done?' · completed':''}</div></div></div>`).join(''):'<div class="emptyq">No sessions logged yet.</div>';
 }
 function renderExChart(){
   const k=document.getElementById('pgExSel').value;const tl=LS.get('tl_'+k,[]);
@@ -1073,10 +1127,11 @@ function renderExChart(){
     <div class="small dim" style="text-align:center;margin-top:22px">Best: ${Math.round(LS.get('pr_'+k,0))}kg est 1RM</div>`;
 }
 function prettyDate(iso){const d=new Date(iso+'T00:00');return d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}
+function cntSets(L){return L.sets?Object.values(L.sets).reduce((a,x)=>a+x.filter(y=>y.done).length,0):0}
 
 /* ---------- LIBRARY ---------- */
 let libFilter='all';
-const CATS=[['all','All'],['strength','Strength'],['plyo','Power/Plyo'],['speed','Speed'],['core','Core/Rotation'],['prehab','Prehab'],['rehab','Rehab'],['conditioning','Conditioning'],['ice','On-Ice'],['mobility','Mobility']];
+const CATS=[['all','All'],['strength','Strength'],['plyo','Power/Plyo'],['speed','Speed'],['skills','Skills'],['core','Core/Rotation'],['prehab','Prehab'],['rehab','Rehab'],['conditioning','Conditioning'],['ice','On-Ice'],['mobility','Mobility']];
 function renderLibrary(){
   document.getElementById('libChips').innerHTML=CATS.map(c=>`<span class="chip ${libFilter===c[0]?'on':''}" onclick="setLibFilter('${c[0]}')">${c[1]}</span>`).join('');
   const q=(document.getElementById('libSearch').value||'').toLowerCase();
