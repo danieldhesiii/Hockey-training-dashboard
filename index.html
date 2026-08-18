@@ -485,12 +485,12 @@ const WEEK = {
     intro:'Heavy intent + jumps. The big lower driver of the week — then no heavy legs again until Thursday.',
     groups:[
       G('contrast','2–3 min',[
-        it('iso-squat','4 × 5s max push','all-out intent','Full recovery, 100% each rep.',['4×5s','4×5s','5×5s','2×5s (deload)']),
-        it('maxjump','3 max reps','BW → light vest','Jump right after the iso — the potentiation.',['BW ×3','light vest ×3','vest ×3','BW ×2']),
+        it('iso-squat','4 × 5s max push','all-out intent','Full recovery, 100% each rep.',{a:['4×5s','4×5s','5×5s','2×5s'],b:['3×5s','3×6s','4×6s','2×5s'],c:['4×6s','5×5s','5×6s','2×5s']}),
+        it('maxjump','3 max reps','BW → light vest','Jump right after the iso — the potentiation.',{a:['BW ×3','vest ×3','vest ×3','BW ×2'],b:['×4','vest ×4','vest ×5','×3'],c:['×3','×3','×4','×2']}),
       ],'Iso → Jump'),
-      G('straight','2 min',[ it('trapbar','4 × 4','move it FAST','Power pull — bar speed is the point.',['4×4 @78%','4×4 @82%','5×3 @85%','3×3 @70%']) ]),
+      G('straight','2 min',[ it('trapbar','4 × 4','move it FAST','Power pull — bar speed is the point.',{a:['4×4 @78%','4×4 @82%','5×3 @85%','3×3 @70%'],b:['5×3 @72% fast','6×2 @75% fast','6×2 @80% fast','3×3 @65%'],c:['4×5 @78%','5×4 @82%','4×3 @88%','3×4 @70%']}) ]),
       G('contrast','2 min',[
-        it('splitsquat','3 × 5 / leg','heavy','Your carrying split squat.',['3×5','3×6','4×5','2×5']),
+        it('splitsquat','3 × 5 / leg','heavy','Your carrying split squat.',{a:['3×5','3×6','4×5','2×5'],b:['3×4','3×5','3×5','2×4'],c:['3×8','4×8','4×10','2×8']}),
         it('splitjump','3 / leg','bodyweight','Explosive, soft landings.'),
       ],'Split squat → jump'),
       G('straight','75s',[ it('mbslam','4 × 5','explosive','Whole-body power.') ]),
@@ -502,9 +502,9 @@ const WEEK = {
   tue:{name:'Upper Strength + Size',load:'light',est:'55–65 min',
     intro:'Systemically light — spares the back & legs. Build the upper body and get shoulder + wrist prehab in.',
     groups:[
-      G('straight','2 min',[ it('bench','4 × 5','RPE 8','Pain-free range.',['4×5','4×5','4×4 heavier','3×5 easy']) ]),
+      G('straight','2 min',[ it('bench','4 × 5','RPE 8','Pain-free range.',{a:['4×5','4×5','4×4 heavier','3×5'],b:['5×3 fast','5×3 fast','6×2 heavier','3×4'],c:['4×6','4×8','5×6 heavier','3×8']}) ]),
       G('superset','90s',[
-        it('pullup','4 × 6','add load','Full range, controlled down.',['4×6','4×7','4×6 +load','3×6']),
+        it('pullup','4 × 6','add load','Full range, controlled down.',{a:['4×6','4×7','4×6 +load','3×6'],b:['5×4 +load','5×4 +load','6×3 +load','3×5'],c:['4×8','4×10','5×8','3×8']}),
         it('landmine','3 × 8 / side','','Shoulder-friendly press.'),
       ]),
       G('superset','75s',[
@@ -524,25 +524,25 @@ const WEEK = {
   wed:{name:'Speed + Conditioning',load:'mixed',est:'55–65 min',
     intro:'Sprints, bounds & sled fresh (never fatigued), then the interval engine. Low spinal load between the two big days.',
     groups:[
-      G('straight','full recovery',[ it('sprint','6 × 20m','max','Walk back + rest — quality only.',['6×20m','6×25m','8×20m','4×20m']) ]),
-      G('straight','full recovery',[ it('sled','4 × 15m','heavy','Drive, long strides.',['4×15m','5×15m','6×15m','3×15m']) ]),
+      G('straight','full recovery',[ it('sprint','6 × 20m','max','Walk back + rest — quality only.',{a:['6×20m','6×25m','8×20m','4×20m'],b:['8×20m','8×25m','10×20m','5×20m'],c:['5×20m','6×20m','6×20m','4×20m']}) ]),
+      G('straight','full recovery',[ it('sled','4 × 15m','heavy','Drive, long strides.',{a:['4×15m','5×15m','6×15m','3×15m'],b:['5×15m','6×15m','7×15m','3×15m'],c:['4×20m','5×20m','5×20m','3×15m']}) ]),
       G('circuit','walk-back rest',[
         it('broad','4 × 3','max distance',''),
         it('latbound','3 × 4 / side','stick landings','Skating stride — big transfer.'),
         it('bound','3 × 20m','',''),
       ],'Jumps & bounds'),
       G('straight','change of direction',[ it('proagility','3 each way','max','Plant low, explode out.') ]),
-      G('straight','conditioning',[ it('tabata','8–10 rounds','10s ON / 20s off','Alactic power — hold it every round.',['8 rounds','9 rounds','10 rounds','6 rounds']) ]),
+      G('straight','conditioning',[ it('tabata','8–10 rounds','10s ON / 20s off','Alactic power — hold it every round.',{a:['8 rounds','9 rounds','10 rounds','6 rounds'],b:['8 rounds','10 rounds','12 rounds','6 rounds'],c:['6 rounds','8 rounds','8 rounds','5 rounds']}) ]),
     ]},
   thu:{name:'Lower Strength — Hinge',load:'big',est:'60–70 min',lower:true,
     intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here.',
     groups:[
       G('contrast','2–3 min',[
-        it('iso-lunge','4 × 5s / leg','all-out','Front-leg drive.',['4×5s','4×5s','5×5s','2×5s']),
+        it('iso-lunge','4 × 5s / leg','all-out','Front-leg drive.',{a:['4×5s','4×5s','5×5s','2×5s'],b:['3×5s','3×6s','4×6s','2×5s'],c:['4×6s','5×5s','5×6s','2×5s']}),
         it('bound','3 reps','','Potentiated bounds.'),
       ],'Iso lunge → bound'),
-      G('straight','2 min',[ it('rdl','4 × 6','RPE 8','Hinge, long spine.',['4×6','4×7','4×5 heavier','3×6']) ]),
-      G('straight','2 min',[ it('nordic','4 × 5','slow eccentric','Lower as slow as you can.',['4×4','4×5','4×6','3×4']) ]),
+      G('straight','2 min',[ it('rdl','4 × 6','RPE 8','Hinge, long spine.',{a:['4×6','4×7','4×5 heavier','3×6'],b:['4×5 fast','5×4 fast','4×4 heavier','3×5'],c:['4×8','4×10','4×8 heavier','3×8']}) ]),
+      G('straight','2 min',[ it('nordic','4 × 5','slow eccentric','Lower as slow as you can.',{a:['4×4','4×5','4×6','3×4'],b:['3×4','3×5','4×5','2×4'],c:['4×6','4×8','5×6','3×5']}) ]),
       G('superset','60s',[
         it('copenhagen','3 × 25s / side','','Groin insurance.'),
         it('calf','4 × 12','pause top',''),
@@ -606,8 +606,8 @@ const DAYLABEL={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:
 
 const BLOCKS=[
   {k:'a',name:'Block A · Power-Strength Base',weeks:4,emphasis:'Build the foundation — heavy iso strength, trap-bar power, and your jump/med-ball engine. Highest general volume.'},
-  {k:'b',name:'Block B · Speed-Power',weeks:4,emphasis:'Convert strength to speed — more sprint/bound volume, faster bar speed, contrast pairs peaked. Power stays maximal.'},
-  {k:'c',name:'Block C · Strength-Size',weeks:4,emphasis:'Add muscle & top-end strength — a touch more accessory volume, heavier compounds, power maintained.'},
+  {k:'b',name:'Block B · Speed-Power',weeks:4,emphasis:'Convert strength to speed — lighter/faster bar speed (5×3, 6×2), more sprint, sled & jump volume, denser 10/20 intervals. Iso trimmed to redirect into explosive output.'},
+  {k:'c',name:'Block C · Strength-Size',weeks:4,emphasis:'Add muscle & top-end strength — higher reps (6–10) and accessory volume, heavier compounds (up to 88%), sprint/jump dialled to maintenance so you can recover and grow.'},
 ];
 const WEEK_LABELS=['Week 1 · Build','Week 2 · Build','Week 3 · Peak','Week 4 · Deload'];
 
@@ -634,8 +634,12 @@ function sessionFor(day){
 function wIdx(){return (ST.week-1)}
 function isDeload(){return ST.week===4}
 function targetFor(item){
-  if(item.wave && item.wave[wIdx()]) return item.wave[wIdx()];
-  if(isDeload()) return item.scheme+' · deload';
+  const w=item.wave;
+  if(w){
+    const arr=Array.isArray(w)?w:(w[ST.block]||w.a); /* per-block wave or shared array */
+    if(arr&&arr[wIdx()])return arr[wIdx()];
+  }
+  if(isDeload())return item.scheme+' · deload';
   return item.scheme;
 }
 
