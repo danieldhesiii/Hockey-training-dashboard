@@ -297,6 +297,11 @@ label.fl{font-size:12px;color:var(--muted);font-weight:600}
     </div>
 
     <div class="card">
+      <h3><span class="bar"></span>☁️ Cloud sync</h3>
+      <div id="syncBox"></div>
+    </div>
+
+    <div class="card">
       <h3><span class="bar"></span>⚙️ Data</h3>
       <button class="btn btn-ghost btn-sm" style="margin:4px 6px 4px 0" onclick="exportData()">⬇ Export backup</button>
       <button class="btn btn-ghost btn-sm" style="margin:4px 6px 4px 0" onclick="document.getElementById('importFile').click()">⬆ Import backup</button>
@@ -343,12 +348,16 @@ label.fl{font-size:12px;color:var(--muted);font-weight:600}
 <!-- Tabs -->
 <nav class="tabbar"><div class="inner" id="tabInner"></div></nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ==========================================================
    HOCKEY TRAINING — interactive workout webapp
    ========================================================== */
 const LS={get:(k,d)=>{try{const v=localStorage.getItem('ht_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
           set:(k,v)=>{try{localStorage.setItem('ht_'+k,JSON.stringify(v))}catch(e){}}};
+/* track data changes so cloud sync can push them (see SYNC module) */
+(function(){const _set=LS.set;LS.set=(k,v)=>{_set(k,v);
+  if(k==='state'||k==='logs'||k==='customEx'||k==='ovr'||k==='prcount'||/^(pr_|tl_|hist_)/.test(k))onDataChanged();};})();
 
 /* ---------- exercise library ---------- */
 const EX = {
@@ -1115,6 +1124,7 @@ function renderMore(){
   document.getElementById('moreBlockDesc').textContent=BLOCKS.find(b=>b.k===ST.block).emphasis;
   document.getElementById('iceFocusList').innerHTML=WEEK.sat.groups.map(g=>{
     const ex=EX[g.items[0].ex];return `<div style="margin:4px 0"><b>${ex.n}</b> — ${g.items[0].scheme}</div>`;}).join('');
+  renderSyncBox();
 }
 function setIce(n){ST.iceDays=n;saveST();renderMore();renderToday();renderProgram()}
 function exportData(){
@@ -1162,8 +1172,116 @@ function resetWeek(){
 function sheet(html){document.getElementById('sheet').innerHTML=html;document.getElementById('modal').classList.add('on')}
 function closeModal(){document.getElementById('modal').classList.remove('on')}
 
+/* ============================================================
+   CLOUD SYNC (Supabase) — capability-code model
+   A private sync code (unguessable uuid) keys your data row.
+   Access only via security-definer RPCs create_sync/pull/push.
+   ============================================================ */
+const SB_URL='https://ighgxihauvmkclnlyqhv.supabase.co';
+const SB_KEY='sb_publishable_Bdaxh14XeNYH4NnoxkvtZA_CM3z5xRm';
+let _sb=null;
+function sbClient(){
+  if(_sb)return _sb;
+  if(!window.supabase||!window.supabase.createClient)return null;
+  _sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:false}});
+  return _sb;
+}
+const SYNC_SKIP=['ht_syncId','ht_lastSync','ht_lastChange','ht_syncDirty'];
+function snapshot(){const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+  if(k&&k.indexOf('ht_')===0&&SYNC_SKIP.indexOf(k)<0)o[k]=localStorage.getItem(k);}return o;}
+function restoreSnapshot(o){
+  const del=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+    if(k&&k.indexOf('ht_')===0&&SYNC_SKIP.indexOf(k)<0)del.push(k);}
+  del.forEach(k=>localStorage.removeItem(k));
+  Object.keys(o||{}).forEach(k=>{try{localStorage.setItem(k,o[k])}catch(e){}});
+  ST=LS.get('state',{block:'a',week:1,iceDays:1});
+}
+function onDataChanged(){try{localStorage.setItem('ht_lastChange',Date.now())}catch(e){}schedulePush();}
+let _pushTimer=null;
+function schedulePush(){if(!LS.get('syncId',null))return;updateSyncUI('saving');
+  clearTimeout(_pushTimer);_pushTimer=setTimeout(()=>syncPush(),2500);}
+function updateSyncUI(state){const el=document.getElementById('syncStatus');if(!el)return;
+  if(state==='saving'){el.textContent='☁️ Saving…';el.style.color='var(--mod)';}
+  else{el.textContent='☁️ Synced';el.style.color='var(--ok)';}}
+async function syncPush(announce){
+  const id=LS.get('syncId',null);const c=sbClient();if(!id||!c)return false;
+  try{const {data,error}=await c.rpc('push_data',{p_id:id,p_data:snapshot()});
+    if(error||data==null){if(announce)alert('Sync failed — check your connection.');return false;}
+    LS.set('lastSync',Date.now());updateSyncUI();if(announce)renderSyncBox();return true;
+  }catch(e){if(announce)alert('Sync failed: '+e.message);return false;}
+}
+async function syncPull(){
+  const id=LS.get('syncId',null);const c=sbClient();if(!id||!c)return null;
+  try{const {data,error}=await c.rpc('pull_data',{p_id:id});
+    if(error||!data||!data.length)return null;return data[0];}catch(e){return null;}
+}
+async function syncEnable(){
+  const c=sbClient();if(!c){alert('Cloud sync needs an internet connection. Try again when you\'re online.');return;}
+  try{const {data,error}=await c.rpc('create_sync');
+    if(error||!data){alert('Couldn\'t start sync: '+((error&&error.message)||'unknown'));return;}
+    LS.set('syncId',data);const ok=await syncPush();renderSyncBox();
+    if(ok)showCode(true);
+  }catch(e){alert('Couldn\'t start sync: '+e.message);}
+}
+function showCode(firstTime){
+  const id=LS.get('syncId',null);if(!id)return;
+  sheet(`<div class="grab"></div><h3>${firstTime?'☁️ Cloud sync is on':'Your sync code'}</h3>
+    <p class="small muted">Enter this code on your other device (More → Cloud sync → Link with a code) to keep them in sync. Treat it like a password — anyone with it can see your data.</p>
+    <div class="card" style="text-align:center;word-break:break-all;font-family:monospace;font-size:15px;user-select:all">${id}</div>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="copyCode('${id}')">Copy code</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeModal()">Done</button>`);
+}
+function copyCode(id){try{navigator.clipboard.writeText(id);alert('Copied ✓');}catch(e){alert('Select and copy the code manually.');}}
+function openLink(){
+  sheet(`<div class="grab"></div><h3>Link with a sync code</h3>
+    <p class="small muted">Paste the code from your other device. This device's current data will be replaced with the synced data.</p>
+    <input class="txt" id="linkCode" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocapitalize="off" autocorrect="off">
+    <button class="btn btn-primary" style="margin-top:10px" onclick="syncLink(document.getElementById('linkCode').value)">Link &amp; sync</button>`);
+}
+async function syncLink(code){
+  code=(code||'').trim();
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(code)){alert('That doesn\'t look like a valid sync code.');return;}
+  const prevId=LS.get('syncId',null);LS.set('syncId',code);
+  const r=await syncPull();
+  if(!r){LS.set('syncId',prevId);alert('No data found for that code (or no connection). Double-check it.');return;}
+  if(!confirm('Replace this device\'s data with the synced data? (Export a backup first if unsure.)')){LS.set('syncId',prevId);return;}
+  restoreSnapshot(r.data);LS.set('lastSync',Date.now());
+  closeModal();renderToday();renderProgram();renderProgress();renderMore();go('today');
+  alert('☁️ Linked & synced.');
+}
+function syncDisable(){LS.set('syncId',null);renderSyncBox();}
+function prettyWhen(ms){if(!ms)return '—';const s=Math.floor((Date.now()-ms)/1000);
+  if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function renderSyncBox(){
+  const box=document.getElementById('syncBox');if(!box)return;
+  const id=LS.get('syncId',null);
+  if(!id){
+    box.innerHTML=`<p class="small muted" style="margin:0 0 10px">Keep your logs in sync across phone &amp; laptop. Turn it on to get a private sync code, then enter that code on your other device.</p>
+      <button class="btn btn-primary btn-sm" style="margin:0 6px 6px 0" onclick="syncEnable()">Turn on cloud sync</button>
+      <button class="btn btn-ghost btn-sm" onclick="openLink()">Link with a code</button>`;
+  }else{
+    box.innerHTML=`<p class="small" style="margin:0 0 4px"><span id="syncStatus" style="color:var(--ok)">☁️ Synced</span> · <span class="dim">last ${prettyWhen(LS.get('lastSync',0))}</span></p>
+      <div style="margin-top:9px">
+      <button class="btn btn-ghost btn-sm" style="margin:0 6px 6px 0" onclick="showCode()">Show my code</button>
+      <button class="btn btn-ghost btn-sm" style="margin:0 6px 6px 0" onclick="syncPush(true)">Sync now</button>
+      <button class="btn btn-ghost btn-sm" style="margin:0 6px 6px 0" onclick="openLink()">Link another code</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--hard)" onclick="if(confirm('Turn off sync on this device? Your data stays here.'))syncDisable()">Turn off</button></div>`;
+  }
+}
+async function syncInit(){
+  if(!LS.get('syncId',null))return;
+  const r=await syncPull();if(!r)return;
+  const remoteT=new Date(r.updated_at).getTime();
+  const localT=+LS.get('lastChange',0);
+  if(remoteT>localT+1500){restoreSnapshot(r.data);LS.set('lastSync',Date.now());
+    renderToday();if(document.getElementById('p-program').classList.contains('active'))renderProgram();}
+  else if(localT>remoteT){syncPush();}
+  else{LS.set('lastSync',Date.now());updateSyncUI();}
+}
+
 /* ---------- INIT ---------- */
 renderToday();
+window.addEventListener('load',()=>{setTimeout(syncInit,600);});
 </script>
 </body>
 </html>
