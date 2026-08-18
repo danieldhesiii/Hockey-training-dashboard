@@ -529,8 +529,8 @@ const WEEK = {
         it('suitcase','3 × 20m / side','heavy','Braced & tall.'),
       ]),
     ]},
-  tue:{name:'Upper Strength + Size',load:'light',est:'60–70 min',
-    intro:'Build the upper body, get shoulder + wrist prehab in, and finish with your 10/20 interval engine — legs are fresh here, well clear of the sprint day.',
+  tue:{name:'Upper Strength + Size',load:'light',est:'65–75 min',
+    intro:'Build the upper body, hit dedicated low-back & core strength while your back is fresh (it gets hammered enough on the lower days), get shoulder + wrist prehab in, and finish with your 10/20 intervals.',
     groups:[
       G('straight','2 min',[ it('bench','4 × 5','RPE 8','Pain-free range.',{a:['4×5','4×5','4×4 heavier','3×5'],b:['5×3 fast','5×3 fast','6×2 heavier','3×4'],c:['4×6','4×8','5×6 heavier','3×8']}) ]),
       G('superset','90s',[
@@ -550,6 +550,10 @@ const WEEK = {
         it('wrist-ecc','3 × 12','light, 3–4s down','Your key wrist work.'),
         it('wrist-uln','3 × 20s hold','',''),
       ],'Wrist rehab (ECU)'),
+      G('superset','45s',[
+        it('backext','3 × 12','add load to progress','Low-back strength — done fresh, off your lower days.',{a:['3×12','3×15','4×12 +load','2×12'],b:['3×10','3×12','3×12 +load','2×10'],c:['3×15','4×15','4×12 +load','3×12']}),
+        it('deadbug','3 × 8 / side','','Anti-extension brace.'),
+      ],'Low-back & anti-extension'),
       G('straight','conditioning',[ it('tabata','8–10 rounds','10s ON / 20s off','Alactic power — hold it every round.',{a:['8 rounds','9 rounds','10 rounds','6 rounds'],b:['8 rounds','10 rounds','12 rounds','6 rounds'],c:['6 rounds','8 rounds','8 rounds','5 rounds']}) ]),
     ]},
   wed:{name:'Speed & Agility',load:'mixed',est:'45–55 min',
@@ -563,10 +567,6 @@ const WEEK = {
         it('bound','3 × 20m','',''),
       ],'Jumps & bounds'),
       G('straight','change of direction',[ it('proagility','3 each way','max','Plant low, explode out.') ]),
-      G('circuit','60s',[
-        it('abwheel','3 × 8','anti-extension strength','Brace hard — no sag. Knees → standing to progress.'),
-        it('hangingleg','3 × 10','controlled, no swing','Lower-ab strength.'),
-      ],'Ab strength'),
     ]},
   thu:{name:'Lower Strength — Hinge',load:'big',est:'60–70 min',lower:true,
     intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here.',
@@ -582,18 +582,18 @@ const WEEK = {
         it('calf','4 × 12','pause top',''),
         it('tib','3 × 15','',''),
       ],'Copenhagen · calf · tib'),
-      G('superset','45s',[
-        it('backext','3 × 12','slow, glute-driven','The low-back strength you asked for.'),
-        it('deadbug','3 × 8 / side','',''),
-      ],'Low-back & anti-extension'),
     ]},
-  fri:{name:'Light — Power Touch + Rehab',load:'light',est:'30–40 min',
-    intro:'Short & sharp. Nothing that fatigues legs or back — fresh for Saturday ice. Rotational power + all your prehab.',
+  fri:{name:'Light — Power Touch + Core + Rehab',load:'light',est:'35–45 min',
+    intro:'Short & sharp. Nothing that fatigues legs — fresh for Saturday ice. Rotational power, dedicated ab strength (fresh, off your lower days) + all your prehab.',
     groups:[
       G('superset','75s',[
         it('mbside','4 × 5 / side','explosive','Your shot power — low fatigue.'),
         it('landminerot','3 × 8 / side','controlled',''),
       ],'Rotational power'),
+      G('circuit','60s',[
+        it('abwheel','3 × 8','anti-extension strength','Brace hard — no sag. Knees → standing to progress.'),
+        it('hangingleg','3 × 10','controlled, no swing','Lower-ab strength.'),
+      ],'Ab strength'),
       G('circuit','45s',[
         it('cuff','3 × 12 / side','',''),
         it('ytw','3 × 8 each','',''),
