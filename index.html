@@ -298,9 +298,11 @@ label.fl{font-size:12px;color:var(--muted);font-weight:600}
 
     <div class="card">
       <h3><span class="bar"></span>⚙️ Data</h3>
-      <button class="btn btn-ghost btn-sm" style="margin:4px 6px 4px 0" onclick="exportData()">Export logs</button>
+      <button class="btn btn-ghost btn-sm" style="margin:4px 6px 4px 0" onclick="exportData()">⬇ Export backup</button>
+      <button class="btn btn-ghost btn-sm" style="margin:4px 6px 4px 0" onclick="document.getElementById('importFile').click()">⬆ Import backup</button>
+      <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
       <button class="btn btn-ghost btn-sm" style="margin:4px 0" onclick="resetWeek()">Reset this week's ticks</button>
-      <p class="small dim" style="margin:9px 0 0">Data is saved on this device (offline-ready). Export before switching browsers.</p>
+      <p class="small dim" style="margin:9px 0 0">✓ Everything you log is saved on this device automatically — a refresh won't lose it. To move data to another phone/browser (or keep a safety copy), Export a backup and Import it on the other device.</p>
     </div>
     <p class="small dim" style="text-align:center;margin:16px 0">Hockey Training · built for Kamil 🏒</p>
   </section>
@@ -1031,9 +1033,39 @@ function renderMore(){
 }
 function setIce(n){ST.iceDays=n;saveST();renderMore();renderToday();renderProgram()}
 function exportData(){
-  const data={state:ST,logs:getLogs(),customEx:LS.get('customEx',{})};
+  const data={v:1,exportedAt:new Date().toISOString(),state:ST,logs:getLogs(),customEx:LS.get('customEx',{}),
+    prs:allPrKeys()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hockey-training-backup.json';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='hockey-training-backup-'+todayISO()+'.json';a.click();
+}
+/* gather all PR / timeline / history keys so a backup is complete & restorable */
+function allPrKeys(){
+  const out={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);
+    if(k&&(k.indexOf('ht_pr_')===0||k.indexOf('ht_tl_')===0||k.indexOf('ht_hist_')===0||k==='ht_prcount')){
+      out[k]=localStorage.getItem(k);}}
+  return out;
+}
+function importData(input){
+  const file=input.files&&input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d||(!d.logs&&!d.state)) throw new Error('Not a valid backup file.');
+      const existing=Object.keys(getLogs()).length;
+      if(existing && !confirm('This will replace the data currently on this device with the backup. Continue?')){input.value='';return;}
+      if(d.state){ST=Object.assign({block:'a',week:1,iceDays:1},d.state);saveST();}
+      if(d.logs)setLogs(d.logs);
+      if(d.customEx)LS.set('customEx',d.customEx);
+      if(d.prs)Object.keys(d.prs).forEach(k=>{try{localStorage.setItem(k,d.prs[k])}catch(_){}});
+      input.value='';
+      alert('✓ Backup restored — '+Object.keys(d.logs||{}).length+' logged day(s).');
+      renderToday();renderProgram();renderProgress();renderMore();go('today');
+    }catch(err){alert('Couldn\'t import that file: '+err.message);input.value='';}
+  };
+  reader.readAsText(file);
 }
 function resetWeek(){
   if(!confirm('Clear this week\'s completed ticks? (Your logged numbers stay.)'))return;
