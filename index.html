@@ -462,6 +462,10 @@ const EX = {
     cue:'Light, full controlled range both directions. Balanced forearm strength around the healing tendon.'},
   'wrist-supin':{n:'Weighted Supination / Pronation',cat:'rehab',ic:'🖐️',
     cue:'Hammer or light bar, rotate palm up/down slowly. Forearm/wrist resilience for stickhandling & shooting.'},
+  'forearm-roller':{n:'Forearm Roller (roll-ups)',cat:'rehab',ic:'🧵',
+    cue:'Wind a light weight up on the roller and back down, wrists doing the work — go both directions (rolling toward you = flexion, away = extension). Brilliant forearm/wrist endurance & strength that carries to stick control and a healthy ECU. Keep it light while the tendon settles.'},
+  'wrist-holds':{n:'Wrist Iso Holds — 3 angles',cat:'rehab',ic:'🖐️',
+    cue:'Isometric holds against a light weight or band, ~20–30s at each of three positions: ulnar deviation (little-finger side), pronation (palm-down), and supination (palm-up). Position-specific tendon strength that calms the ECU. Mild discomfort ok, never sharp pain.'},
   'wallsit':{n:'Wall Sit',cat:'rehab',ic:'🧱',
     cue:'Thighs parallel, hold. The isometric knee builder you asked for — tendon-friendly, calms achy knees. Add load on the lap to progress.'},
   'spanish':{n:'Spanish Squat',cat:'rehab',ic:'🧱',
@@ -560,12 +564,11 @@ const WEEK = {
       ],'Low-back & anti-extension'),
       G('straight','conditioning',[ it('tabata','8–10 rounds','10s ON / 20s off','Alactic power — hold it every round.',{a:['8 rounds','9 rounds','10 rounds','6 rounds'],b:['8 rounds','10 rounds','12 rounds','6 rounds'],c:['6 rounds','8 rounds','8 rounds','5 rounds']}) ]),
     ]},
-  wed:{name:'Speed & Agility',load:'mixed',est:'55–70 min',
-    intro:'Field/track day — no gym needed. Sprints, parachute-resisted speed, sled, bounds & change-of-direction done fresh. Finish with portable bodyweight abs + wrist rehab. Intervals live on Tuesday, so nothing blunts these sprints.',
+  wed:{name:'Speed & Agility',load:'mixed',est:'50–65 min',
+    intro:'Field/track day — no gym needed. Sprints, parachute-resisted speed, bounds & change-of-direction done fresh, then portable bodyweight abs and forearm/wrist rehab. Intervals live on Tuesday; sled moved to Thursday.',
     groups:[
       G('straight','full recovery',[ it('sprint','6 × 20m','max accel','Walk back + rest — quality only.',{a:['6×20m','6×25m','8×20m','4×20m'],b:['8×20m','8×25m','10×20m','5×20m'],c:['5×20m','6×20m','6×20m','4×20m']}) ]),
       G('straight','full recovery',[ it('parachute','4 × 30m','near-max + release','Resisted top-speed; pop the chute mid-run to finish free (overspeed).',{a:['4×30m','5×30m','6×30m','3×30m'],b:['5×30m','6×30m','6×40m','3×30m'],c:['4×30m','4×30m','5×30m','3×30m']}) ]),
-      G('straight','full recovery',[ it('sled','4 × 15m','heavy','Drive, long strides — heavy acceleration force.',{a:['4×15m','5×15m','6×15m','3×15m'],b:['5×15m','6×15m','7×15m','3×15m'],c:['4×20m','5×20m','5×20m','3×15m']}) ]),
       G('circuit','walk-back rest',[
         it('broad','4 × 3','max distance',''),
         it('latbound','3 × 4 / side','stick landings','Skating stride — big transfer.'),
@@ -577,12 +580,12 @@ const WEEK = {
         it('legraise','3 × 12','bodyweight, controlled','Lower-ab strength — no swing, low back pinned down.'),
       ],'Ab strength (bodyweight)'),
       G('circuit','45s',[
-        it('wrist-ecc','3 × 12','light DB or band','Portable — your key ECU rehab.'),
-        it('wrist-uln','3 × 20s hold','',''),
-      ],'Wrist rehab'),
+        it('forearm-roller','2 × up & down','light','Both directions — flexion & extension.'),
+        it('wrist-holds','3 × 25s','1 per angle','Ulnar deviation · pronation · supination.'),
+      ],'Forearm & wrist rehab'),
     ]},
-  thu:{name:'Lower Strength — Hinge',load:'big',est:'60–70 min',lower:true,
-    intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here.',
+  thu:{name:'Lower Strength — Hinge',load:'big',est:'65–75 min',lower:true,
+    intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here, plus a heavy sled push for acceleration force (moved off your field day).',
     groups:[
       G('contrast','2–3 min',[
         it('iso-lunge','4 × 5s / leg','all-out','Front-leg drive.',{a:['4×5s','4×5s','5×5s','2×5s'],b:['3×5s','3×6s','4×6s','2×5s'],c:['4×6s','5×5s','5×6s','2×5s']}),
@@ -590,6 +593,7 @@ const WEEK = {
       ],'Iso lunge → bound'),
       G('straight','2 min',[ it('rdl','4 × 6','RPE 8','Hinge, long spine.',{a:['4×6','4×7','4×5 heavier','3×6'],b:['4×5 fast','5×4 fast','4×4 heavier','3×5'],c:['4×8','4×10','4×8 heavier','3×8']}) ]),
       G('straight','2 min',[ it('nordic','4 × 5','slow eccentric','Lower as slow as you can.',{a:['4×4','4×5','4×6','3×4'],b:['3×4','3×5','4×5','2×4'],c:['4×6','4×8','5×6','3×5']}) ]),
+      G('straight','2 min',[ it('sled','4 × 15m','heavy','Horizontal-force sled push/march — drive, long strides, full leg extension.',{a:['4×15m','5×15m','6×15m','3×15m'],b:['5×15m','6×15m','7×15m','3×15m'],c:['4×20m','5×20m','5×20m','3×15m']}) ]),
       G('superset','60s',[
         it('copenhagen','3 × 25s / side','','Groin insurance.'),
         it('calf','4 × 12','pause top',''),
