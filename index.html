@@ -396,6 +396,8 @@ const EX = {
     cue:'Heavy load, long powerful strides, full leg extension. Horizontal force = acceleration. Lean in, drive. On a short runway, do shorter pushes and more rounds — and drag it back for the return (see Backward Sled Drag).'},
   'sled-back':{n:'Backward Sled Drag',cat:'strength',ic:'🛷',
     cue:'Face the sled and walk backwards dragging it — the return trip on a short runway, so no wasted space. Stay low with a big knee bend and lean back slightly, smooth continuous drag. Hammers the quads & VMO — brilliant knee-health work that pairs with your wall-sit / Spanish-squat focus.'},
+  'sled-lat':{n:'Lateral Sled Drag',cat:'speed',ic:'🛷',
+    cue:'Side-on to the sled, drag it sideways driving off the outside leg with a strong lateral hip push — then come back leading the other leg so both sides get loaded. This is the closest thing to the skating stride under resistance: frontal-plane hip abduction/adduction, exactly what powers your crossovers and stride. Stay low in an athletic stance. The most skating-specific sled movement you can do.'},
   'proagility':{n:'Pro-Agility (5-10-5)',cat:'speed',ic:'↔️',
     cue:'From a middle line, sprint 5 yd one way, plant on the outside foot, sprint 10 yd back the other way, plant, then 5 yd through the middle. Low hips on the cut, aggressive re-acceleration. Do both directions. This is the decel→reaccel hockey lives on.'},
   'parachute':{n:'Parachute-Resisted Sprint',cat:'speed',ic:'🪂',
@@ -587,7 +589,7 @@ const WEEK = {
       ],'Forearm & wrist rehab'),
     ]},
   thu:{name:'Lower Strength — Hinge',load:'big',est:'65–75 min',lower:true,
-    intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here, plus a heavy sled push for acceleration force (moved off your field day).',
+    intro:'The posterior-chain big day — a different pattern to Monday so your back never repeats. Nordics, Copenhagen, calves & tib live here, plus a sled circuit — lateral drags (your most skating-specific piece) with forward push & backward drag, down-and-back on a short runway.',
     groups:[
       G('contrast','2–3 min',[
         it('iso-lunge','4 × 5s / leg','all-out','Front-leg drive.',{a:['4×5s','4×5s','5×5s','2×5s'],b:['3×5s','3×6s','4×6s','2×5s'],c:['4×6s','5×5s','5×6s','2×5s']}),
@@ -595,10 +597,11 @@ const WEEK = {
       ],'Iso lunge → bound'),
       G('straight','2 min',[ it('rdl','4 × 6','RPE 8','Hinge, long spine.',{a:['4×6','4×7','4×5 heavier','3×6'],b:['4×5 fast','5×4 fast','4×4 heavier','3×5'],c:['4×8','4×10','4×8 heavier','3×8']}) ]),
       G('straight','2 min',[ it('nordic','4 × 5','slow eccentric','Lower as slow as you can.',{a:['4×4','4×5','4×6','3×4'],b:['3×4','3×5','4×5','2×4'],c:['4×6','4×8','5×6','3×5']}) ]),
-      G('superset','90s',[
-        it('sled','5 × 10m','heavy push','Push down the runway — drive, long strides, full extension. Short space: shorter reps, more rounds.',{a:['5×10m','6×10m','6×12m','3×10m'],b:['6×10m','7×10m','8×10m','4×10m'],c:['5×12m','6×12m','6×12m','4×10m']}),
-        it('sled-back','5 × 10m','backward drag','The return trip — drag it back walking backwards, big knee bend.'),
-      ],'Sled down-and-back'),
+      G('circuit','75s',[
+        it('sled-lat','4 × 10m / side','skating-specific','Lateral drag both ways — the biggest transfer to your stride. Lead each leg.',{a:['4×10m/side','5×10m/side','6×10m/side','3×10m/side'],b:['5×10m/side','6×10m/side','6×12m/side','3×10m/side'],c:['4×12m/side','5×12m/side','5×12m/side','3×10m/side']}),
+        it('sled','3 × 10m','heavy push','Forward — acceleration force. Push down your runway.'),
+        it('sled-back','3 × 10m','backward drag','Return trip — quads & knees, big knee bend.'),
+      ],'Sled — lateral + down-and-back'),
       G('superset','60s',[
         it('copenhagen','3 × 25s / side','','Groin insurance.'),
         it('calf','4 × 12','pause top',''),
