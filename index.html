@@ -689,9 +689,19 @@ const WEEK = {
         it('sk-shoot','15 min','pick 3–5 drills','Push & shoot · inside/outside foot · backhand. Quick release, pick corners.'),
       ],'Skills — Shooting focus 🥅'),
     ]},
-  sat:{name:'On-Ice',load:'ice',est:'60–75 min',ice:true,
-    intro:'Your ice day. Skating power, skills & compete. Full-effort/full-recovery skating — quality, not just laps.',
+  sat:{name:'Gym + Ice',load:'ice',est:'35 min gym · 60–75 min ice',ice:true,
+    intro:'Morning gym (shoulder health, hip and core, ~35 min) then ice. Keep the gym session controlled — you\'re skating later. Do the gym block in the morning and ice whenever your session runs.',
     groups:[
+      G('straight','',[ it('bear-crawl','1 round','fwd/back · lateral','Shoulder + hip movement prep.') ]),
+      G('superset','60s',[
+        it('serratus','3 × 12','band or cable','Scapular stabiliser — protects the shoulder in puck battles and overhead battles.',{a:['3×12','3×12','3×12','2×10'],b:['3×12','3×12','3×12','2×10'],c:['3×15','3×15','4×12','2×10']}),
+        it('ytw','3 × 10','light plate or band','Rotator cuff + mid-trap — pre-ice shoulder health.',{a:['3×10','3×10','3×10','2×8'],b:['3×10','3×10','3×12','2×8'],c:['3×12','3×12','3×12','2×10']}),
+      ],'Shoulder health — pre-ice'),
+      G('straight','45s',[ it('face-pulls','3 × 15','cable or band','Rear delt + external rotation. Light and controlled.',{a:['3×15','3×15','4×15','2×12'],b:['3×15','3×15','4×15','2×12'],c:['3×20','4×15','4×20','2×15']}) ]),
+      G('superset','45s',[
+        it('pallof','3 × 10 / side','moderate band','Anti-rotation core — braced posture on ice.',{a:['3×10','3×10','4×10','2×8'],b:['3×10','3×10','4×10','2×8'],c:['3×12','3×12','4×12','2×10']}),
+        it('copenhagen','3 × 8 / side','adductor ISO hold','Hip adductor strength — powers crossovers, protects the groin.',{a:['3×8','3×8','4×8','2×6'],b:['3×8','3×8','4×8','2×6'],c:['3×10','3×10','4×10','2×8']}),
+      ],'Core + hip adductor'),
       G('straight','',[ it('ice-warm','8–10 min','','Edges & transitions.') ]),
       G('straight','full recovery',[ it('ice-skate','6–8 starts','max','Explosive starts & crossovers.') ]),
       G('straight','',[ it('ice-shoot','40–60 shots','quick release','Wrist / snap / one-timers.') ]),
@@ -759,18 +769,22 @@ const ICE_MAP={
   1:{days:['sat'],trim:0,desc:'Saturday ice only. Full SLP gym + sprint volume Tue–Fri.'},
   2:{days:['mon','sat'],trim:0,desc:'Mon + Sat ice — your fixed days. Full SLP gym Tue–Fri.'},
   3:{days:['mon','fri','sat'],trim:0,desc:'Mon + Fri + Sat. Friday speed session swapped for ice — skip the gym Fri if skating.'},
-  4:{days:['mon','fri','sat','sun'],trim:1,desc:'Mon + Fri + Sat + Sun. Sunday recovery becomes a lighter skate too.'},
+  4:{days:['mon','fri','sat'],trim:1,desc:'Mon + Fri + Sat — 3 skates. Tue/Thu gym volume eased slightly for density.'},
 };
 function iceInfo(){return ICE_MAP[ST.iceDays]||ICE_MAP[1]}
-function isIceDay(day){return iceInfo().days.indexOf(day)>=0}
+function isIceDay(day){
+  if(day==='mon') return true;  // always ice — heavy on-ice day regardless of setting
+  if(day==='sun') return false; // always gym/recovery — never replaced by ice
+  return iceInfo().days.indexOf(day)>=0;
+}
 
 function sessionFor(day){
   if(isIceDay(day) && day!=='sat'){
-    return {name:'On-Ice (added)',load:'ice',est:'50–70 min',ice:true,
+    return {name:'On-Ice',load:'ice',est:'50–70 min',ice:true,
       intro:'Ice session. No gym today — skating covers your speed, conditioning and skills work.',
       groups:WEEK.sat.groups};
   }
-  return WEEK[day];
+  return WEEK[day]; // sat → WEEK.sat (morning gym + ice), sun → WEEK.sun (always recovery)
 }
 function wIdx(){return (ST.week-1)}
 function isDeload(){return ST.week===4}
