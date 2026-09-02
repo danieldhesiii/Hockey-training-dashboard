@@ -642,27 +642,8 @@ const WEEK = {
         it('sk-shoot','15 min','pick 3–5 drills','Push & shoot · inside/outside foot · backhand · snapshot. Quick release, pick corners.'),
       ],'Skills — Shooting focus 🥅'),
     ]},
-  thu:{name:'Speed & Agility II',load:'mixed',est:'55–70 min',
-    intro:'SLP Blueprint — second speed day. Same structure as Tuesday but different exercises: skating-pattern jumps (skater bounds, diagonal hops), 5-10-5 and T-agility for multi-directional change-of-direction. Stickhandling skills follow.',
-    groups:[
-      G('straight','',[ it('hipflexor','2 × 10','each leg','Hip flexor drive — prime the stride.') ]),
-      G('straight','',[ it('sprint-prep','1 × 1 (full series)','','Same dynamic warm-up as Tuesday.') ]),
-      G('circuit','full recovery',[
-        it('mb-skater','2 × 5','lateral bounds','Max distance, stick the landing 1s.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
-        it('diag-hops','2 × 5','alternating','Forward-diagonal — skating angle.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
-        it('latbound','2 × 5 / side','stick landings','Skating stride — lateral reactive power.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
-      ],'Plyometrics — skating patterns'),
-      G('straight','full recovery',[ it('sprint','4 × 10 yds','max acceleration','Full rest between. Speed only.',{a:['4×1','5×1','5×1','3×1'],b:['4×1','5×1','6×1','3×1'],c:['4×1','4×1','5×1','3×1']}) ]),
-      G('straight','full recovery',[ it('proagility','6 × 1','5-10-5 both directions','Low hips on the cut, explode out.',{a:['6×1','6×1','8×1','4×1'],b:['6×1','6×1','8×1','4×1'],c:['6×1','6×1','6×1','4×1']}) ]),
-      G('straight','30s between',[ it('t-agility','6 × 1','T drill — fwd/shuffle L-R/backpedal','Both directions.',{a:['6×1','6×1','8×1','4×1'],b:['6×1','6×1','8×1','4×1'],c:['6×1','6×1','6×1','4×1']}) ]),
-      G('straight','conditioning',[ it('shuttle','10 × 1','short shuttles','Hold effort across all rounds.',{a:['10×1','10×1','12×1','6×1'],b:['10×1','12×1','12×1','6×1'],c:['8×1','10×1','10×1','6×1']}) ]),
-      G('circuit','minimal',[
-        it('hand-eye','5–10 min','before skills','Juggling · wall bounces.'),
-        it('sk-stick','15 min','pick 3–5 drills','Focus: off-hand, toe drags, behind-back, tight spaces.'),
-      ],'Skills — Stickhandling focus 🏒'),
-    ]},
-  fri:{name:'Full Body Strength + Sprint',load:'big',est:'75–90 min',lower:true,
-    intro:'SLP Blueprint — the weekly full-body strength session. Lower power, pulling strength and trunk work in one block. Repeat-sprint bike conditioning finishes it. Shooting skills follow: practising shot mechanics under accumulated fatigue builds the resilience you need late in a game.',
+  thu:{name:'Full Body Strength + Sprint',load:'big',est:'75–90 min',lower:true,
+    intro:'SLP Blueprint — the main strength session. Lands on Thursday so your legs have 2 full days before Saturday ice. Lower power, pulling and trunk work in one block, then repeat-sprint bike conditioning. Brief hand-eye to finish — hands aren\'t affected by leg work.',
     groups:[
       G('straight','',[ it('bear-crawl','1 round','fwd/back · lateral · slide-through','10 yds each direction. Movement prep.') ]),
       G('superset','90s',[
@@ -682,7 +663,25 @@ const WEEK = {
         it('side-bends','3 × 12 / side','DB or KB','Lateral trunk strength.',),
         it('backext','3 × 12','bodyweight','Low-back endurance — no hyperextension.',{a:['3×12','3×12','4×12','2×12'],b:['3×12','3×12','4×12','2×12'],c:['3×15','4×15','4×15','2×12']}),
       ],'Core & trunk'),
-      G('straight','conditioning',[ it('rsa','repeat sprint ability','5min warmup → 6×(15s hard 100% / 90s easy) → 5min cooldown','Max effort every sprint. This is your weekly anaerobic conditioning hit.',{a:['full protocol','full protocol','full protocol','warmup + 4 rounds'],b:['full protocol','full protocol','full protocol','warmup + 4 rounds'],c:['full protocol','full protocol','full protocol','warmup + 4 rounds']}) ]),
+      G('straight','conditioning',[ it('rsa','repeat sprint ability','5min warmup → 6×(15s hard 100% / 90s easy) → 5min cooldown','Max effort every sprint. Weekly anaerobic conditioning hit.',{a:['full protocol','full protocol','full protocol','warmup + 4 rounds'],b:['full protocol','full protocol','full protocol','warmup + 4 rounds'],c:['full protocol','full protocol','full protocol','warmup + 4 rounds']}) ]),
+      G('circuit','minimal',[
+        it('hand-eye','5–10 min','','Juggling · wall bounces — hands stay sharp even on a legs day.'),
+      ],'Hand-eye 🎯'),
+    ]},
+  fri:{name:'Speed & Agility II',load:'mixed',est:'55–70 min',
+    intro:'SLP Blueprint — second speed day. Skating-pattern jumps (skater bounds, diagonal hops), 5-10-5 and T-agility for multi-directional change-of-direction. If ice falls on Friday, this session can be skipped or cut to the skills block only — ice replaces the speed work.',
+    groups:[
+      G('straight','',[ it('hipflexor','2 × 10','each leg','Hip flexor drive — prime the stride.') ]),
+      G('straight','',[ it('sprint-prep','1 × 1 (full series)','','Same dynamic warm-up as Tuesday.') ]),
+      G('circuit','full recovery',[
+        it('mb-skater','2 × 5','lateral bounds','Max distance, stick the landing 1s.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
+        it('diag-hops','2 × 5','alternating','Forward-diagonal — skating angle.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
+        it('latbound','2 × 5 / side','stick landings','Skating stride — lateral reactive power.',{a:['2×5','3×5','3×5','2×4'],b:['2×5','3×5','3×5','2×4'],c:['2×5','2×5','3×5','2×4']}),
+      ],'Plyometrics — skating patterns'),
+      G('straight','full recovery',[ it('sprint','4 × 10 yds','max acceleration','Full rest between.',{a:['4×1','5×1','5×1','3×1'],b:['4×1','5×1','6×1','3×1'],c:['4×1','4×1','5×1','3×1']}) ]),
+      G('straight','full recovery',[ it('proagility','6 × 1','5-10-5 both directions','Low hips on the cut.',{a:['6×1','6×1','8×1','4×1'],b:['6×1','6×1','8×1','4×1'],c:['6×1','6×1','6×1','4×1']}) ]),
+      G('straight','30s between',[ it('t-agility','6 × 1','T drill — fwd/shuffle L-R/backpedal','Both directions.',{a:['6×1','6×1','8×1','4×1'],b:['6×1','6×1','8×1','4×1'],c:['6×1','6×1','6×1','4×1']}) ]),
+      G('straight','conditioning',[ it('shuttle','10 × 1','short shuttles','Hold effort across all rounds.',{a:['10×1','10×1','12×1','6×1'],b:['10×1','12×1','12×1','6×1'],c:['8×1','10×1','10×1','6×1']}) ]),
       G('circuit','minimal',[
         it('hand-eye','5–10 min','before skills','Juggling · wall bounces.'),
         it('sk-shoot','15 min','pick 3–5 drills','Push & shoot · inside/outside foot · backhand. Quick release, pick corners.'),
@@ -751,14 +750,14 @@ const BLOCKS=[
 ];
 const WEEK_LABELS=['Week 1 · Build','Week 2 · Build','Week 3 · Peak','Week 4 · Deload'];
 
-let ST = LS.get('state',{block:'a',week:1,iceDays:3});
+let ST = LS.get('state',{block:'a',week:1,iceDays:2});
 function saveST(){LS.set('state',ST)}
 
 const ICE_MAP={
-  1:{days:['sat'],trim:0,desc:'Saturday only. Full SLP gym + sprint volume Tue–Fri.'},
-  2:{days:['sat','sun'],trim:0,desc:'Sat + Sun ice. Sunday recovery becomes a skate.'},
-  3:{days:['mon','sat','sun'],trim:0,desc:'Mon + Sat + Sun ice — your current schedule. SLP gym Tue–Fri untouched.'},
-  4:{days:['mon','sat','sun','tue'],trim:1,desc:'4 skates. Tuesday speed day replaced by ice. Wed/Fri conditioning eased slightly.'},
+  1:{days:['sat'],trim:0,desc:'Saturday ice only. Full SLP gym + sprint volume Tue–Fri.'},
+  2:{days:['mon','sat'],trim:0,desc:'Mon + Sat ice — your fixed days. Full SLP gym Tue–Fri.'},
+  3:{days:['mon','fri','sat'],trim:0,desc:'Mon + Fri + Sat. Friday speed session swapped for ice — skip the gym Fri if skating.'},
+  4:{days:['mon','fri','sat','sun'],trim:1,desc:'Mon + Fri + Sat + Sun. Sunday recovery becomes a lighter skate too.'},
 };
 function iceInfo(){return ICE_MAP[ST.iceDays]||ICE_MAP[1]}
 function isIceDay(day){return iceInfo().days.indexOf(day)>=0}
