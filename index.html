@@ -708,33 +708,8 @@ const WEEK = {
         it('sk-shoot','15 min','pick 3–5 drills','Push & shoot · inside/outside foot · backhand. Quick release, pick corners.'),
       ],'Skills — Shooting focus 🥅'),
     ]},
-  sat:{name:'Lower Hypertrophy + Ice',load:'big',est:'60 min gym · 60–75 min ice',
-    intro:'Morning lower hypertrophy (higher reps, full range, pump the legs) then ice later. This complements Thursday\'s power work — Thu builds strength and speed, Saturday builds size and volume. Keep the gym session in the morning so your legs have a few hours before you skate.',
-    groups:[
-      G('straight','',[ it('hipflexor','2 × 10','each leg','Hip flexor activation — prime the stride before loading the legs.') ]),
-      G('straight','2 min',[
-        it('splitsquat','4 × 10 / leg','moderate-heavy DB','Full depth, pause at the bottom. Hypertrophy range — feel every rep.',{a:['4×10','4×10','4×12','2×8'],b:['4×10','4×12','4×12','2×10'],c:['4×12','4×12','5×10','2×10']}),
-      ],'Main — quads & glutes'),
-      G('superset','90s',[
-        it('rdl','3 × 12','DB or bar, single leg emphasis','Slow eccentric, feel the hamstring stretch. Not a deadlift — hinge and load.',{a:['3×12','3×12','4×10','2×10'],b:['3×10','3×12','4×10','2×10'],c:['3×12','4×12','4×12','2×10']}),
-        it('hipthrust','3 × 15','bar or DB across hips','Full hip extension, squeeze glutes at the top. 1s pause.',{a:['3×15','3×15','4×15','2×12'],b:['3×12','3×15','4×12','2×12'],c:['3×15','4×15','4×15','2×12']}),
-      ],'Posterior chain — hamstrings & glutes'),
-      G('superset','75s',[
-        it('leg-curl','3 × 12','machine or lying','2s eccentric. Full range — pause at the top.',{a:['3×12','3×12','4×12','2×10'],b:['3×12','3×15','4×12','2×10'],c:['3×15','4×12','4×15','2×10']}),
-        it('calf','4 × 20','single leg on a step','Full range — all the way down, all the way up. Slow.',{a:['4×20','4×20','5×20','2×15'],b:['4×20','4×20','5×20','2×15'],c:['4×25','5×20','5×25','2×20']}),
-      ],'Hamstrings + calves'),
-      G('superset','60s',[
-        it('pallof','3 × 10 / side','moderate band','Anti-rotation — braced posture under load.',{a:['3×10','3×10','4×10','2×8'],b:['3×10','3×10','4×10','2×8'],c:['3×12','3×12','4×12','2×10']}),
-        it('side-bends','3 × 15 / side','DB or KB','Lateral trunk — full range, controlled.',),
-      ],'Core finisher'),
-      G('straight','',[ it('ice-warm','8–10 min','','Edges & transitions.') ]),
-      G('straight','full recovery',[ it('ice-skate','6–8 starts','max','Explosive starts & crossovers.') ]),
-      G('straight','',[ it('ice-shoot','40–60 shots','quick release','Wrist / snap / one-timers.') ]),
-      G('straight','',[ it('ice-hands','10 min','head up','Tight control under pressure.') ]),
-      G('straight','',[ it('ice-game','remaining','compete','Small-area games / battles.') ]),
-    ]},
-  sun:{name:'Upper Bodybuilding',load:'big',est:'70–80 min',
-    intro:'Hypertrophy upper — chest, shoulders and arms. Higher reps, shorter rest, feel the pump. This is your size day: squeeze every rep, control the negative, leave nothing in the tank. Wrist and mobility prehab at the end — non-negotiable given your ECU history.',
+  sat:{name:'Upper Bodybuilding + Ice',load:'big',est:'70–80 min gym · 60–75 min ice',
+    intro:'Morning upper bodybuilding (chest, shoulders, arms — pump session) then ice later. Higher reps, shorter rest, feel it. Wrist rehab at the end before you skate.',
     groups:[
       G('straight','',[ it('mob-series','1 round','5 reps each exercise · upper focus','Shoulder butterflies · Y-T-A raises · T-spine rotations · band pull-aparts. Wake up the upper body.') ]),
       G('superset','75s',[
@@ -757,6 +732,31 @@ const WEEK = {
         it('wrist-ecc','3 × 12','3–4s down','ECU tendon loading — your most important wrist work.',),
         it('wrist-uln','3 × 20s','','Ulnar deviation iso hold.',),
       ],'Wrist rehab 🩹'),
+      G('straight','',[ it('ice-warm','8–10 min','','Edges & transitions.') ]),
+      G('straight','full recovery',[ it('ice-skate','6–8 starts','max','Explosive starts & crossovers.') ]),
+      G('straight','',[ it('ice-shoot','40–60 shots','quick release','Wrist / snap / one-timers.') ]),
+      G('straight','',[ it('ice-hands','10 min','head up','Tight control under pressure.') ]),
+      G('straight','',[ it('ice-game','remaining','compete','Small-area games / battles.') ]),
+    ]},
+  sun:{name:'Lower Hypertrophy',load:'big',est:'60–70 min',
+    intro:'Lower hypertrophy — higher reps, full range, pump the legs. Complements Thursday\'s power work: Thu builds strength and speed, Sunday builds size and volume. Ankle prehab at the end.',
+    groups:[
+      G('straight','',[ it('hipflexor','2 × 10','each leg','Hip flexor activation — prime the stride before loading the legs.') ]),
+      G('straight','2 min',[
+        it('splitsquat','4 × 10 / leg','moderate-heavy DB','Full depth, pause at the bottom. Hypertrophy range — feel every rep.',{a:['4×10','4×10','4×12','2×8'],b:['4×10','4×12','4×12','2×10'],c:['4×12','4×12','5×10','2×10']}),
+      ],'Main — quads & glutes'),
+      G('superset','90s',[
+        it('rdl','3 × 12','DB or bar, single leg emphasis','Slow eccentric, feel the hamstring stretch. Not a deadlift — hinge and load.',{a:['3×12','3×12','4×10','2×10'],b:['3×10','3×12','4×10','2×10'],c:['3×12','4×12','4×12','2×10']}),
+        it('hipthrust','3 × 15','bar or DB across hips','Full hip extension, squeeze glutes at the top. 1s pause.',{a:['3×15','3×15','4×15','2×12'],b:['3×12','3×15','4×12','2×12'],c:['3×15','4×15','4×15','2×12']}),
+      ],'Posterior chain — hamstrings & glutes'),
+      G('superset','75s',[
+        it('leg-curl','3 × 12','machine or lying','2s eccentric. Full range — pause at the top.',{a:['3×12','3×12','4×12','2×10'],b:['3×12','3×15','4×12','2×10'],c:['3×15','4×12','4×15','2×10']}),
+        it('calf','4 × 20','single leg on a step','Full range — all the way down, all the way up. Slow.',{a:['4×20','4×20','5×20','2×15'],b:['4×20','4×20','5×20','2×15'],c:['4×25','5×20','5×25','2×20']}),
+      ],'Hamstrings + calves'),
+      G('superset','60s',[
+        it('pallof','3 × 10 / side','moderate band','Anti-rotation — braced posture under load.',{a:['3×10','3×10','4×10','2×8'],b:['3×10','3×10','4×10','2×8'],c:['3×12','3×12','4×12','2×10']}),
+        it('side-bends','3 × 15 / side','DB or KB','Lateral trunk — full range, controlled.',),
+      ],'Core finisher'),
       G('circuit','light',[
         it('tib','3 × 15','','Shin & ankle health.',),
         it('anklemob','2 × 10 / side','','Ankle dorsiflexion.',),
@@ -822,7 +822,7 @@ function sessionFor(day){
   if(isIceDay(day) && day!=='sat'){
     return {name:'On-Ice',load:'ice',est:'50–70 min',ice:true,
       intro:'Ice session. No gym today — skating covers your speed, conditioning and skills work.',
-      groups:WEEK.sat.groups.slice(5)}; // ice groups only (skip the morning gym block)
+      groups:WEEK.sat.groups.slice(6)}; // ice groups only (skip the morning gym block)
   }
   return WEEK[day]; // sat → WEEK.sat (gym + ice), sun → WEEK.sun (always bodybuilding)
 }
