@@ -576,23 +576,25 @@ function it(ex,scheme,load,note,wave){return {ex,scheme,load:load||'',note:note|
 function G(kind,rest,items,tag){return {kind,rest,items,tag:tag||''}}
 
 const WEEK = {
-  mon:{name:'Lower Power',load:'big',est:'60–70 min',lower:true,
-    intro:'Heavy intent + jumps. The big lower driver of the week — only shown if ice is not scheduled on Monday. With your current 3-ice schedule (Mon/Sat/Sun), this day is normally on-ice.',
+  mon:{name:'Upper Pull + Shoulder',load:'big',est:'55–65 min',
+    intro:'Pull-focused upper session — only shown if Monday ice is cancelled. Distinct from Wednesday (which is push-dominant). Heavy rows, chin-ups, shoulder health and rotational power. Nothing lower-body so legs stay fresh for the ice that usually runs Monday.',
     groups:[
-      G('contrast','2–3 min',[
-        it('iso-squat','4 × 5s max push','all-out intent','Full recovery, 100% each rep.',{a:['4×5s','4×5s','5×5s','2×5s'],b:['3×5s','3×6s','4×6s','2×5s'],c:['4×6s','5×5s','5×6s','2×5s']}),
-        it('maxjump','3 max reps','BW → light vest','Jump right after the iso — the potentiation.',{a:['BW ×3','vest ×3','vest ×3','BW ×2'],b:['×4','vest ×4','vest ×5','×3'],c:['×3','×3','×4','×2']}),
-      ],'Iso → Jump'),
-      G('straight','2 min',[ it('trapbar','4 × 4','move it FAST','Power pull — bar speed is the point.',{a:['4×4 @78%','4×4 @82%','5×3 @85%','3×3 @70%'],b:['5×3 @72% fast','6×2 @75% fast','6×2 @80% fast','3×3 @65%'],c:['4×5 @78%','5×4 @82%','4×3 @88%','3×4 @70%']}) ]),
-      G('contrast','2 min',[
-        it('splitsquat','3 × 5 / leg','heavy','Your carrying split squat.',{a:['3×5','3×6','4×5','2×5'],b:['3×4','3×5','3×5','2×4'],c:['3×8','4×8','4×10','2×8']}),
-        it('splitjump','3 / leg','bodyweight','Explosive, soft landings.'),
-      ],'Split squat → jump'),
-      G('straight','75s',[ it('mbslam','4 × 5','explosive','Whole-body power.') ]),
+      G('straight','',[ it('bear-crawl','1 round','fwd/back · lateral · slide-through','10 yds each direction. Shoulder + core movement prep.') ]),
+      G('superset','2 min',[
+        it('pullup','4 × 5','explosive pull, control down','Bar speed up — this is power, not grinding.',{a:['4×5','4×5','4×5 +load','2×5'],b:['3×5 +load','4×5 +load','4×5 +load','2×4'],c:['4×6','5×5','5×5','2×5']}),
+        it('mb-toss','3 × 4','side slam → chest toss','Rotational + horizontal power.',),
+      ],'Pull power'),
+      G('straight','90s',[ it('row','3 × 8 / side','heavy DB or cable','Elbow high, full scapular retraction.',{a:['3×8','3×8','4×8','2×8'],b:['3×6','3×8','4×6','2×6'],c:['3×10','4×10','4×10','2×8']}) ]),
       G('superset','60s',[
-        it('pallof','3 × 10 / side','',''),
-        it('suitcase','3 × 20m / side','heavy','Braced & tall.'),
-      ]),
+        it('ytw','3 × 12','light plate or band','Y = raise arms overhead; T = spread wide; W = pull elbows in.',{a:['3×12','3×12','3×12','2×10'],b:['3×12','3×12','3×12','2×10'],c:['3×12','3×15','3×15','2×10']}),
+        it('face-pulls','3 × 15','cable or band','External rotation, squeeze at the back.',),
+      ],'Shoulder health'),
+      G('straight','60s',[ it('landminerot','3 × 8 / side','hips still, rotate through the thoracic','Rotational strength — carries over to shot power.',{a:['3×8','3×8','4×8','2×8'],b:['3×8','3×8','4×8','2×6'],c:['3×10','3×10','4×10','2×8']}) ]),
+      G('straight','60s',[ it('farmer','3 × 20m','heavy DBs','Packed shoulders, tall posture, grip it hard.',{a:['3×20m','3×20m','4×20m','2×20m'],b:['3×20m','3×20m','4×20m','2×20m'],c:['3×25m','4×20m','4×25m','2×20m']}) ]),
+      G('circuit','minimal',[
+        it('hand-eye','5–10 min','','Juggling · wall bounces — warm your hands up before ice.'),
+        it('sk-stick','10 min','light & loose','Quick, easy stickhandling — activation only, nothing taxing.'),
+      ],'Skills — light pre-ice activation 🏒'),
     ]},
   tue:{name:'Speed & Agility I',load:'mixed',est:'55–70 min',
     intro:'SLP Blueprint — speed day. Jumps and sprint work done completely fresh. Stickhandling skills follow while your CNS is still firing; hands are loose after sprinting. Field/track or any open space.',
